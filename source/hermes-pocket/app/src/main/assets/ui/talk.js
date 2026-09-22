@@ -185,12 +185,37 @@
       el.appendChild(hist);
       this.paintHistory(hist);
 
-      el.appendChild(this.title('频道'));
+      el.appendChild(this.title('群聊（频道）'));
       const stream = document.createElement('div');
-      stream.className = 'tk-stream';
+      stream.className = 'tk-chat';
       stream.id = 'tk-stream';
       el.appendChild(stream);
       this.paintStream();
+
+      /* 群聊输入框：在群里说话就是广播；要私信某人就点他气泡上的名字 */
+      const gline = document.createElement('div');
+      gline.className = 'tk-askline';
+      const gin = document.createElement('input');
+      gin.className = 'tk-askin';
+      gin.id = 'tk-shoutin';
+      gin.setAttribute('data-testid', 'talk-shoutin');
+      gin.placeholder = '在群里说一句（= 广播给全体）';
+      const gok = document.createElement('button');
+      gok.className = 'tk-act';
+      gok.id = 'tk-shoutok';
+      gok.setAttribute('data-testid', 'talk-shoutok');
+      gok.textContent = '广播';
+      const gfire = async () => {
+        const text = (gin.value || '').trim();
+        if (!text) { HP.App.toast('先说点什么'); return; }
+        gin.value = '';
+        await this.send('全体', 'broadcast', text);
+      };
+      gok.addEventListener('click', gfire);
+      gin.addEventListener('keydown', (e) => { if (e.key === 'Enter') gfire(); });
+      gline.appendChild(gin);
+      gline.appendChild(gok);
+      el.appendChild(gline);
     },
 
     /* 一个角色 = 一行等高卡片（名称 / 副行 / 能接入的标签） */
@@ -265,10 +290,24 @@
       const rows = this.msgs.filter((m) => this.withPrivate || m.kind !== 'private').slice(-80);
       if (!rows.length) { s.textContent = '（还没有消息）'; return; }
       rows.forEach((m) => {
+        const me = m.from === 'owner.me';
         const d = document.createElement('div');
-        d.className = 'tk-msg';
-        d.innerHTML = '<b>' + (KIND[m.kind] || '·') + '</b> ' + esc(m.from) + ' → ' + esc(m.to || '全体') +
-          ' <span class="tk-dim">' + esc((m.topic || '')) + '</span><br>' + esc((m.body || '').split('\n')[0]);
+        d.className = 'tk-bub ' + (me ? 'me' : 'him');
+        const who = document.createElement('div');
+        who.className = 'tk-bubwho';
+        const name = document.createElement('span');
+        name.className = 'tk-bubname';
+        name.textContent = (KIND[m.kind] || '') + ' ' + m.from;
+        if (!me) name.addEventListener('click', () => this.openRoleSheet(m.from));
+        who.appendChild(name);
+        const sp = document.createElement('span');
+        sp.className = 'tk-dim';
+        sp.textContent = m.topic ? ('　' + m.topic) : '';
+        who.appendChild(sp);
+        const txt = document.createElement('div');
+        txt.textContent = (m.body || '').split('\n')[0];
+        d.appendChild(who);
+        d.appendChild(txt);
         s.appendChild(d);
       });
     },
@@ -422,52 +461,89 @@
 
     async paintRole(el) {
       const r = this.sel || {};
+      this.style = this.style || 'chat';
+
+      const bar = document.createElement('div');
+      bar.className = 'tk-row';
       const back = document.createElement('button');
       back.className = 'tk-chip';
       back.setAttribute('data-testid', 'talk-back');
       back.textContent = '← 频道';
       back.addEventListener('click', () => { this.view = 'channel'; this.sel = null; this.render(); });
-      el.appendChild(back);
+      bar.appendChild(back);
+      bar.appendChild(this.toggle('聊天', this.style === 'chat', () => { this.style = 'chat'; this.render(); }));
+      bar.appendChild(this.toggle('终端', this.style === 'term', () => { this.style = 'term'; this.render(); }));
+      el.appendChild(bar);
 
       const head = document.createElement('div');
       head.className = 'tk-title';
-      head.textContent = (r.title || r.name) + '　' + (r.state === 'paused' ? '被停' : (r.online ? '在线' : '不在线')) + (r.pending ? ' · 欠 ' + r.pending : '');
+      head.textContent = (r.title || r.name) + '\u3000' + (r.state === 'paused' ? '被停' : (r.online ? '在线' : '不在线')) +
+        (r.pending ? ' · 欠 ' + r.pending : '');
       el.appendChild(head);
 
-      const out = document.createElement('pre');
-      out.className = 'tk-term';
-      out.id = 'tk-term';
-      /* 缓存命中就先铺上（切回来秒显，像另一个窗口一直都开着），再后台刷新 */
-      out.textContent = this.cache[r.full_name] || '（正在读他的会话…）';
-      el.appendChild(out);
-      rpc('talk.capture', { role: r.full_name, lines: 200 }).then((c) => {
-        const raw = (c && c.raw) || '（没内容）';
-        this.cache[r.full_name] = raw;
-        const box = document.getElementById('tk-term');
-        if (box && this.sel && this.sel.full_name === r.full_name) box.textContent = raw;
-      }).catch((e) => {
-        if (!this.cache[r.full_name]) out.textContent = '读不到：' + e.message;
-      });
+      if (this.style === 'chat') {
+        const box = document.createElement('div');
+        box.className = 'tk-chat';
+        box.id = 'tk-chat';
+        el.appendChild(box);
+        this.paintChat(r);
+      } else {
+        const out = document.createElement('pre');
+        out.className = 'tk-term';
+        out.id = 'tk-term';
+        out.textContent = this.cache[r.full_name] || '（正在读他的会话…）';
+        el.appendChild(out);
+        rpc('talk.capture', { role: r.full_name, lines: 200 }).then((c) => {
+          const raw = (c && c.raw) || '（没内容）';
+          this.cache[r.full_name] = raw;
+          const box = document.getElementById('tk-term');
+          if (box && this.sel && this.sel.full_name === r.full_name) box.textContent = raw;
+        }).catch((e) => { if (!this.cache[r.full_name]) out.textContent = '读不到：' + e.message; });
+      }
 
-      const inbox = document.createElement('button');
-      inbox.className = 'tk-act';
-      inbox.setAttribute('data-testid', 'talk-inbox');
-      inbox.textContent = '看他要回什么';
-      inbox.addEventListener('click', async () => {
-        try {
-          const ib = await rpc('talk.inbox', { role: r.full_name });
-          const raw = (ib && ib.raw) || '';
-          HP.App.toast(raw ? raw.split('\n').slice(0, 3).join(' / ') : '（他不欠你回复）', 5000);
-        } catch (e) { HP.App.toast('读不到：' + e.message); }
-      });
-      el.appendChild(inbox);
+      /* 输入行：聊天和终端两种形式都在，敲一句按发送 */
+      const line = document.createElement('div');
+      line.className = 'tk-askline';
+      const inp = document.createElement('input');
+      inp.className = 'tk-askin';
+      inp.id = 'tk-sayin';
+      inp.setAttribute('data-testid', 'talk-sayin');
+      inp.placeholder = this.style === 'chat' ? '说点什么…' : '说点什么（会送进他的会话）…';
+      const ok = document.createElement('button');
+      ok.className = 'tk-act';
+      ok.id = 'tk-sayok';
+      ok.setAttribute('data-testid', 'talk-sayok');
+      ok.textContent = '发送';
+      const fire = async () => {
+        const text = (inp.value || '').trim();
+        if (!text) { HP.App.toast('先说点什么'); return; }
+        inp.value = '';
+        await this.send(r.full_name, 'private', text);
+      };
+      ok.addEventListener('click', fire);
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') fire(); });
+      line.appendChild(inp);
+      line.appendChild(ok);
+      el.appendChild(line);
+    },
 
-      const say = document.createElement('button');
-      say.className = 'tk-act';
-      say.setAttribute('data-testid', 'talk-say');
-      say.textContent = '跟他说一句';
-      say.addEventListener('click', () => this.ask(r.full_name, 'private'));
-      el.appendChild(say);
+    async paintChat(r) {
+      const box = document.getElementById('tk-chat');
+      if (!box) return;
+      box.textContent = '（正在读聊天…）';
+      try {
+        const th = await rpc('talk.thread', { role: r.full_name, limit: 100 });
+        const items = (th && th.items) || [];
+        box.textContent = '';
+        if (!items.length) { box.textContent = '（还没聊过）'; return; }
+        items.forEach((m) => {
+          const b = document.createElement('div');
+          b.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
+          b.textContent = m.body;
+          box.appendChild(b);
+        });
+        box.scrollTop = box.scrollHeight;
+      } catch (e) { box.textContent = '读不到聊天：' + e.message; }
     },
 
     /* 输入：只让他敲"要说的话"，别的都不用选 */

@@ -56,3 +56,7 @@
 .tk-sheetrow { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid #1e232d; font-size: 13px; }
 .tk-sheetrow .tk-k { color: #8b93a5; flex: 0 0 68px; }
 .tk-sheetrow .tk-v { color: #e6e8ee; flex: 1 1 auto; word-break: break-all; }
+
+.tk-bubwho { font-size: 12px; opacity: .85; margin-bottom: 3px; }
+.tk-bubname { text-decoration: underline dotted; }
+.tk-bub .tk-dim { color: inherit; opacity: .7; }
