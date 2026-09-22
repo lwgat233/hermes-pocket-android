@@ -152,6 +152,24 @@
       return out;
     },
 
+    /* 每次进频道页核对一次：库 / tmux / 中转站 + 每个角色是否真有会话 */
+    async paintDoctor(line, btn) {
+      try {
+        const d = await rpc('talk.doctor', {});
+        const miss = d.missing || [];
+        if (!d.db || (d.roles_total || 0) === 0) {
+          line.textContent = '服务端：还没搭建 —— 点右边「搭服务端」';
+        } else {
+          line.textContent = '服务端：' + (d.roles_total || 0) + ' 个角色 · ' +
+            (miss.length ? ('缺 ' + miss.length + ' 个会话') : '会话齐') +
+            ' · 中转站' + (d.relay === 'active' ? '在跑' : '没跑');
+        }
+        if (btn) btn.style.display = (miss.length || !d.db || (d.roles_total || 0) === 0) ? '' : 'none';
+      } catch (e) {
+        line.textContent = '服务端：连不上（' + e.message + '）';
+      }
+    },
+
     async refreshAsks() {
       try { const r = await rpcCache('talk.asks', {}, 'asks'); this.asks = (r && r.asks) || []; }
       catch (e) { this.asks = []; }
@@ -189,6 +207,31 @@
       head.appendChild(this.toggle('实时', this.live, (v) => { this.live = v; v ? this.startPoll() : this.stopPoll(); this.render(); }));
       head.appendChild(this.toggle('含私信 🔒', this.withPrivate, (v) => { this.withPrivate = v; this.paintStream(); }));
       el.appendChild(head);
+
+      /* 服务端状态（每次进频道页核对）：几个角色、缺几个会话、中转站在跑吗 */
+      const sl = document.createElement('div');
+      sl.className = 'tk-title';
+      sl.id = 'tk-serverline';
+      sl.textContent = '服务端：核对中…';
+      el.appendChild(sl);
+      const sb = document.createElement('button');
+      sb.className = 'tk-chip';
+      sb.id = 'tk-setupbtn';
+      sb.setAttribute('data-testid', 'talk-setupbtn');
+      sb.textContent = '搭服务端';
+      sb.style.display = 'none';
+      sb.addEventListener('click', async () => {
+        sb.textContent = '正在搭…';
+        try {
+          const r = await rpc('talk.setup', {});
+          const d = (r && r.doctor) || {};
+          HP.App.toast('服务端已就绪：' + (d.roles_total || 0) + ' 个角色' +
+            ((d.missing || []).length ? ('，还缺 ' + (d.missing || []).length + ' 个会话') : ''));
+          this.render();
+        } catch (e) { HP.App.toast('搭失败：' + e.message, 5000); }
+      });
+      el.appendChild(sb);
+      this.paintDoctor(sl, sb);
 
       /* 等你授权：谁在等你答、等什么 —— 答完自动消失（放最上面，怕你漏看） */
       if (this.asks.length) {
