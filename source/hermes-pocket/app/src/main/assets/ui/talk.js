@@ -378,18 +378,32 @@
         save.addEventListener('click', () => this.saveRole());
         acts.appendChild(save);
       } else {
-        const inbox = document.createElement('button');
-        inbox.className = 'tk-act';
-        inbox.setAttribute('data-testid', 'talk-sheet-inbox');
-        inbox.textContent = '看他要回什么';
-        inbox.addEventListener('click', async () => {
+        const paused = r.state === 'paused';
+        const pa = document.createElement('button');
+        pa.className = 'tk-act';
+        pa.setAttribute('data-testid', 'talk-sheet-pause');
+        pa.textContent = paused ? '恢复他' : '暂停他';
+        pa.addEventListener('click', async () => {
           try {
-            const ib = await rpc('talk.inbox', { role: r.full_name });
-            const raw = (ib && ib.raw) || '';
-            HP.App.toast(raw ? raw.split('\n').slice(0, 3).join(' / ') : '（他不欠你回复）', 5000);
-          } catch (e) { HP.App.toast('读不到：' + e.message); }
+            await rpc(paused ? 'talk.start' : 'talk.pause', { role: r.full_name });
+            HP.App.toast(paused ? ('已恢复 ' + r.full_name) : ('已暂停 ' + r.full_name));
+            this.closeSheet(); this.render();
+          } catch (e) { HP.App.toast('改不了状态：' + e.message, 5000); }
         });
-        acts.appendChild(inbox);
+        acts.appendChild(pa);
+        const del = document.createElement('button');
+        del.className = 'tk-act';
+        del.setAttribute('data-testid', 'talk-sheet-del');
+        del.textContent = '删除他';
+        del.addEventListener('click', async () => {
+          if (!window.confirm('删掉 ' + r.full_name + '？他的权限和接入也一起清掉')) return;
+          try {
+            await rpc('talk.role-del', { role: r.full_name, force: true });
+            HP.App.toast('已删 ' + r.full_name);
+            this.closeSheet(); this.render();
+          } catch (e) { HP.App.toast('删不了：' + e.message, 5000); }
+        });
+        acts.appendChild(del);
       }
       card.appendChild(acts);
       ov.appendChild(card);

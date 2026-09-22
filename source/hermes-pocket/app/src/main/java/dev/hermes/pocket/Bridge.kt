@@ -712,6 +712,13 @@ print('@@OK', '1')
             "talk.spawn" -> if (hasId) ok(id, talkJson(listOf("spawn", "--role", talkRole(m.optString("role")))))
             "talk.solo" -> if (hasId) ok(id, talkJson(listOf("solo") +
                     (if (m.optString("name", "").isBlank()) emptyList() else listOf("--name", talkText(m.optString("name"))))))
+            "talk.pause" -> if (hasId) ok(id, talkJson(listOf("pause", "--role", talkText(m.optString("role", "")), "--by", "owner.me")))
+            "talk.start" -> if (hasId) ok(id, talkJson(listOf("start", "--role", talkText(m.optString("role", "")), "--by", "owner.me")))
+            "talk.role-del" -> if (hasId) {
+                val a = mutableListOf("role-del", "--full", talkText(m.optString("role", "")), "--by", "owner.me")
+                if (m.optBoolean("force", false)) a.add("--force")
+                ok(id, talkJson(a))
+            }
             "talk.role-edit" -> if (hasId) ok(id, talkJson(listOf("role-edit",
                     "--full", talkText(m.optString("role", "")),
                     "--title", talkText(m.optString("title", "")),
