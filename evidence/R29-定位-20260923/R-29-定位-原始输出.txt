@@ -1,0 +1,93 @@
+### R-29「群聊不自动到最下面」定位原始输出 —— 2026-09-23 · 角色 pipeline.author（只定位，未改代码）
+# 被测源：source/hermes-pocket/app/src/main/assets/ui/talk.js（sha256 4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a）
+
+=== ① 哪条路径漏了钉底（读到的文件与行）===
+talk.js:128   onShow(tab) { … this.render(); this.startPoll(); }          ← 切栏目的入口（app.js:1363 调它）
+talk.js:200-205 render() → group ? paintGroup(el) : …                     ← 群聊走 paintGroup
+talk.js:367-377 paintGroup：建 #tk-stream（className tk-chat、maxHeight 54vh、overflowY auto），末尾 this.paintStream()
+talk.js:510-530 paintStream()：s.textContent = '' 整块重建后逐条 append，**全文没有任何 scrollTop 赋值**
+talk.js:190-196 tick()（2.5s 轮询，talk.js:133-136）：收到新消息 → if (view==='channel' && live) this.paintStream()  ← 新消息到达就走这条路，同样不钉底
+talk.js:884    box.scrollTop = box.scrollHeight;   ← **全文唯一一处钉底**，只服务单聊的 #tk-chat（talk.js:771 建、861 paintChat）
+结论：钉底只做在单聊一条路上（talk.js:884）。群聊的容器 #tk-stream 既没有「新消息到达」时的钉底（tick→paintStream，talk.js:195），
+      也没有「切栏目进来」时的钉底（onShow→render→paintGroup→paintStream，talk.js:128/205/377）；
+      并且没有任何「当前是否在底部 / 用户是否手动上翻」的状态（全文 grep scrollTop/atBottom/nearBottom/addEventListener('scroll') 只命中 884 一处）。
+
+=== ② 本地测试台实测（跑真 paintGroup / 真 paintStream / 真 paintChat，读真 DOM；探针 source/hermes-pocket/tools/ui-harness/d-r29-scroll.mjs）===
+命令：cd source/hermes-pocket/tools/ui-harness && node harness.mjs d-r29-scroll.mjs
+{
+  "name": "R-29 定位：群聊栏目渲染后的滚动位置（真 paintGroup / 真 paintStream / 真 paintChat）",
+  "result": {
+    "check": {
+      "进群聊": {
+        "容器在": true,
+        "scrollTop": 0,
+        "scrollHeight": 3880,
+        "可视高度": 494,
+        "离底部还差": 3386,
+        "头顶那条是不是最老的": "·  owner.me第 1 条：内容内容内容内"
+      },
+      "新消息到达后重画": {
+        "scrollTop": 0,
+        "scrollHeight": 3956,
+        "可视高度": 494,
+        "离底部还差": 3462,
+        "最后一条在不在可视区": false
+      },
+      "手动上翻后": {
+        "上翻时的位置": 1731,
+        "重画后位置": 1731,
+        "位置被改动": false,
+        "离底部还差": 1807
+      },
+      "钉底相关": {
+        "源码里_scrollTop赋值处": 0,
+        "页面上有回到底部的入口": false,
+        "有滚动监听": false
+      },
+      "单聊对照": {
+        "scrollTop": 2980,
+        "scrollHeight": 3180,
+        "可视高度": 200,
+        "离底部还差": 0,
+        "最后一条在可视区": true
+      }
+    }
+  }
+}
+读法：
+· 进群聊（切栏目那条路）：scrollTop=0、scrollHeight=3880、可视 494 → 离底部还差 3386px，头顶第一条是最老的第 1 条 ⇒ 看到的是**最老的消息**，不在最下面。
+· 新消息到达后重画（tick 那条路）：scrollTop 仍 0、离底部 3462px、最后一条不在可视区 ⇒ 不自动到底。
+· 手动上翻到中间（1731）后再来一条重画：位置没有被动（1731 → 1731）⇒ 现在「上翻不被抢回」是**因为没有钉底**，实现时必须保住这条。
+· paintStream 函数体里 scrollTop 赋值处 = 0、页面上没有回到底部的入口、没有滚动监听 ⇒ 群聊这条路完全没有钉底/回底逻辑。
+· 单聊对照：离底部 0、最后一条在可视区 ⇒ 单聊是钉底的（talk.js:884）。
+
+=== ③ 判据清单（真点怎么算过；本轮不接主机，真点由 tester 做，未验 ≠ 通过）===
+① 切到群聊栏目后 300ms 内：#tk-stream 满足 scrollHeight - clientHeight - scrollTop <= 2（在底部）；
+② 服务端再发一条（广播/定向）后 300ms 内：①仍成立，且最后一条气泡在可视区内；
+③ 手动上翻（真触摸上滑）后：再来 1 条消息，scrollTop 与上翻时相同（±2px）—— 位置不被抢回；同时出现「⇣ 回到底部（新 N 条）」入口；
+④ 点该入口后 300ms 内：到底（差 <= 2），入口消失、计数清零；
+⑤ 群聊页与单聊页（点角色进入聊天）两条路都成立；单聊仍钉底（不因这次改动退化）；
+⑥ 消息不足一屏（3 条）时滚不动也不报错：Runtime.exceptionThrown = 0、console.error = 0；
+⑦ 频道页（talk 栏目，没有 #tk-stream）行为不变。
+
+=== ④ 实现建议（只写方案，本轮不动代码）===
+1) 钉底收成一个入口：talk.js 加 pinBottom(box, {force})——先判「重画前是不是在底部」（scrollHeight - scrollTop - clientHeight <= 24），
+   只有在底部（或 force = 切栏目/首次渲染）才 box.scrollTop = box.scrollHeight；并把「用户在不在底部」记在容器上（一次 scroll 监听，挂 box._pinned）。
+2) 三个调用点接同一入口：paintStream()（新消息到达，talk.js:195 那条）、paintGroup()（切栏目进群聊，talk.js:377）、paintChannel()（频道页重建）；
+   单聊 talk.js:884 也改成走它（语义不变，另外获得「上翻不抢回」）。
+3) 不整块重建：paintStream 现在每次 s.textContent = '' 重建最多 80 条（talk.js:513），改成按 m.id 只追加新行 + 上限裁旧，
+   这样上翻时 DOM 不重排、位置天然稳，长列表也不卡。
+4) 不抢回 + 有回程：上翻后挂一个「⇣ 回到底部（新 N 条）」入口（与终端那条同形），点它滚到底并清计数；常驻按键 ≤3 不受影响。
+5) 打包配方（归 renderer，模型不变）：bash tools/build.sh --name "R29-群聊钉底" --feature "群聊/单聊钉底统一入口，上翻不被抢回" --feature-id "R-29"
+   （tools/build.sh + source/hermes-pocket/tools/stamp-build.py：盖章→核对→gradle→包内对账→归档 apk/测试版/；复核 python3 source/hermes-pocket/tools/stamp-build.py --verify <apk>）
+   本轮无新增依赖、无原生改动，纯 assets/ui/talk.js。
+
+=== ⑤ 顺带发现的相邻缺陷（不在本轮范围，未改）===
+talk.js 里 this.pullRoleOutput(...) 有 4 处调用（talk.js:135、850、851、885）、**文件内 0 处定义**：
+  定义在提交 f8f031d（1:1 整段重写）里被删掉，ee40d76「恢复 paintChat」把调用恢复了、函数没恢复。
+  后果：单聊页每 2.5s 一条 unhandled rejection（startPoll 那条，talk.js:135），且「他直接在会话里回话」不会再被自动捞成气泡（talk.js:850/851 的两次延时拉取全抛）。
+  建议单列一条需求给 author 处理，别并进 R-29。
+
+=== ⑥ 边界 ===
+· 本证据出自本地测试台（Chromium + 假原生桥，喂的是真消息形状、调的是真渲染函数、读的是真 DOM 尺寸）；**设备上的真触摸读数由 tester 在本轮第 3 步做**。
+· 真机上字体/密度不同，像素数会变；判据用的是「离底部 <= 2px」这种与尺寸无关的写法。

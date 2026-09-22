@@ -3,10 +3,10 @@
   "appName": "Hermes Pocket",
   "packageId": "dev.hermes.pocket",
   "entry": "dev.hermes.pocket.MainActivity",
-  "testVersion": "unified-20260923-004612",
+  "testVersion": "unified-20260923-012200",
   "feature": "版本串与打包时间每包自动写入（出包时刻盖章）",
   "featureId": "F1",
   "acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动",
-  "builtAt": "2026-09-23 00:46 CST",
+  "builtAt": "2026-09-23 01:22 CST",
   "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build.py 在出包时自动写，不再手写"
 }

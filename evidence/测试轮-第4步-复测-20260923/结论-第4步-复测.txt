@@ -1,0 +1,30 @@
+# 第 4 步「复测」结论（pipeline.tester · 2026-09-23 07:35 CST）
+
+对象：apk/测试版/hermes-pocket-渲染出包-复测对象-20260923.apk（5062486 字节 · 渲染者出包 01:22）
+设备：无头模拟器 emulator-5554 / Android 14 / AVD hpk34（容器 hp-emu）· adb install -r Success
+
+## 包级对账（先对包，再装）
+- 整包 sha256 实测 = ba5231f7acacb77559dd5adc9355b14ecadb71465aa3983c6f0bde7e6bd77e49 = 派活单给的值 ✓
+- source/hermes-pocket/tools/stamp-build.py --verify = **PASS 包内 ↔ 源树 对账** ✓
+- 包内 assets/build-info.json：testVersion `unified-20260923-012200` · builtAt `2026-09-23 01:22 CST` · featureId `F1`
+- 包内 assets/ui/talk.js sha256 = 4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a = 派活单给的值 ✓
+  （说明界面逻辑与第 1 步那版一致，没被这轮「版本串」改动碰过）
+
+## 三处读数（都在设备页面里读回，不是看截图猜）
+1. 页面 `HP.BUILD` = `unified-20260923-012200`
+2. 设置页「构建版本」那一行 = 「构建版本：**unified-20260923-012200** · 版本串与打包时间每包自动写入（出包时刻盖章）（F1）· 打包 **2026-09-23 01:22 CST**」
+3. 终端横幅 = 「Hermes Pocket  移动端 SSH + Hermes TUI 渲染层  **unified-20260923-012200**」
+   —— 48 列会折行：row0 末尾是 `u`、row1 是 `nified-20260923-012200`，拼起来才是完整串（判据要按拼回来的读）
+
+**判据结论：三处与包内 build-info.json 完全一致 = PASS。** F1 修好了 —— 第 1 步报的陈旧串（unified-20260921c / builtAt 2026-09-22 00:35）在设备上已不复现。
+
+截图：截图-设置页构建版本-20260923.png · 截图-终端横幅-20260923.png
+原始读数：设备读数-原始输出.txt（驱动 JSON 原样）· 包级对账.txt
+
+## 未验（沿用本人定的口径：未验 ≠ 通过）
+第 1 步那 5 条 —— 点角色→信息窗 / 气泡 / 删会话 / 切会话 / 开左栏收起会话键 —— 本轮仍是**未验**：
+都要 app 先 SSH 连上 NAS 才有可点对象，本人已定「不接主机、不动 NAS 的 authorized_keys」。
+（第 1 步已验的 4 条在本轮不重复：装的是这一版、装包启动无异常、频道页降级如实、左栏能开能关。）
+
+## 环境
+模拟器容器 hp-emu 用完即删（释放约 2.8 G）；宿主 available 回到 4 G 上下。
