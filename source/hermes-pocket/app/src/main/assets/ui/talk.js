@@ -664,9 +664,11 @@
       this.render();
     },
 
+    /* 跟某个角色单独说（= 一个"窗口"：草稿/记录都留在这个会话里） */
     async paintRole(el) {
       const r = this.sel || {};
       this.style = this.style || 'chat';
+      const full = r.full_name || '';
 
       const bar = document.createElement('div');
       bar.className = 'tk-row';
@@ -692,7 +694,7 @@
         box.id = 'tk-chat';
         box.style.display = 'flex';
         box.style.flexDirection = 'column';
-        box.style.maxHeight = '54vh';
+        box.style.maxHeight = '48vh';
         box.style.overflowY = 'auto';
         el.appendChild(box);
         this.paintChat(r);
@@ -700,54 +702,74 @@
         const out = document.createElement('pre');
         out.className = 'tk-term';
         out.id = 'tk-term';
-        out.textContent = this.cache[r.full_name] || '（正在读他的会话…）';
+        out.textContent = this.cache[full] || '（正在读他的会话…）';
         el.appendChild(out);
-        rpc('talk.capture', { role: r.full_name, lines: 200 }).then((c) => {
+        rpc('talk.capture', { role: full, lines: 200 }).then((c) => {
           const raw = (c && c.raw) || '（没内容）';
-          this.cache[r.full_name] = raw;
-          const box = document.getElementById('tk-term');
-          if (box && this.sel && this.sel.full_name === r.full_name) box.textContent = raw;
-        }).catch((e) => { if (!this.cache[r.full_name]) out.textContent = '读不到：' + e.message; });
+          this.cache[full] = raw;
+          const b = document.getElementById('tk-term');
+          if (b && this.sel && this.sel.full_name === full) b.textContent = raw;
+        }).catch((e) => { if (!this.cache[full]) out.textContent = '读不到：' + e.message; });
       }
 
-      /* 输入行：聊天和终端两种形式都在，敲一句按发送 */
-      const line = document.createElement('div');
-      line.className = 'tk-askline';
+      /* 选择：这条谁能看见 + 以什么身份说（各一个键，标签写清；不做第二个选择器） */
+      const chips = document.createElement('div');
+      chips.className = 'tk-row';
+      chips.id = 'tk-saychips';
+      chips.style.padding = '4px 0';
       const kc = document.createElement('button');
       kc.className = 'tk-chip' + (this.kind === 'default' ? ' on' : '');
       kc.id = 'tk-kindchip';
       kc.setAttribute('data-testid', 'talk-kindchip');
-      kc.textContent = this.kind === 'default' ? '他人可见' : '只给他';
+      kc.textContent = this.kind === 'default' ? '可见：他人可见' : '可见：只给他';
       kc.addEventListener('click', () => {
         this.kind = (this.kind === 'default' ? 'private' : 'default');
         this.render();
       });
-      line.appendChild(kc);
+      chips.appendChild(kc);
       const wc = document.createElement('button');
       wc.className = 'tk-chip' + (this.asWho === 'owner.me' ? ' on' : '');
       wc.id = 'tk-whosay';
       wc.setAttribute('data-testid', 'talk-whosay');
-      wc.textContent = this.asWho === 'owner.me' ? '经理说' : '本人说';
+      wc.textContent = this.asWho === 'owner.me' ? '身份：经理说' : '身份：本人说';
       wc.addEventListener('click', () => {
         this.asWho = (this.asWho === 'owner.me' ? 'me' : 'owner.me');
         this.render();
       });
-      line.appendChild(wc);
+      chips.appendChild(wc);
+      el.appendChild(chips);
+
+      /* 输入条：固定在这个会话里（贴底不跨页），草稿按会话各存一份 */
+      const line = document.createElement('div');
+      line.className = 'tk-askline';
+      line.id = 'tk-sayline';
+      line.style.position = 'sticky';
+      line.style.bottom = '0';
+      line.style.background = '#0f1218';
+      line.style.display = 'flex';
+      line.style.gap = '8px';
+      line.style.padding = '8px 0';
       const inp = document.createElement('input');
       inp.className = 'tk-askin';
       inp.id = 'tk-sayin';
       inp.setAttribute('data-testid', 'talk-sayin');
+      inp.style.flex = '1 1 auto';
+      inp.style.minWidth = '0';
       inp.placeholder = this.style === 'chat' ? '说点什么…' : '说点什么（会送进他的会话）…';
+      inp.value = String(CACHE.get('draft.' + full, '') || '');
+      inp.addEventListener('input', () => CACHE.set('draft.' + full, inp.value));
       const ok = document.createElement('button');
       ok.className = 'tk-act';
       ok.id = 'tk-sayok';
       ok.setAttribute('data-testid', 'talk-sayok');
       ok.textContent = '发送';
+      ok.style.flex = '0 0 auto';
       const fire = async () => {
         const text = (inp.value || '').trim();
         if (!text) { HP.App.toast('先说点什么'); return; }
         inp.value = '';
-        await this.send(r.full_name, this.kind || 'private', text);
+        CACHE.set('draft.' + full, '');
+        await this.send(full, this.kind || 'private', text);
         setTimeout(() => this.pullRoleOutput(r), 2500);
         setTimeout(() => this.pullRoleOutput(r), 6000);
       };
@@ -756,102 +778,6 @@
       line.appendChild(inp);
       line.appendChild(ok);
       el.appendChild(line);
-    },
-
-    /* Hermes 的界面是整屏重画的，"行数变多"取不到新行 —— 直接抠他最近一次回答的框
-     * 形如：╭─ ☤ Hermes ─╮  正文…  ╰───╯   （正文就是他的话） */
-    lastAnswer(scr) {
-      const lines = String(scr || '').split('\n');
-      let start = -1;
-      for (let i = lines.length - 1; i >= 0; i--) {
-        if (lines[i].indexOf('☤') >= 0 && lines[i].indexOf('╭') >= 0) { start = i; break; }
-      }
-      if (start < 0) return '';
-      const out = [];
-      for (let i = start + 1; i < lines.length; i++) {
-        const l = lines[i];
-        if (l.indexOf('╰') >= 0) break;
-        if (/^[─═]{5,}/.test(l)) break;
-        if (l.indexOf('☤') >= 0 && /deepseek|gpt|claude|Hermes/.test(l)) break;
-        out.push(l.replace(/^[│|]\s?/, '').replace(/\s*[│|]\s*$/, ''));
-      }
-      return out.join('\n').trim();
-    },
-
-    /* 他只会在自己的会话里说话 —— 这里把"新出现的行"挑出来当他的话（气泡） */
-    newLines(base, now) {
-      const b = String(base || '').split('\n');
-      const n = String(now || '').split('\n');
-      if (n.length <= b.length) return [];
-      const fresh = n.slice(b.length);
-      const junk = /^[\s]*[─═━│┃╭╮╰╯+\-=|><*·.]+[\s]*$/;
-      const mine = (t) => String(t || '').replace(/\s/g, '').length === 0;
-      return fresh
-        .map((l) => String(l).replace(/\s+$/, ''))
-        .filter((l) => l && !junk.test(l) && !mine(l))
-        .slice(-8);
-    },
-
-    /* 拉一次他的会话：把新增的行记成他的话 */
-    async pullRoleOutput(r) {
-      try {
-        const c = await rpc('talk.capture', { role: r.full_name, lines: 120 });
-        const raw = (c && c.raw) || '';
-        const ans = this.lastAnswer(raw);
-        if (!ans) { this.capBase[r.full_name] = raw; return; }
-        const seen = this.said = this.said || {};
-        const prev = (seen[r.full_name] || []).slice(-3);
-        if (prev.indexOf(ans) >= 0) { this.capBase[r.full_name] = raw; return; }   /* 同一句不重复显示 */
-        (seen[r.full_name] = seen[r.full_name] || []).push(ans);
-        seen[r.full_name] = seen[r.full_name].slice(-20);
-        this.live = this.live || {};
-        this.live[r.full_name] = (this.live[r.full_name] || []).concat(ans.split('\n')).slice(-40);
-        this.capBase[r.full_name] = raw;
-        if (this.view === 'role' && this.style === 'chat' && this.sel && this.sel.full_name === r.full_name) this.paintChat(r);
-        return;
-      } catch (e) { return; }
-      /* 旧的行差法留着当兜底（非 Hermes 的会话用得上） */
-      try {
-        const c = await rpc('talk.capture', { role: r.full_name, lines: 120 });
-        const raw = (c && c.raw) || '';
-        const base = this.capBase[r.full_name];
-        if (base == null) { this.capBase[r.full_name] = raw; return; }
-        const fresh = this.newLines(base, raw);
-        this.capBase[r.full_name] = raw;
-        if (fresh.length) {
-          this.live = this.live || {};
-          this.live[r.full_name] = (this.live[r.full_name] || []).concat(fresh).slice(-40);
-          if (this.view === 'role' && this.style === 'chat' && this.sel && this.sel.full_name === r.full_name) this.paintChat(r);
-        }
-      } catch (e) { /* 读不到就先不显示，不打扰 */ }
-    },
-
-    async paintChat(r) {
-      const box = document.getElementById('tk-chat');
-      if (!box) return;
-      box.textContent = '';
-      let items = [];
-      try {
-        const th = await rpcCache('talk.thread', { role: r.full_name, limit: 100 }, 'thread.' + r.full_name);
-        items = (th && th.items) || [];
-      } catch (e) { /* 拉不到对话记录不影响看他的话，别把气泡一起吞了 */ }
-      const live = ((this.live || {})[r.full_name] || []);
-      if (!items.length && !live.length) { box.textContent = '（还没聊过）'; return; }
-      items.forEach((m) => {
-        const me = m.who === 'me';
-        const head = me ? ('我 → ' + (r.title || r.full_name)) : ((r.title || r.full_name) + ' → 我');
-        const bu = bubbleEl({ mine: me, head: head, text: m.body, time: hhmm(m.at) });
-        bu.className = 'tk-bub ' + (me ? 'me' : 'him');
-        box.appendChild(bu);
-      });
-      /* 他在自己会话里回的话（从 Hermes 回答框里抠的）：也写清是他 → 我 */
-      live.forEach((t) => {
-        const bu = bubbleEl({ mine: false, head: (r.title || r.full_name) + ' → 我', text: t, time: '' });
-        bu.className = 'tk-bub him';
-        box.appendChild(bu);
-      });
-      box.scrollTop = box.scrollHeight;
-      this.pullRoleOutput(r);
     },
 
     /* 输入：只让他敲"要说的话"，别的都不用选 */
@@ -880,9 +806,15 @@
         this.render();
       } catch (e) { HP.App.toast('开不了新对话：' + e.message, 5000); }
     },
-    openSession(s) {
-      if (s.role) return this.openRole(s.role);
-      HP.App.toast('这是单独对话（' + s.name + '）：在终端里 tmux attach -t ' + s.tmux, 5000);
+    async openSession(s) {
+      if (s.role) {
+        try {
+          const r = await rpc('talk.switch', { role: s.role });
+          if (r && r.switched) HP.App.toast('已切到 ' + s.role, 2500);
+        } catch (e) { /* 切不过去也照样能看记录 */ }
+        return this.openRole(s.role);
+      }
+      HP.App.toast('这是单独对话（' + s.name + '）：它不在角色体系里', 5000);
     },
     when(ts) {
       try { return new Date(ts * 1000).toLocaleString(); } catch (e) { return ''; }
