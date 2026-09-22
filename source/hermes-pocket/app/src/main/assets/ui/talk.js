@@ -379,18 +379,20 @@
         acts.appendChild(save);
       } else {
         const paused = r.state === 'paused';
-        const pa = document.createElement('button');
-        pa.className = 'tk-act';
-        pa.setAttribute('data-testid', 'talk-sheet-pause');
-        pa.textContent = paused ? '恢复他' : '暂停他';
-        pa.addEventListener('click', async () => {
+        const offline = !r.online;
+        const key = document.createElement('button');
+        key.className = 'tk-act';
+        key.setAttribute('data-testid', 'talk-sheet-power');
+        key.textContent = offline ? '拉起他' : (paused ? '恢复他' : '暂停他');
+        key.addEventListener('click', async () => {
           try {
-            await rpc(paused ? 'talk.start' : 'talk.pause', { role: r.full_name });
-            HP.App.toast(paused ? ('已恢复 ' + r.full_name) : ('已暂停 ' + r.full_name));
+            if (offline) await rpc('talk.spawn', { role: r.full_name, launch: true });
+            else await rpc(paused ? 'talk.start' : 'talk.pause', { role: r.full_name });
+            HP.App.toast(offline ? ('正在拉起 ' + r.full_name) : (paused ? ('已恢复 ' + r.full_name) : ('已暂停 ' + r.full_name)));
             this.closeSheet(); this.render();
           } catch (e) { HP.App.toast('改不了状态：' + e.message, 5000); }
         });
-        acts.appendChild(pa);
+        acts.appendChild(key);
         const del = document.createElement('button');
         del.className = 'tk-act';
         del.setAttribute('data-testid', 'talk-sheet-del');
