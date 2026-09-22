@@ -92,6 +92,43 @@
         el.appendChild(wrap);
       });
 
+      /* ＋ 新角色：在客户端就能建（服务端只记名册，回头 roles-json 就带出来） */
+      const addb = document.createElement('button');
+      addb.className = 'tk-act';
+      addb.id = 'tk-addrole';
+      addb.setAttribute('data-testid', 'talk-addrole');
+      addb.textContent = '＋ 新角色';
+      const form = document.createElement('div');
+      form.className = 'tk-asks';
+      form.id = 'tk-addform';
+      form.style.display = 'none';
+      [['scene', '场景（组）'], ['name', '角色名'], ['title', '一句话描述'], ['tags', '标签（可空）']].forEach((f) => {
+        const i = document.createElement('input');
+        i.className = 'tk-askin';
+        i.id = 'tk-new-' + f[0];
+        i.placeholder = f[1];
+        form.appendChild(i);
+      });
+      const mk = document.createElement('button');
+      mk.className = 'tk-act';
+      mk.id = 'tk-new-ok';
+      mk.textContent = '建';
+      mk.addEventListener('click', async () => {
+        const g = (kk) => (document.getElementById('tk-new-' + kk).value || '').trim();
+        if (!g('scene') || !g('name')) { HP.App.toast('场景和角色名得填'); return; }
+        try {
+          const r = await rpc('talk.reg', { scene: g('scene'), name: g('name'), title: g('title'), tags: g('tags') });
+          HP.App.toast('已建角色：' + ((r && r.full) || (g('scene') + '.' + g('name'))));
+          this.render();
+        } catch (e) { HP.App.toast('建失败：' + e.message); }
+      });
+      form.appendChild(mk);
+      addb.addEventListener('click', () => {
+        form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+      });
+      el.appendChild(addb);
+      el.appendChild(form);
+
       /* 接入表（经理维护）：哪个频道里谁能收到消息 */
       const chs = Object.keys(this.channels || {});
       if (chs.length) {

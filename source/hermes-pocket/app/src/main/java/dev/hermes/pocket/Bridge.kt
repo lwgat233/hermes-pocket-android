@@ -712,6 +712,11 @@ print('@@OK', '1')
             "talk.spawn" -> if (hasId) ok(id, talkJson(listOf("spawn", "--role", talkRole(m.optString("role")))))
             "talk.solo" -> if (hasId) ok(id, talkJson(listOf("solo") +
                     (if (m.optString("name", "").isBlank()) emptyList() else listOf("--name", talkText(m.optString("name"))))))
+            "talk.reg" -> if (hasId) ok(id, talkJson(listOf("reg",
+                    "--full", talkText(m.optString("scene", "")).trim(' ', '.') + "." +
+                              talkText(m.optString("name", "")).trim(' ', '.'),
+                    "--title", talkText(m.optString("title", "")),
+                    "--scope", talkText(m.optString("tags", "")))))
             "talk.asks" -> if (hasId) ok(id, talkJson(listOf("asks-json")))
             "talk.answer" -> if (hasId) ok(id, talkJson(listOf("answer", "--id", m.optString("id", "0"),
                     "--text", talkText(m.optString("text", "")), "--by", "owner.me")))
