@@ -681,7 +681,7 @@
       bd.id = 'tk-rolebind';
       bd.setAttribute('data-testid', 'talk-rolebind');
       bd.textContent = '绑定会话：' + (r.bind || ('默认 roles:' + String(r.full_name || '').replace(/\./g, '-')));
-      el.appendChild(bd);
+      ov.appendChild(bd);
       say.textContent = '跟他对话';
       say.addEventListener('click', () => { const full = r.full_name; this.closeSheet(); this.openRole(full); });
       acts.appendChild(say);

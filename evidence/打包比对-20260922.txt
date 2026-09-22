@@ -1,0 +1,120 @@
+打包对比（谁改了、改在哪，全部从 APK 里解出来数，不看源码）
+生成时间：2026-09-22 23:29:41
+
+APK（测试版目录）                       大小     sha256(前16)
+hermes-pocket-M1渲染架构-测试-20260921-D.apk 4908722    ce948fb7b13fc182
+hermes-pocket-他会话的话也成泡-20260922.apk 5061875    61fd01c025bc8321
+hermes-pocket-他的话抠出来-20260922.apk  5061875    ca0fbe97f749b1b8
+hermes-pocket-会话三组-20260922.apk        5017427    7460941b7d760e98
+hermes-pocket-会话切换修正-20260922.apk  5017398    422d8dc7a871df72
+hermes-pocket-会话弹窗与切换设置-20260922.apk 5062465    97b5cfd7da1f2d0e
+hermes-pocket-会话弹窗与左栏收起-20260922.apk 5062454    82da4e14c521c375
+hermes-pocket-会话流程-测试-20260921-M2A.apk 4913093    7380140433e7bbdf
+hermes-pocket-全用resume-20260922.apk        5062500    6d63fad806f82b39
+hermes-pocket-切过去用resume-20260922.apk  5062500    bf82cc8fa8687674
+hermes-pocket-切过去用resume面板版-20260922.apk 5062500    c902ca3ffad77b32
+hermes-pocket-历史上下行-测试-20260921-M4B.apk 4940744    af22293f2a3eb67b
+hermes-pocket-可用版-20260922.apk           5062227    e575eb302f4c2ee1
+hermes-pocket-回退attach与扫历史-20260922.apk 5017505    0c411ea23479efa1
+hermes-pocket-回退到可用版-20260922.apk  5017398    e2e11e3714425208
+hermes-pocket-定向他人可见-20260922.apk  5017046    6b394f9d1d43a898
+hermes-pocket-客户端建角色-20260922.apk  5061385    56e6da796049ffce
+hermes-pocket-左侧隐藏栏-测试-20260921-C.apk 4908819    60f720b7207242e0
+hermes-pocket-左栏收起会话键-20260922.apk 5062500    86a58c99e01fae09
+hermes-pocket-技能下载与回写-测试-20260921-M3C.apk 4931070    74db1ffcf124d0b1
+hermes-pocket-投递带标签-20260922.apk     5017032    ebc91e2f75e279f5
+hermes-pocket-拉起他-20260922.apk           5061794    637e0875a7f019c3
+hermes-pocket-搭服务端与核对-20260922.apk 5017289    2c0a8e307f277ae7
+hermes-pocket-改模型-测试-20260921-M3B.apk 4926038    ed6a04e032e95b2a
+hermes-pocket-显示绑定会话-20260922.apk  5062227    9ee227e16e2308b1
+hermes-pocket-本人或经理说-20260922.apk  5017289    c57b0bfd761c59c6
+hermes-pocket-气泡与他的话-20260922.apk  5061875    f63d5feddee57a2e
+hermes-pocket-气泡内联样式-20260922.apk  5061875    85b29a38be39ce33
+hermes-pocket-气泡回来了-20260922.apk     5017398    f91e217f7635a42f
+hermes-pocket-气泡样式修好-20260922.apk  5061875    96916defaefaa6db
+hermes-pocket-气泡统一与谁跟谁-20260922.apk 5061875    6c9722951a43309a
+hermes-pocket-气泡能出来了-20260922.apk  5061875    c7e9a6196b7170b9
+hermes-pocket-点会话就切过去-20260922.apk 5017289    2c0a8e307f277ae7
+hermes-pocket-点会话弹窗-20260922.apk     5017427    2e1464bf34c71fe0
+hermes-pocket-点终端不弹键盘-测试-20260921-kbdA.apk 4942344    86b223efd6b86fe8
+hermes-pocket-点角色弹信息窗-20260922.apk 5061554    20a7d0e7ea31b3d6
+hermes-pocket-系统提示词-测试-20260921-M3A.apk 4921426    06710a7b7ef74a58
+hermes-pocket-群聊与一对一聊天-20260922.apk 5061875    cdcef63edae065c5
+hermes-pocket-群聊式对话-20260922.apk     5061875    7f9e361d39f0f350
+hermes-pocket-群聊独立栏目-20260922.apk  5061875    4d9588c45ac5a410
+hermes-pocket-聊天状态识别-测试-20260921-M2B.apk 4917037    c281f66dad4db0eb
+hermes-pocket-角色窗加暂停删除-20260922.apk 5061794    2c14ac794f90da62
+hermes-pocket-设备复验修复-测试-20260921-devB.apk 4941160    a3d3c39232d79deb
+hermes-pocket-设置生效与长文本滚动-测试-20260921-B.apk 4938716    a6a77c5614a3a2b2
+hermes-pocket-设置生效-测试-20260921-A.apk 4900766    11c6de11c1d7f6d3
+hermes-pocket-谁跟谁-20260922.apk           5061875    b8c49d94662d2f31
+hermes-pocket-输入区重排v2-20260922.apk   5017398    88d43a4a6d664e50
+hermes-pocket-输入条重排-20260922.apk     5017398    482b25ab21829eaf
+hermes-pocket-输入框实时与攒着-测试-20260921-kbdB.apk 4942440    242fc5bb30816872
+hermes-pocket-连接提示与公钥-测试-20260921-M2C.apk 4917457    6d26b6a90e7011ef
+hermes-pocket-连通性与丢包-测试-20260921-M4A.apk 4939248    cbd9c0f1d004c7e5
+hermes-pocket-键盘与输入框-测试-20260921-kbdC.apk 4943352    d2c99b19b121e6a9
+hermes-pocket-频道改版-20260922.apk        5061385    de3460a39bcb2831
+hermes-pocket-频道面板-测试-20260922.apk 4992550    39e151000aa31687
+hermes-pocket-频道面板-等你授权-20260922.apk 5061234    3a1c426f2dfe6daf
+hermes-pocket.apk                              5062500    6d63fad806f82b39
+
+=== 每个包里「切过去」用的到底是什么（从包的 assets/ui 里解出来数） ===
+APK                                            /resume   tmux attach  switch-client
+hermes-pocket-M1渲染架构-测试-20260921-D.apk 0         1            0           
+hermes-pocket-他会话的话也成泡-20260922.apk 0         3            0           
+hermes-pocket-他的话抠出来-20260922.apk  0         3            0           
+hermes-pocket-会话三组-20260922.apk        0         3            3           
+hermes-pocket-会话切换修正-20260922.apk  0         2            2           
+hermes-pocket-会话弹窗与切换设置-20260922.apk 0         3            2           
+hermes-pocket-会话弹窗与左栏收起-20260922.apk 0         3            2           
+hermes-pocket-会话流程-测试-20260921-M2A.apk 0         2            0           
+hermes-pocket-全用resume-20260922.apk        4         1            0           
+hermes-pocket-切过去用resume-20260922.apk  0         3            2           
+hermes-pocket-切过去用resume面板版-20260922.apk 3         2            1           
+hermes-pocket-历史上下行-测试-20260921-M4B.apk 0         2            0           
+hermes-pocket-可用版-20260922.apk           0         3            2           
+hermes-pocket-回退attach与扫历史-20260922.apk 0         3            2           
+hermes-pocket-回退到可用版-20260922.apk  0         3            0           
+hermes-pocket-定向他人可见-20260922.apk  0         3            0           
+hermes-pocket-客户端建角色-20260922.apk  0         3            0           
+hermes-pocket-左侧隐藏栏-测试-20260921-C.apk 0         1            0           
+hermes-pocket-左栏收起会话键-20260922.apk 0         3            2           
+hermes-pocket-技能下载与回写-测试-20260921-M3C.apk 0         2            0           
+hermes-pocket-投递带标签-20260922.apk     0         3            0           
+hermes-pocket-拉起他-20260922.apk           0         3            0           
+hermes-pocket-搭服务端与核对-20260922.apk 0         3            0           
+hermes-pocket-改模型-测试-20260921-M3B.apk 0         2            0           
+hermes-pocket-显示绑定会话-20260922.apk  0         3            2           
+hermes-pocket-本人或经理说-20260922.apk  0         3            0           
+hermes-pocket-气泡与他的话-20260922.apk  0         3            0           
+hermes-pocket-气泡内联样式-20260922.apk  0         3            0           
+hermes-pocket-气泡回来了-20260922.apk     0         2            0           
+hermes-pocket-气泡样式修好-20260922.apk  0         3            0           
+hermes-pocket-气泡统一与谁跟谁-20260922.apk 0         3            0           
+hermes-pocket-气泡能出来了-20260922.apk  0         3            0           
+hermes-pocket-点会话就切过去-20260922.apk 0         3            0           
+hermes-pocket-点会话弹窗-20260922.apk     0         3            3           
+hermes-pocket-点终端不弹键盘-测试-20260921-kbdA.apk 0         2            0           
+hermes-pocket-点角色弹信息窗-20260922.apk 0         3            0           
+hermes-pocket-系统提示词-测试-20260921-M3A.apk 0         2            0           
+hermes-pocket-群聊与一对一聊天-20260922.apk 0         3            0           
+hermes-pocket-群聊式对话-20260922.apk     0         3            0           
+hermes-pocket-群聊独立栏目-20260922.apk  0         3            0           
+hermes-pocket-聊天状态识别-测试-20260921-M2B.apk 0         2            0           
+hermes-pocket-角色窗加暂停删除-20260922.apk 0         3            0           
+hermes-pocket-设备复验修复-测试-20260921-devB.apk 0         2            0           
+hermes-pocket-设置生效与长文本滚动-测试-20260921-B.apk 0         1            0           
+hermes-pocket-设置生效-测试-20260921-A.apk 0         1            0           
+hermes-pocket-谁跟谁-20260922.apk           0         3            0           
+hermes-pocket-输入区重排v2-20260922.apk   0         2            0           
+hermes-pocket-输入条重排-20260922.apk     0         3            0           
+hermes-pocket-输入框实时与攒着-测试-20260921-kbdB.apk 0         2            0           
+hermes-pocket-连接提示与公钥-测试-20260921-M2C.apk 0         2            0           
+hermes-pocket-连通性与丢包-测试-20260921-M4A.apk 0         2            0           
+hermes-pocket-键盘与输入框-测试-20260921-kbdC.apk 0         2            0           
+hermes-pocket-频道改版-20260922.apk        0         3            0           
+hermes-pocket-频道面板-测试-20260922.apk 0         3            0           
+hermes-pocket-频道面板-等你授权-20260922.apk 0         3            0           
+
+=== 最新包 vs 上一版：panels.js 的差别（真正的改动行） ===

@@ -1,0 +1,13 @@
+本轮真因与证据（2026-09-22）
+
+现象：点角色有提示、但信息窗不弹出；会话删除点了没反馈、服务端也没删
+真因：talk.js 的 paintSheet() 里有一处 el.（变量未定义）→ 点角色时抛 ReferenceError，
+      信息窗整个画不出来 → 窗里的「删除这个会话」按钮也就点不到（两件事同一个 bug）
+
+定位方式（不靠猜）：tools/panel-probe.mjs —— 用最小 DOM 打桩在 Node 里跑真面板代码，
+  模拟：render() → openRoleSheet('home.maid') → 点「跟他对话」/openRole()，抓运行时报错
+  修前：★ 点角色 → paintSheet 第 684 行 ReferenceError: el is not defined
+  修后：✔ render() / openRoleSheet / openRole 都不抛异常
+
+出包：sha256 e6e2f8b4bbd3e96485ea5ef8d7326feca53209b94e8c41fefd56e4a4741ea2c4
+验证：6 个 JS 构件 node --check ✓（构建闸门：任一语法错不出包）
