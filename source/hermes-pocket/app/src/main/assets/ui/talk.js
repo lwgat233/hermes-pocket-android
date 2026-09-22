@@ -673,6 +673,13 @@
       const say = document.createElement('button');
       say.className = 'tk-act';
       say.setAttribute('data-testid', 'talk-sheet-say');
+      /* 他绑的是哪个 session（角色只能用这个会话回答） */
+      const bd = document.createElement('div');
+      bd.className = 'tk-title';
+      bd.id = 'tk-rolebind';
+      bd.setAttribute('data-testid', 'talk-rolebind');
+      bd.textContent = '绑定会话：' + (r.bind || ('默认 roles:' + String(r.full_name || '').replace(/\./g, '-')));
+      el.appendChild(bd);
       say.textContent = '跟他对话';
       say.addEventListener('click', () => { const full = r.full_name; this.closeSheet(); this.openRole(full); });
       acts.appendChild(say);
