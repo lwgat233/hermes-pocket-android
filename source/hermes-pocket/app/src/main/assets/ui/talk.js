@@ -12,6 +12,51 @@
   const rpc = (op, args) => HP.App.rpc(op, args || {}, 20000);
   const KIND = { broadcast: '📢', private: '🔒', default: '· ' };
 
+  /* 气泡（私聊/群聊共用一套）：强制写清"谁 → 谁"，样式学聊天软件（圆角+名字小字+时间） */
+  const bubbleEl = (o) => {
+    const box = document.createElement('div');
+    const st = box.style;
+    st.display = 'flex';
+    st.flexDirection = 'column';
+    st.maxWidth = '82%';
+    st.alignSelf = o.mine ? 'flex-end' : 'flex-start';
+    st.background = o.mine ? '#2b6cff' : '#22262f';
+    st.color = o.mine ? '#fff' : '#e6e8ee';
+    st.borderRadius = '16px';
+    st[o.mine ? 'borderBottomRightRadius' : 'borderBottomLeftRadius'] = '6px';
+    st.padding = '8px 12px 9px';
+    st.marginTop = '8px';
+    st.boxShadow = '0 1px 2px rgba(0,0,0,.25)';
+    if (o.head) {
+      const h = document.createElement('div');
+      h.style.fontSize = '11px';
+      h.style.opacity = '.82';
+      h.style.marginBottom = '3px';
+      h.textContent = o.head;
+      box.appendChild(h);
+    }
+    const t = document.createElement('div');
+    t.style.fontSize = '14px';
+    t.style.lineHeight = '1.5';
+    t.style.whiteSpace = 'pre-wrap';
+    t.style.wordBreak = 'break-word';
+    t.textContent = o.text;
+    box.appendChild(t);
+    if (o.time) {
+      const d = document.createElement('div');
+      d.style.fontSize = '10px';
+      d.style.opacity = '.62';
+      d.style.alignSelf = o.mine ? 'flex-end' : 'flex-start';
+      d.style.marginTop = '3px';
+      d.textContent = o.time;
+      box.appendChild(d);
+    }
+    return box;
+  };
+  const hhmm = (ts) => { try { const d = new Date((ts || 0) * 1000); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); } catch (e) { return ''; } };
+
+
+
   /* 气泡样式直接内联：不依赖样式表是否被应用（用户报过"一行一行"，追查成本太高） */
   const BUB = (el, mine) => {
     const st = el.style;
@@ -374,26 +419,16 @@
       if (!rows.length) { s.textContent = '（还没有消息）'; return; }
       rows.forEach((m) => {
         const me = m.from === 'owner.me';
-        const d = BUB(document.createElement('div'), me);
+        const arrow = m.kind === 'private' ? (' → ' + (m.to || '?')) : (m.kind === 'broadcast' ? ' → 全体' : '');
+        const head = (KIND[m.kind] || '') + ' ' + m.from + arrow + (m.topic ? ('　' + m.topic) : '');
+        const d = bubbleEl({ mine: me, head: head, text: (m.body || '').split('\n')[0], time: hhmm(m.at) });
         d.className = 'tk-bub ' + (me ? 'me' : 'him');
-        const who = document.createElement('div');
-        who.className = 'tk-bubwho';
-        const name = document.createElement('span');
-        name.className = 'tk-bubname';
-        /* 露出私聊时必须写清"谁跟谁"，不能只写谁发的 */
-        const arrow = m.kind === 'private' ? (' → ' + (m.to || '?'))
-          : (m.kind === 'broadcast' ? ' → 全体' : '');
-        name.textContent = (KIND[m.kind] || '') + ' ' + m.from + arrow;
-        if (!me) name.addEventListener('click', () => this.openRoleSheet(m.from));
-        who.appendChild(name);
-        const sp = document.createElement('span');
-        sp.className = 'tk-dim';
-        sp.textContent = m.topic ? ('　' + m.topic) : '';
-        who.appendChild(sp);
-        const txt = document.createElement('div');
-        txt.textContent = (m.body || '').split('\n')[0];
-        d.appendChild(who);
-        d.appendChild(txt);
+        if (!me) {
+          const hn = document.createElement('span');
+          hn.className = 'tk-bubname';
+          d.setAttribute('data-from', m.from);
+          d.addEventListener('click', () => this.openRoleSheet(m.from));
+        }
         s.appendChild(d);
       });
     },
@@ -699,16 +734,16 @@
       const live = ((this.live || {})[r.full_name] || []);
       if (!items.length && !live.length) { box.textContent = '（还没聊过）'; return; }
       items.forEach((m) => {
-        const bu = BUB(document.createElement('div'), m.who === 'me');
-        bu.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
-        bu.textContent = m.body;
+        const me = m.who === 'me';
+        const head = me ? ('我 → ' + (r.title || r.full_name)) : ((r.title || r.full_name) + ' → 我');
+        const bu = bubbleEl({ mine: me, head: head, text: m.body, time: hhmm(m.at) });
+        bu.className = 'tk-bub ' + (me ? 'me' : 'him');
         box.appendChild(bu);
       });
-      /* 他多半是在自己的会话里回话 → 那些新行也画成他的话 */
+      /* 他在自己会话里回的话（从 Hermes 回答框里抠的）：也写清是他 → 我 */
       live.forEach((t) => {
-        const bu = BUB(document.createElement('div'), false);
+        const bu = bubbleEl({ mine: false, head: (r.title || r.full_name) + ' → 我', text: t, time: '' });
         bu.className = 'tk-bub him';
-        bu.textContent = t;
         box.appendChild(bu);
       });
       box.scrollTop = box.scrollHeight;
