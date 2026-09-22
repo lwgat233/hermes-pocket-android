@@ -87,6 +87,7 @@
 
   /* 本地保存（记录/角色/技巧都留一份在手机上）+ 登录时刷新校验
    * 规矩：网络通 → 拿服务端的并覆写本地；网络不通 → 用本地那份并标"离线"。 */
+  const HP_TALK_SEEN = {};   /* 见过的角色：做「历史」分组用 */
   const CACHE = {
     get(k, d) { try { const v = localStorage.getItem('HP_TALK_CACHE.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('HP_TALK_CACHE.' + k, JSON.stringify(v)); } catch (e) { } }
@@ -517,20 +518,65 @@
       });
     },
 
+    /* 会话列表：分成 在线 / 没在线 / 历史 三组（点一下弹选择窗，不直接切） */
     async paintHistory(el) {
-      try {
-        const r = await rpcCache('talk.sessions', {}, 'sessions');
-        const list = (r && r.sessions) || [];
-        el.textContent = list.length ? '' : '（还没有）';
-        list.slice(0, 6).forEach((s) => {
+      el.textContent = '';
+      let sess = [], roles = [];
+      try { sess = (((await rpcCache('talk.sessions', {}, 'sessions')) || {}).sessions) || []; } catch (e) { /* 离线也能看 */ }
+      try { roles = (((await rpcCache('talk.roles', {}, 'roles')) || {}).roles) || []; } catch (e) { /* 同上 */ }
+      const sessOfRole = {};
+      sess.forEach((s) => { if (s.role) sessOfRole[s.role] = s; });
+      roles.forEach((r) => { HP_TALK_SEEN[r.full_name] = 1; });
+
+      const addGroup = (label, rows) => {
+        if (!rows.length) return;
+        const t2 = this.title(label + '（' + rows.length + '）');
+        t2.setAttribute('data-testid', 'talk-group');
+        el.appendChild(t2);
+        rows.forEach((row) => {
           const b = document.createElement('button');
-          b.className = 'tk-hist-row';
-          b.textContent = (s.kind === 'solo' ? '👤 ' : '· ') + (s.role || s.name) + '　' + this.when(s.last_used) + (s.alive ? '' : '（已关）');
-          b.addEventListener('click', () => this.openSession(s));
+          b.className = 'tk-chip';
+          b.setAttribute('data-testid', 'talk-sessrow');
+          b.style.display = 'block';
+          b.style.width = '100%';
+          b.style.textAlign = 'left';
+          b.style.margin = '4px 0';
+          b.textContent = row.name + (row.sub ? '　· ' + row.sub : '');
+          b.addEventListener('click', () => this.openSessionSheet({ name: row.name, role: row.role }));
           el.appendChild(b);
         });
-      } catch (e) { el.textContent = '（读不到历史）'; }
+      };
+
+      /* ① 在线：会话真在跑 */
+      const online = roles.filter((r) => r.online).map((r) => ({
+        name: (r.title || r.name), role: r.full_name,
+        sub: '在跑' + (r.pending ? ' · 欠 ' + r.pending : ''),
+      }));
+      /* ② 没在线：角色在，会话没起 */
+      const offline = roles.filter((r) => !r.online).map((r) => ({
+        name: (r.title || r.name), role: r.full_name,
+        sub: r.state === 'paused' ? '被停' : '没起会话',
+      }));
+      /* ③ 历史：见过但现在不在角色表里的（角色删了/会话结束了） */
+      const known = {};
+      roles.forEach((r) => { known[r.full_name] = 1; });
+      const histRows = [];
+      Object.keys(HP_TALK_SEEN).forEach((f) => {
+        if (known[f]) return;
+        histRows.push({ name: f, role: f, sub: '历史（会话已结束）' });
+      });
+      sess.forEach((s) => {
+        if (s.role && known[s.role]) return;
+        if (s.role) return;
+        histRows.push({ name: s.name, role: null, sub: '普通会话' });
+      });
+
+      addGroup('在线', online);
+      addGroup('没在线', offline);
+      addGroup('历史', histRows);
+      if (!online.length && !offline.length && !histRows.length) el.textContent = '（还没有会话）';
     },
+
 
     toggle(label, on, fn) {
       const b = document.createElement('button');
