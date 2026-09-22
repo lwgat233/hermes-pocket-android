@@ -619,6 +619,26 @@
       el.appendChild(line);
     },
 
+    /* Hermes 的界面是整屏重画的，"行数变多"取不到新行 —— 直接抠他最近一次回答的框
+     * 形如：╭─ ☤ Hermes ─╮  正文…  ╰───╯   （正文就是他的话） */
+    lastAnswer(scr) {
+      const lines = String(scr || '').split('\n');
+      let start = -1;
+      for (let i = lines.length - 1; i >= 0; i--) {
+        if (lines[i].indexOf('☤') >= 0 && lines[i].indexOf('╭') >= 0) { start = i; break; }
+      }
+      if (start < 0) return '';
+      const out = [];
+      for (let i = start + 1; i < lines.length; i++) {
+        const l = lines[i];
+        if (l.indexOf('╰') >= 0) break;
+        if (/^[─═]{5,}/.test(l)) break;
+        if (l.indexOf('☤') >= 0 && /deepseek|gpt|claude|Hermes/.test(l)) break;
+        out.push(l.replace(/^[│|]\s?/, '').replace(/\s*[│|]\s*$/, ''));
+      }
+      return out.join('\n').trim();
+    },
+
     /* 他只会在自己的会话里说话 —— 这里把"新出现的行"挑出来当他的话（气泡） */
     newLines(base, now) {
       const b = String(base || '').split('\n');
@@ -635,6 +655,23 @@
 
     /* 拉一次他的会话：把新增的行记成他的话 */
     async pullRoleOutput(r) {
+      try {
+        const c = await rpc('talk.capture', { role: r.full_name, lines: 120 });
+        const raw = (c && c.raw) || '';
+        const ans = this.lastAnswer(raw);
+        if (!ans) { this.capBase[r.full_name] = raw; return; }
+        const seen = this.said = this.said || {};
+        const prev = (seen[r.full_name] || []).slice(-3);
+        if (prev.indexOf(ans) >= 0) { this.capBase[r.full_name] = raw; return; }   /* 同一句不重复显示 */
+        (seen[r.full_name] = seen[r.full_name] || []).push(ans);
+        seen[r.full_name] = seen[r.full_name].slice(-20);
+        this.live = this.live || {};
+        this.live[r.full_name] = (this.live[r.full_name] || []).concat(ans.split('\n')).slice(-40);
+        this.capBase[r.full_name] = raw;
+        if (this.view === 'role' && this.style === 'chat' && this.sel && this.sel.full_name === r.full_name) this.paintChat(r);
+        return;
+      } catch (e) { return; }
+      /* 旧的行差法留着当兜底（非 Hermes 的会话用得上） */
       try {
         const c = await rpc('talk.capture', { role: r.full_name, lines: 120 });
         const raw = (c && c.raw) || '';
