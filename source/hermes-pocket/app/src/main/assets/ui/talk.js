@@ -343,6 +343,15 @@
       gin.addEventListener('keydown', (e) => { if (e.key === 'Enter') gfire(); });
       gline.appendChild(gin);
       gline.appendChild(gok);
+      const wc2 = document.createElement('button');
+      wc2.className = 'tk-chip' + (this.asWho === 'owner.me' ? ' on' : '');
+      wc2.id = 'tk-whosay2';
+      wc2.textContent = this.asWho === 'owner.me' ? '经理说' : '本人说';
+      wc2.addEventListener('click', () => {
+        this.asWho = (this.asWho === 'owner.me' ? 'me' : 'owner.me');
+        this.render();
+      });
+      gline.appendChild(wc2);
       el.appendChild(gline);
 
       /* 投递台账：谁收了、谁没收、为什么 */
@@ -671,6 +680,16 @@
         this.render();
       });
       line.appendChild(kc);
+      const wc = document.createElement('button');
+      wc.className = 'tk-chip' + (this.asWho === 'owner.me' ? ' on' : '');
+      wc.id = 'tk-whosay';
+      wc.setAttribute('data-testid', 'talk-whosay');
+      wc.textContent = this.asWho === 'owner.me' ? '经理说' : '本人说';
+      wc.addEventListener('click', () => {
+        this.asWho = (this.asWho === 'owner.me' ? 'me' : 'owner.me');
+        this.render();
+      });
+      line.appendChild(wc);
       const inp = document.createElement('input');
       inp.className = 'tk-askin';
       inp.id = 'tk-sayin';
@@ -803,8 +822,8 @@
       if (this.busy) return;
       this.busy = true;
       try {
-        if (kind === 'broadcast') await rpc('talk.shout', { body: body });
-        else await rpc('talk.say', { role: target, body: body, kind: kind || 'private' });
+        if (kind === 'broadcast') await rpc('talk.shout', { body: body, by: this.asWho || 'me' });
+        else await rpc('talk.say', { role: target, body: body, kind: kind || 'private', by: this.asWho || 'me' });
         HP.App.toast('已发出');
         await this.tick().catch(() => { });
         this.render();

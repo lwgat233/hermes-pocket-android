@@ -741,7 +741,8 @@ print('@@OK', '1')
                 val body = talkText(m.optString("body", ""))
                 if (body.isBlank()) throw IllegalArgumentException("说要说什么")
                 // 广播：也走 say，逐个投递 + 每条带【频道广播】标签 + 各存记录
-                val r = runCatching { talkJson(listOf("say", "--by", "me", "--role", "全体",
+                val by = if (m.optString("by", "me") == "owner.me") "owner.me" else "me"
+                val r = runCatching { talkJson(listOf("say", "--by", by, "--role", "全体",
                         "--kind", "broadcast", "--topic", talkText(m.optString("topic", "喊话")), "--body", body)) }
                 ok(id, JSONObject().put("broadcast", true).put("raw", r.getOrNull() ?: JSONObject()))
             }
@@ -751,7 +752,9 @@ print('@@OK', '1')
                 if (body.isBlank()) throw IllegalArgumentException("说要说什么")
                 // kind: private=只给他本人看；default=发给他但**他人可见**
                 val kind = if (m.optString("kind", "private") == "default") "default" else "private"
-                val r = runCatching { talkJson(listOf("say", "--by", "me", "--role", to, "--kind", kind,
+                // by: me=本人（用户）说话；owner.me=经理（助手）替用户下令
+                val by = if (m.optString("by", "me") == "owner.me") "owner.me" else "me"
+                val r = runCatching { talkJson(listOf("say", "--by", by, "--role", to, "--kind", kind,
                         "--body", body, "--topic", talkText(m.optString("topic", "私信")))) }
                 ok(id, JSONObject().put("to", to).put("kind", kind).put("delivered", r.isSuccess)
                     .put("raw", r.getOrNull() ?: JSONObject()))
