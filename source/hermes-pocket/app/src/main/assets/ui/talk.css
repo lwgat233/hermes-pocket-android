@@ -44,3 +44,15 @@
 .tk-dim { color: #6b7280; }
 .tk-term { background: #0e1015; color: #cfd3dd; border: 1px solid #232833; border-radius: 8px;
   padding: 10px; font-size: 12px; font-family: var(--font-mono, monospace); max-height: 42vh; overflow: auto; white-space: pre-wrap; }
+
+/* 点角色弹出的信息窗（浮层） */
+.tk-sheet { position: fixed; left: 0; top: 0; right: 0; bottom: 0; background: #000000a8;
+  display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 50; }
+.tk-sheetcard { width: 100%; max-width: 420px; max-height: 80vh; overflow: auto; background: #141821;
+  border: 1px solid #2a2f3a; border-radius: 14px; padding: 14px; }
+.tk-sheethead { display: flex; align-items: center; gap: 8px; font-size: 16px; color: #e6e8ee; margin-bottom: 10px; }
+.tk-sheethead .name { flex: 1 1 auto; font-weight: 620; }
+.tk-sheetx { color: #8b93a5; padding: 4px 8px; }
+.tk-sheetrow { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid #1e232d; font-size: 13px; }
+.tk-sheetrow .tk-k { color: #8b93a5; flex: 0 0 68px; }
+.tk-sheetrow .tk-v { color: #e6e8ee; flex: 1 1 auto; word-break: break-all; }

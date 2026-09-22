@@ -218,7 +218,7 @@
         tags.appendChild(t);
       });
       if (tags.childNodes.length) b.appendChild(tags);
-      b.addEventListener('click', () => this.openRole(r.full_name));
+      b.addEventListener('click', () => this.openRoleSheet(r.full_name));
       return b;
     },
 
@@ -294,6 +294,107 @@
       b.textContent = label;
       b.addEventListener('click', () => fn(!on));
       return b;
+    },
+
+    /* ---------------- 点角色弹出的信息窗 ---------------- */
+    openRoleSheet(full) {
+      this.sheetRole = this.roles.find((x) => x.full_name === full) || { full_name: full, title: full };
+      this.sheetEdit = false;
+      this.paintSheet();
+    },
+    closeSheet() {
+      const s = document.getElementById('tk-sheet');
+      if (s) s.remove();
+      this.sheetRole = null;
+    },
+    async saveRole() {
+      const g = (k) => (document.getElementById('tk-e-' + k).value || '').trim();
+      const old = this.sheetRole.full_name;
+      try {
+        const res = await rpc('talk.role-edit', { role: old, title: g('title'), tags: g('tags'), scene: g('scene') });
+        HP.App.toast('已改：' + ((res && res.full) || old));
+        this.closeSheet();
+        this.render();
+      } catch (e) { HP.App.toast('改不了：' + e.message, 5000); }
+    },
+    paintSheet() {
+      const old = document.getElementById('tk-sheet');
+      if (old) old.remove();
+      const r = this.sheetRole;
+      if (!r) return;
+      const ov = document.createElement('div');
+      ov.className = 'tk-sheet';
+      ov.id = 'tk-sheet';
+      ov.setAttribute('data-testid', 'talk-sheet');
+      const card = document.createElement('div');
+      card.className = 'tk-sheetcard';
+      const head = document.createElement('div');
+      head.className = 'tk-sheethead';
+      head.innerHTML = '<span class="tk-dot"></span><span class="name">' + esc(r.title || r.name) + '</span>' +
+        '<span class="tk-sheetx" id="tk-sheetx">✕</span>';
+      head.querySelector('#tk-sheetx').addEventListener('click', () => this.closeSheet());
+      card.appendChild(head);
+      [['全名', r.full_name], ['会话', sess(r.full_name)],
+       ['状态', r.state === 'paused' ? '被停' : (r.online ? '在线' : '不在线')],
+       ['欠回复', String(r.pending || 0)], ['标签', r.tags || '（无）'],
+       ['能接入', (r.channels || []).join('、') || '（无）']].forEach((kv) => {
+        const d = document.createElement('div');
+        d.className = 'tk-sheetrow';
+        d.innerHTML = '<span class="tk-k">' + esc(kv[0]) + '</span><span class="tk-v">' + esc(kv[1]) + '</span>';
+        card.appendChild(d);
+      });
+      if (this.sheetEdit) {
+        const parts = String(r.full_name).split('.');
+        [['title', '描述（一句话）', r.title || ''], ['tags', '标签（逗号分隔）', r.tags || ''],
+         ['scene', '场景（组）', parts[0] || ''], ['name', '角色名', parts[1] || '']].forEach((f) => {
+          const i = document.createElement('input');
+          i.className = 'tk-askin';
+          i.id = 'tk-e-' + f[0];
+          i.placeholder = f[1];
+          i.value = f[2];
+          if (f[0] === 'name') { i.disabled = true; i.placeholder = '角色名（改名走命令行）'; }
+          card.appendChild(i);
+        });
+      }
+      const acts = document.createElement('div');
+      acts.className = 'tk-acts';
+      const say = document.createElement('button');
+      say.className = 'tk-act';
+      say.setAttribute('data-testid', 'talk-sheet-say');
+      say.textContent = '跟他对话';
+      say.addEventListener('click', () => { const full = r.full_name; this.closeSheet(); this.openRole(full); });
+      acts.appendChild(say);
+      const edit = document.createElement('button');
+      edit.className = 'tk-act';
+      edit.setAttribute('data-testid', 'talk-sheet-edit');
+      edit.textContent = this.sheetEdit ? '取消改' : '改信息';
+      edit.addEventListener('click', () => { this.sheetEdit = !this.sheetEdit; this.paintSheet(); });
+      acts.appendChild(edit);
+      if (this.sheetEdit) {
+        const save = document.createElement('button');
+        save.className = 'tk-act';
+        save.setAttribute('data-testid', 'talk-sheet-save');
+        save.textContent = '存';
+        save.addEventListener('click', () => this.saveRole());
+        acts.appendChild(save);
+      } else {
+        const inbox = document.createElement('button');
+        inbox.className = 'tk-act';
+        inbox.setAttribute('data-testid', 'talk-sheet-inbox');
+        inbox.textContent = '看他要回什么';
+        inbox.addEventListener('click', async () => {
+          try {
+            const ib = await rpc('talk.inbox', { role: r.full_name });
+            const raw = (ib && ib.raw) || '';
+            HP.App.toast(raw ? raw.split('\n').slice(0, 3).join(' / ') : '（他不欠你回复）', 5000);
+          } catch (e) { HP.App.toast('读不到：' + e.message); }
+        });
+        acts.appendChild(inbox);
+      }
+      card.appendChild(acts);
+      ov.appendChild(card);
+      ov.addEventListener('click', (e) => { if (e.target === ov) this.closeSheet(); });
+      document.body.appendChild(ov);
     },
 
     /* ---------------- 跟某个角色单独说（= 一个"窗口"） ---------------- */
