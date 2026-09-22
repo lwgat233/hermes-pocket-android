@@ -554,3 +554,11 @@ body.immersive #stage { border-top: 0; }
 .net-legend { flex: 1; }
 .net-legend-row { font-size: 13px; }
 .net-sum { color: #8aa; margin-top: 2px; }
+
+
+/* 开左栏（频道表）时：属于「当前会话」的东西一律收起来 —— 输入行、攒着/实时、ESC 那排虚拟键
+   （用 CSS 不用 JS：这些元素会被重新渲染出来，JS 藏过的会被重建顶回来） */
+body.drawer-open #keybar,
+body.drawer-open #composer,
+body.drawer-open #tk-sayline,
+body.drawer-open #tk-saychips { display: none !important; }

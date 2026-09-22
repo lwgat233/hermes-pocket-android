@@ -1331,6 +1331,7 @@
     openDrawer() {
       HP.Panels.renderDrawer();
       $('drawer').classList.add('show');
+      document.body.classList.add('drawer-open');   /* 会话专属的键/输入行由 CSS 收起 */
       this.sessionKeys(false);   /* 开了左栏：当前会话的输入条/键先收起 */
       $('drawer-scrim').classList.remove('hidden');
       // 自检只是**开发用的**读数，不弹给用户：没连接时 Hermes 那几行本来就没渲染，
@@ -1342,6 +1343,7 @@
     },
     closeDrawer() {
       $('drawer').classList.remove('show');
+      document.body.classList.remove('drawer-open');
       this.sessionKeys(true);
       $('drawer-scrim').classList.add('hidden');
     },
