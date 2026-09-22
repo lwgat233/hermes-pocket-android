@@ -735,23 +735,23 @@ print('@@OK', '1')
             "talk.asks" -> if (hasId) ok(id, talkJson(listOf("asks-json")))
             "talk.answer" -> if (hasId) ok(id, talkJson(listOf("answer", "--id", m.optString("id", "0"),
                     "--text", talkText(m.optString("text", "")), "--by", "owner.me")))
-            "talk.shout" -> if (hasId) ok(id, talkJson(listOf("send", "--role", "owner.me", "--from", "owner.me",
-                    "--to", "全体", "--kind", "broadcast",
-                    "--topic", talkText(m.optString("topic", "喊话")), "--body", talkText(m.optString("body", "")))))
-            // 对某个角色说话 = 记进对话（私信）+ 投进他的会话；两条都真跑，任一失败都在回包里说明
+            "talk.shout" -> if (hasId) {
+                val body = talkText(m.optString("body", ""))
+                if (body.isBlank()) throw IllegalArgumentException("说要说什么")
+                // 广播：也走 say，逐个投递 + 每条带【频道广播】标签 + 各存记录
+                val r = runCatching { talkJson(listOf("say", "--by", "me", "--role", "全体",
+                        "--kind", "broadcast", "--topic", talkText(m.optString("topic", "喊话")), "--body", body)) }
+                ok(id, JSONObject().put("broadcast", true).put("raw", r.getOrNull() ?: JSONObject()))
+            }
             "talk.say" -> if (hasId) {
                 val to = talkRole(m.optString("role"))
                 val body = talkText(m.optString("body", ""))
                 if (body.isBlank()) throw IllegalArgumentException("说要说什么")
-                val sent = runCatching { talkJson(listOf("send", "--role", "owner.me", "--from", "owner.me",
-                        "--to", to, "--kind", "private", "--topic", talkText(m.optString("topic", "私信")),
-                        "--body", body)) }
-                val pushed = runCatching { talkJson(listOf("deliver", "--role", to, "--text", body)) }
-                ok(id, JSONObject().put("to", to)
-                    .put("logged", sent.isSuccess).put("delivered", pushed.isSuccess)
-                    .put("sent", sent.getOrNull() ?: JSONObject())
-                    .put("push", pushed.getOrNull() ?: JSONObject())
-                    .put("error", (sent.exceptionOrNull() ?: pushed.exceptionOrNull())?.message ?: ""))
+                // 记录 + 投递一步到位：带【私聊】标签（哪儿发的 + 谁发的 + 编号 + 怎么回我）
+                val r = runCatching { talkJson(listOf("say", "--by", "me", "--role", to,
+                        "--body", body, "--topic", talkText(m.optString("topic", "私信")))) }
+                ok(id, JSONObject().put("to", to).put("delivered", r.isSuccess)
+                    .put("raw", r.getOrNull() ?: JSONObject()))
             }
             "talk.capture" -> if (hasId) ok(id, JSONObject().put("raw",
                 sshOrThrow().exec(talkCmd(listOf("capture", "--role", talkRole(m.optString("role")),
