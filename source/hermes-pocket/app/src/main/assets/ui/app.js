@@ -1319,9 +1319,19 @@
      * 「☰」：列出**栏目**（左侧隐藏栏）。栏目由登记表 `HP.Registry` 生成 —— 加一个功能只改登记表，
      * 界面不手写栏目；没有归属 / 没挂上 / 没测的项在 `HP.Registry.check()` 里点名。
      */
+    /* 会话专属的东西（输入条 + 可见性/身份键）只属于「当前会话」：开左栏就收起来 */
+    sessionKeys(on) {
+      ['tk-sayline', 'tk-saychips'].forEach((id) => {
+        const e = document.getElementById(id);
+        if (!e) return;
+        e.style.display = on ? (id === 'tk-sayline' ? 'flex' : '') : 'none';
+      });
+    },
+
     openDrawer() {
       HP.Panels.renderDrawer();
       $('drawer').classList.add('show');
+      this.sessionKeys(false);   /* 开了左栏：当前会话的输入条/键先收起 */
       $('drawer-scrim').classList.remove('hidden');
       // 自检只是**开发用的**读数，不弹给用户：没连接时 Hermes 那几行本来就没渲染，
       // 以前会把"还没渲染"当成"栏目登记有问题"弹一条像错误的提示（用户报的 N-1 就是这个）。
@@ -1332,6 +1342,7 @@
     },
     closeDrawer() {
       $('drawer').classList.remove('show');
+      this.sessionKeys(true);
       $('drawer-scrim').classList.add('hidden');
     },
     /**

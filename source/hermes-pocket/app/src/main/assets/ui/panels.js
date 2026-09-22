@@ -715,6 +715,44 @@
      * 规矩（用户 log 第 6 条）：**能看、能选、永不终止** —— 所以这里没有、也不许有 kill 之类的键。
      * 数据来自只读 op `tmux.list`，解析在 `HP.Sessions.parse`（纯函数，测试台能喂真实输出）。
      */
+    /* 点会话 = 弹选择窗：切过去 / 删除这个会话 / 取消（不直接切、不直接删） */
+    sessionSheet(s) {
+      const older = document.getElementById('tk-sess-sheet');
+      if (older) older.remove();
+      const wrap = document.createElement('div');
+      wrap.id = 'tk-sess-sheet';
+      wrap.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:95;display:flex;align-items:center;justify-content:center';
+      const box = document.createElement('div');
+      box.style.cssText = 'background:#141821;border-radius:16px;padding:16px;width:86%;max-width:420px';
+      const t = document.createElement('div');
+      t.className = 'tk-title';
+      t.textContent = s.name;
+      box.appendChild(t);
+      const mk = (label, tid, fn, danger) => {
+        const b = document.createElement('button');
+        b.className = 'tk-act' + (danger ? ' danger' : '');
+        b.id = tid;
+        b.setAttribute('data-testid', tid);
+        b.textContent = label;
+        b.style.cssText = 'display:block;width:100%;margin:6px 0';
+        b.addEventListener('click', fn);
+        box.appendChild(b);
+      };
+      mk('切过去', 'tk-sess-switch', () => { wrap.remove(); HP.Sessions.attach(s.name); HP.Panels.renderSessions(); });
+      mk('删除这个会话', 'tk-sess-del', async () => {
+        if (!confirm('删掉「' + s.name + '」这个会话？')) return;
+        try {
+          const r = await HP.App.rpc('talk.sessionDel', { name: s.name });
+          HP.App.toast(r && r.deleted ? ('已删除：' + (r.role || r.name)) : ('没删掉：' + ((r && r.why) || '未知原因')), 4000);
+        } catch (e) { HP.App.toast('删失败：' + e.message, 5000); }
+        wrap.remove(); HP.Panels.renderSessions();
+      }, true);
+      mk('取消', 'tk-sess-cancel', () => wrap.remove());
+      wrap.appendChild(box);
+      wrap.addEventListener('click', (e) => { if (e.target === wrap) wrap.remove(); });
+      document.body.appendChild(wrap);
+    },
+
     async renderSessions(force) {
       const el = document.getElementById('tab-sessions');
       if (!el) return;
@@ -750,7 +788,7 @@
         right: s.attached ? 'attach 中' : '空闲',
         testid: 'session-' + s.name,
         cls: s.name === cur ? 'row-on' : '',
-        onTap: () => { HP.Sessions.attach(s.name); this.renderSessions(); }
+        onTap: () => { HP.Panels.sessionSheet(s); }
       }));
       el.appendChild(HP.UI.list(rows, HP.Sessions.err ? '远端没有 tmux 会话（' + HP.Sessions.err + '）' : '远端还没有 tmux 会话 —— 启动流程会自动建一个'));
     },
