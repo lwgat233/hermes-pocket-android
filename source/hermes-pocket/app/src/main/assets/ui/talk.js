@@ -90,7 +90,7 @@
   const HP_TALK_SEEN = {};
   /* 切过去用什么指令：可配（设置里有键改），{v} 会替换成匹配到的名字 */
   const SW_CFG = {
-    cmd: 'tmux switch-client -t {v} 2>/dev/null || tmux attach -t {v}',
+    cmd: '/resume {v}',
     mode: 'name',   /* name=会话名 / session=hermes 的 session id / role=角色名 / none=不匹配 */
   };
   function swLoad() {

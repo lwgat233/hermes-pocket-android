@@ -738,7 +738,11 @@
         b.addEventListener('click', fn);
         box.appendChild(b);
       };
-      mk('切过去', 'tk-sess-switch', () => { wrap.remove(); HP.Sessions.attach(s.name); HP.Panels.renderSessions(); });
+      mk('切过去（在终端里恢复这个会话）', 'tk-sess-switch', () => {
+        wrap.remove();
+        HP.App.send('/resume ' + s.name + '\r');
+        HP.App.toast('已切：/resume ' + s.name, 3500);
+      });
       mk('删除这个会话', 'tk-sess-del', async () => {
         if (!confirm('删掉「' + s.name + '」这个会话？')) return;
         try {
