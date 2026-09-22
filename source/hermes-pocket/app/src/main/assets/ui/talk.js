@@ -380,7 +380,10 @@
         who.className = 'tk-bubwho';
         const name = document.createElement('span');
         name.className = 'tk-bubname';
-        name.textContent = (KIND[m.kind] || '') + ' ' + m.from;
+        /* 露出私聊时必须写清"谁跟谁"，不能只写谁发的 */
+        const arrow = m.kind === 'private' ? (' → ' + (m.to || '?'))
+          : (m.kind === 'broadcast' ? ' → 全体' : '');
+        name.textContent = (KIND[m.kind] || '') + ' ' + m.from + arrow;
         if (!me) name.addEventListener('click', () => this.openRoleSheet(m.from));
         who.appendChild(name);
         const sp = document.createElement('span');
