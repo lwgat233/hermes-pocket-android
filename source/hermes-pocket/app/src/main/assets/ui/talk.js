@@ -45,7 +45,10 @@
     startPoll() {
       this.stopPoll();
       if (!this.live) return;
-      this.timer = setInterval(() => this.tick().catch(() => { }), 2000);
+      this.timer = setInterval(() => {
+        this.tick().catch(() => { });
+        if (this.view === 'role' && this.style === 'chat' && this.sel) this.pullRoleOutput(this.sel);
+      }, 2500);
     },
     stopPoll() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
 
@@ -567,12 +570,45 @@
         if (!text) { HP.App.toast('先说点什么'); return; }
         inp.value = '';
         await this.send(r.full_name, 'private', text);
+        setTimeout(() => this.pullRoleOutput(r), 2500);
+        setTimeout(() => this.pullRoleOutput(r), 6000);
       };
       ok.addEventListener('click', fire);
       inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') fire(); });
       line.appendChild(inp);
       line.appendChild(ok);
       el.appendChild(line);
+    },
+
+    /* 他只会在自己的会话里说话 —— 这里把"新出现的行"挑出来当他的话（气泡） */
+    newLines(base, now) {
+      const b = String(base || '').split('\n');
+      const n = String(now || '').split('\n');
+      if (n.length <= b.length) return [];
+      const fresh = n.slice(b.length);
+      const junk = /^[\s]*[─═━│┃╭╮╰╯+\-=|><*·.]+[\s]*$/;
+      const mine = (t) => String(t || '').replace(/\s/g, '').length === 0;
+      return fresh
+        .map((l) => String(l).replace(/\s+$/, ''))
+        .filter((l) => l && !junk.test(l) && !mine(l))
+        .slice(-8);
+    },
+
+    /* 拉一次他的会话：把新增的行记成他的话 */
+    async pullRoleOutput(r) {
+      try {
+        const c = await rpc('talk.capture', { role: r.full_name, lines: 120 });
+        const raw = (c && c.raw) || '';
+        const base = this.capBase[r.full_name];
+        if (base == null) { this.capBase[r.full_name] = raw; return; }
+        const fresh = this.newLines(base, raw);
+        this.capBase[r.full_name] = raw;
+        if (fresh.length) {
+          this.live = this.live || {};
+          this.live[r.full_name] = (this.live[r.full_name] || []).concat(fresh).slice(-40);
+          if (this.view === 'role' && this.style === 'chat' && this.sel && this.sel.full_name === r.full_name) this.paintChat(r);
+        }
+      } catch (e) { /* 读不到就先不显示，不打扰 */ }
     },
 
     async paintChat(r) {
@@ -588,6 +624,13 @@
           const b = document.createElement('div');
           b.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
           b.textContent = m.body;
+          box.appendChild(b);
+        });
+        /* 他可能在会话里直接回话（没走 talk.py reply）→ 这些也从会话里捞出来显示 */
+        ((this.live || {})[r.full_name] || []).forEach((t) => {
+          const b = document.createElement('div');
+          b.className = 'tk-bub him';
+          b.textContent = t;
           box.appendChild(b);
         });
         box.scrollTop = box.scrollHeight;
