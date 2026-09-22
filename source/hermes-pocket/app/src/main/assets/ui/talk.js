@@ -614,30 +614,29 @@
     async paintChat(r) {
       const box = document.getElementById('tk-chat');
       if (!box) return;
-      box.textContent = '（正在读聊天…）';
+      box.textContent = '';
+      let items = [];
       try {
         const th = await rpcCache('talk.thread', { role: r.full_name, limit: 100 }, 'thread.' + r.full_name);
-        const items = (th && th.items) || [];
-        box.textContent = '';
-        if (!items.length && !((this.live || {})[r.full_name] || []).length) {
-          box.textContent = '（还没聊过）';
-          return;
-        }
-        items.forEach((m) => {
-          const b = document.createElement('div');
-          b.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
-          b.textContent = m.body;
-          box.appendChild(b);
-        });
-        /* 他可能在会话里直接回话（没走 talk.py reply）→ 这些也从会话里捞出来显示 */
-        ((this.live || {})[r.full_name] || []).forEach((t) => {
-          const b = document.createElement('div');
-          b.className = 'tk-bub him';
-          b.textContent = t;
-          box.appendChild(b);
-        });
-        box.scrollTop = box.scrollHeight;
-      } catch (e) { box.textContent = '读不到聊天：' + e.message; }
+        items = (th && th.items) || [];
+      } catch (e) { /* 拉不到对话记录不影响看他的话，别把气泡一起吞了 */ }
+      const live = ((this.live || {})[r.full_name] || []);
+      if (!items.length && !live.length) { box.textContent = '（还没聊过）'; return; }
+      items.forEach((m) => {
+        const bu = document.createElement('div');
+        bu.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
+        bu.textContent = m.body;
+        box.appendChild(bu);
+      });
+      /* 他多半是在自己的会话里回话 → 那些新行也画成他的话 */
+      live.forEach((t) => {
+        const bu = document.createElement('div');
+        bu.className = 'tk-bub him';
+        bu.textContent = t;
+        box.appendChild(bu);
+      });
+      box.scrollTop = box.scrollHeight;
+      this.pullRoleOutput(r);
     },
 
     /* 输入：只让他敲"要说的话"，别的都不用选 */
