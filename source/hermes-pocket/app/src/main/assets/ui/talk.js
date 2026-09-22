@@ -931,8 +931,18 @@
         return b2;
       };
       mk('切过去（就在当前 tmux 里）', 'tk-sess-switch', async () => {
-        if (s.role) { try { await rpc('talk.switch', { role: s.role }); HP.App.toast('已切到 ' + s.role, 2500); } catch (e) { HP.App.toast('切不过去：' + e.message, 4000); } }
-        else { swLoad(); await rpc('talk.run', { line: swBuild(s.name) }); }
+        try {
+          if (s.role) {
+            const r = await rpc('talk.switch', { role: s.role });
+            if (r && r.cmd) { HP.App.send(r.cmd + '\r'); HP.App.toast('已切：' + r.cmd, 3500); }
+            else { HP.App.toast('切不过去：' + ((r && r.why) || '未知原因'), 4000); }
+          } else {
+            swLoad();
+            const line = swBuild(s.name);
+            HP.App.send(line + '\r');
+            HP.App.toast('已切：' + line, 3500);
+          }
+        } catch (e) { HP.App.toast('切失败：' + e.message, 4000); }
         this.view = 'channel'; this.render();
       });
       if (s.role) mk('跟他说话（聊天界面）', 'tk-sess-talk', () => { this.openRole(s.role); });
@@ -979,7 +989,7 @@
       if (s.role) {
         try {
           const r = await rpc('talk.switch', { role: s.role });
-          if (r && r.switched) HP.App.toast('已切到 ' + s.role, 2500);
+          if (r && r.cmd) { HP.App.send(r.cmd + '\r'); HP.App.toast('已切：' + r.cmd, 3000); }
         } catch (e) { /* 切不过去也照样能看记录 */ }
         return this.openRole(s.role);
       }
