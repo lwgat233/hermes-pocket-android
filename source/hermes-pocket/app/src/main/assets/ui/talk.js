@@ -87,7 +87,18 @@
 
   /* 本地保存（记录/角色/技巧都留一份在手机上）+ 登录时刷新校验
    * 规矩：网络通 → 拿服务端的并覆写本地；网络不通 → 用本地那份并标"离线"。 */
-  const HP_TALK_SEEN = {};   /* 见过的角色：做「历史」分组用 */
+  const HP_TALK_SEEN = {};
+  /* 切过去用什么指令：可配（设置里有键改），{v} 会替换成匹配到的名字 */
+  const SW_CFG = {
+    cmd: 'tmux switch-client -t {v} 2>/dev/null || tmux attach -t {v}',
+    mode: 'name',   /* name=会话名 / session=hermes 的 session id / role=角色名 / none=不匹配 */
+  };
+  function swLoad() {
+    try { const o = JSON.parse(localStorage.getItem('HP_SWITCH_CFG') || '{}'); if (o && o.cmd) { SW_CFG.cmd = o.cmd; SW_CFG.mode = o.mode || 'name'; } } catch (e) { /* 用默认 */ }
+    return SW_CFG;
+  }
+  function swSave() { try { localStorage.setItem('HP_SWITCH_CFG', JSON.stringify(SW_CFG)); } catch (e) { /* 存不了也不崩 */ } }
+  function swBuild(v) { return String(SW_CFG.cmd || '').replace(/\{v\}/g, v); }   /* 见过的角色：做「历史」分组用 */
   const CACHE = {
     get(k, d) { try { const v = localStorage.getItem('HP_TALK_CACHE.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem('HP_TALK_CACHE.' + k, JSON.stringify(v)); } catch (e) { } }
@@ -565,6 +576,17 @@
         if (known[f]) return;
         histRows.push({ name: f, role: f, sub: '历史（会话已结束）' });
       });
+      /* 真历史：hermes 自己的 session 清单（拿到几条是几条） */
+      try {
+        const h = await rpc('talk.hermesSessions', {});
+        ((h && h.items) || []).forEach((it) => {
+          const nm = (it.title || it.id || '').split(/\s+/)[0];
+          if (!nm) return;
+          if (known[nm]) return;
+          if (histRows.some((r2) => r2.name === nm)) return;
+          histRows.push({ name: nm, role: null, sub: '历史和话（hermes session）' });
+        });
+      } catch (e) { /* 扫不到就不显示这一块 */ }
       sess.forEach((s) => {
         if (s.role && known[s.role]) return;
         if (s.role) return;
@@ -903,7 +925,7 @@
       };
       mk('切过去（就在当前 tmux 里）', 'tk-sess-switch', async () => {
         if (s.role) { try { await rpc('talk.switch', { role: s.role }); HP.App.toast('已切到 ' + s.role, 2500); } catch (e) { HP.App.toast('切不过去：' + e.message, 4000); } }
-        else { await rpc('talk.run', { line: 'tmux switch-client -t ' + s.name + ' 2>/dev/null || tmux attach -t ' + s.name }); }
+        else { swLoad(); await rpc('talk.run', { line: swBuild(s.name) }); }
         this.view = 'channel'; this.render();
       });
       if (s.role) mk('跟他说话（聊天界面）', 'tk-sess-talk', () => { this.openRole(s.role); });
@@ -915,6 +937,34 @@
           this.view = 'channel'; this.render();
         } catch (e) { HP.App.toast('删失败：' + e.message, 5000); }
       }, true);
+      mk('切换指令设置…', 'tk-swcfg', () => {
+        swLoad();
+        const c = document.createElement('input');
+        c.id = 'tk-swcmd';
+        c.setAttribute('data-testid', 'talk-swcmd');
+        c.value = SW_CFG.cmd;
+        c.style.cssText = 'width:100%;margin:4px 0';
+        el.appendChild(c);
+        const modes = document.createElement('div');
+        modes.className = 'tk-row';
+        [['name', '会话名'], ['session', 'session'], ['role', '角色名'], ['none', '不用正则']].forEach(([m, label]) => {
+          const b3 = document.createElement('button');
+          b3.className = 'tk-chip' + (SW_CFG.mode === m ? ' on' : '');
+          b3.id = 'tk-swmode-' + m;
+          b3.setAttribute('data-testid', 'talk-swmode-' + m);
+          b3.textContent = label;
+          b3.addEventListener('click', () => { SW_CFG.mode = m; swSave(); HP.App.toast('匹配方式：' + label, 2000); });
+          modes.appendChild(b3);
+        });
+        el.appendChild(modes);
+        const sv = document.createElement('button');
+        sv.className = 'tk-act';
+        sv.id = 'tk-swsave';
+        sv.setAttribute('data-testid', 'talk-swsave');
+        sv.textContent = '存下这个指令';
+        sv.addEventListener('click', () => { SW_CFG.cmd = c.value; swSave(); HP.App.toast('已存：' + swBuild('{会话名}'), 3000); });
+        el.appendChild(sv);
+      });
       mk('取消', 'tk-sess-cancel', () => { this.view = 'channel'; this.render(); });
     },
 

@@ -1302,6 +1302,15 @@
     /**
      * 启动流程（首次连接与断线重连都走它）：**先看远端有没有 tmux** ——
      * 有就 attach 回原会话（不新建、不重启、不杀），没有才按主机启动命令建。
+    /* 会话专属的东西（输入条 + 选择键 + 发送键）：只在"当前会话"里出现，开左栏就藏起来 */
+    sessionKeys(on) {
+      ['tk-sayline', 'tk-saychips'].forEach((id) => {
+        const e = document.getElementById(id);
+        if (!e) return;
+        e.style.display = on ? (id === 'tk-sayline' ? 'flex' : '') : 'none';
+      });
+    },
+
      * 读数与选择在「会话」栏目里（`#tab-sessions`）。
      */
     async bootstrapSessions(why) {
@@ -1322,6 +1331,7 @@
     openDrawer() {
       HP.Panels.renderDrawer();
       $('drawer').classList.add('show');
+      this.sessionKeys(false);   /* 开了左栏：会话里的输入条/键先收起来 */
       $('drawer-scrim').classList.remove('hidden');
       // 自检只是**开发用的**读数，不弹给用户：没连接时 Hermes 那几行本来就没渲染，
       // 以前会把"还没渲染"当成"栏目登记有问题"弹一条像错误的提示（用户报的 N-1 就是这个）。
@@ -1332,6 +1342,7 @@
     },
     closeDrawer() {
       $('drawer').classList.remove('show');
+      this.sessionKeys(true);
       $('drawer-scrim').classList.add('hidden');
     },
     /**
