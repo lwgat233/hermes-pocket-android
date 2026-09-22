@@ -12,6 +12,24 @@
   const rpc = (op, args) => HP.App.rpc(op, args || {}, 20000);
   const KIND = { broadcast: '📢', private: '🔒', default: '· ' };
 
+  /* 本地保存（记录/角色/技巧都留一份在手机上）+ 登录时刷新校验
+   * 规矩：网络通 → 拿服务端的并覆写本地；网络不通 → 用本地那份并标"离线"。 */
+  const CACHE = {
+    get(k, d) { try { const v = localStorage.getItem('HP_TALK_CACHE.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('HP_TALK_CACHE.' + k, JSON.stringify(v)); } catch (e) { } }
+  };
+  const rpcCache = async (op, args, key) => {
+    try {
+      const r = await rpc(op, args);
+      if (key) CACHE.set(key, r);
+      return r;
+    } catch (e) {
+      const c = key ? CACHE.get(key, null) : null;
+      if (c) { c.__cached = true; return c; }     /* 连不上就用本地那份 */
+      throw e;
+    }
+  };
+
   /* monospace 的会话名：跟服务端 tmux_session() 一致 */
   const sess = (full) => 'role-' + String(full || '').replace(/\./g, '-');
 
@@ -22,7 +40,7 @@
     cache: {},                     /* role -> 上次读到的会话输出（切回来秒显，充当"多窗口"） */
     asks: [],
 
-    onShow() { this.render(); this.startPoll(); },
+    onShow() { this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
     onHide() { this.stopPoll(); },
     startPoll() {
       this.stopPoll();
@@ -32,15 +50,34 @@
     stopPoll() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
 
     async refreshRoles() {
-      const r = await rpc('talk.roles');
+      const r = await rpcCache('talk.roles', {}, 'roles');
       const scenes = (r && r.scenes) || [];
+      this.offline = !!(r && r.__cached);
       this.channels = (r && r.channels) || {};
       this.roles = [];
       scenes.forEach((s) => (s.roles || []).forEach((x) => { x.scene = s.scene; this.roles.push(x); }));
     },
 
+    /* 每次"登录进来"（进频道页）刷新校验：角色 / 等你授权 / 频道接入表 */
+    async verifySync() {
+      const out = { ok: true, roles: 0, asks: 0, chans: 0 };
+      try {
+        const r = await rpc('talk.roles');
+        CACHE.set('roles', r);
+        out.roles = (r && r.scenes ? r.scenes : []).reduce((n, x) => n + (x.roles || []).length, 0);
+        out.chans = r && r.channels ? Object.keys(r.channels).length : 0;
+      } catch (e) { out.ok = false; }
+      try { const a = await rpc('talk.asks'); CACHE.set('asks', a); out.asks = (a && a.count) || 0; }
+      catch (e) { out.ok = false; }
+      this.lastSync = { at: Date.now(), ...out };
+      HP.App.toast(out.ok
+        ? ('已同步：' + out.roles + ' 个角色 · ' + out.asks + ' 条等你授权 · ' + out.chans + ' 个频道')
+        : '连不上服务端：显示本地保存的那份', 4000);
+      return out;
+    },
+
     async refreshAsks() {
-      try { const r = await rpc('talk.asks'); this.asks = (r && r.asks) || []; }
+      try { const r = await rpcCache('talk.asks', {}, 'asks'); this.asks = (r && r.asks) || []; }
       catch (e) { this.asks = []; }
     },
 
@@ -314,7 +351,7 @@
 
     async paintHistory(el) {
       try {
-        const r = await rpc('talk.sessions');
+        const r = await rpcCache('talk.sessions', {}, 'sessions');
         const list = (r && r.sessions) || [];
         el.textContent = list.length ? '' : '（还没有）';
         list.slice(0, 6).forEach((s) => {
@@ -532,7 +569,7 @@
       if (!box) return;
       box.textContent = '（正在读聊天…）';
       try {
-        const th = await rpc('talk.thread', { role: r.full_name, limit: 100 });
+        const th = await rpcCache('talk.thread', { role: r.full_name, limit: 100 }, 'thread.' + r.full_name);
         const items = (th && th.items) || [];
         box.textContent = '';
         if (!items.length) { box.textContent = '（还没聊过）'; return; }
