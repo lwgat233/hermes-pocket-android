@@ -535,7 +535,9 @@
       let sess = [], roles = [];
       try { sess = (((await rpcCache('talk.sessions', {}, 'sessions')) || {}).sessions) || []; } catch (e) { /* 离线也能看 */ }
       try { roles = (((await rpcCache('talk.roles', {}, 'roles')) || {}).roles) || []; } catch (e) { /* 同上 */ }
+      const CONTAINER = 'roles';   /* 装角色窗口的容器会话：不是给人切的目标 */
       const sessOfRole = {};
+      sess = (sess || []).filter((s) => s && s.name !== CONTAINER);
       sess.forEach((s) => { if (s.role) sessOfRole[s.role] = s; });
       roles.forEach((r) => { HP_TALK_SEEN[r.full_name] = 1; });
 

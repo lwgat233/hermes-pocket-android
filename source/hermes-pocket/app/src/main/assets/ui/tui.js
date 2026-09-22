@@ -491,7 +491,7 @@
     quick: [
       { label: '恢复/新建 Hermes 会话（tmux，含鼠标）', send: "tmux new -As hermes 'hermes --tui' \\; set -g mouse on\r" },
       { label: 'tmux 脱离会话（C-b d）', send: '\x02d' },
-      { label: '切到会话（不新建）', send: 'tmux switch-client -t hermes 2>/dev/null || tmux attach -t hermes\r' },
+      { label: '恢复最近的会话', send: '/resume latest\r' },
       { label: '开启 tmux 鼠标 → 支持滚轮/点选', send: "tmux set -g mouse on\r" },
       { label: '关闭 tmux 鼠标（用 tmux 自带选区）', send: "tmux set -g mouse off\r" },
       { label: '/help', send: '/help\r' },
