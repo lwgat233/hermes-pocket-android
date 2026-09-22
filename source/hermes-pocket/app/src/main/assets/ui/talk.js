@@ -780,6 +780,34 @@
       el.appendChild(line);
     },
 
+    /* 聊天气泡：我说的靠右蓝、他说的靠左灰；他说的话从会话里捞（不再靠屏幕抠字以外的猜测） */
+    async paintChat(r) {
+      const box = document.getElementById('tk-chat');
+      if (!box) return;
+      box.textContent = '';
+      let items = [];
+      try {
+        const th = await rpcCache('talk.thread', { role: r.full_name, limit: 100 }, 'thread.' + r.full_name);
+        items = (th && th.items) || [];
+      } catch (e) { /* 拉不到记录也要能看他的话 */ }
+      const live = ((this.live || {})[r.full_name] || []);
+      if (!items.length && !live.length) { box.textContent = '（还没聊过）'; return; }
+      items.forEach((m) => {
+        const me = m.who === 'me';
+        const head = me ? ('我 → ' + (r.title || r.full_name)) : ((r.title || r.full_name) + ' → 我');
+        const bu = bubbleEl({ mine: me, head: head, text: m.body, time: hhmm(m.at) });
+        bu.className = 'tk-bub ' + (me ? 'me' : 'him');
+        box.appendChild(bu);
+      });
+      live.forEach((tx) => {
+        const bu = bubbleEl({ mine: false, head: (r.title || r.full_name) + ' → 我', text: tx, time: '' });
+        bu.className = 'tk-bub him';
+        box.appendChild(bu);
+      });
+      box.scrollTop = box.scrollHeight;
+      this.pullRoleOutput(r);
+    },
+
     /* 输入：只让他敲"要说的话"，别的都不用选 */
     ask(target, kind) {
       const who = target === '全体' ? '全体' : (this.roles.find((x) => x.full_name === target) || {}).title || target;
