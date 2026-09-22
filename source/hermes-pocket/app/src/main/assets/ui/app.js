@@ -1347,7 +1347,7 @@
       if (t && board) t.textContent = board.name;
       if (tab === 'hermes') HP.Panels.renderHermes();
       if (tab === 'sessions') HP.Panels.renderSessions();
-      if (HP.Talk) { tab === 'talk' ? HP.Talk.onShow() : HP.Talk.onHide(); }
+      if (HP.Talk) { (tab === 'talk' || tab === 'group') ? HP.Talk.onShow(tab) : HP.Talk.onHide(); }
     },
 
     /** 选一个栏目 → 打开面板并切到它（.tabs 仍然存在，只是藏起来；程序里的跳转还照旧可用） */

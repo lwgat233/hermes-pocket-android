@@ -40,7 +40,7 @@
     cache: {},                     /* role -> 上次读到的会话输出（切回来秒显，充当"多窗口"） */
     asks: [],
 
-    onShow() { this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
+    onShow(tab) { this.tab = tab || 'talk'; this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
     onHide() { this.stopPoll(); },
     startPoll() {
       this.stopPoll();
@@ -92,9 +92,11 @@
     },
 
     async render() {
-      const el = document.getElementById('tab-talk');
+      const group = this.tab === 'group';
+      const el = document.getElementById(group ? 'tab-group' : 'tab-talk');
       if (!el) return;
       el.textContent = '';
+      if (group) { this.paintGroup(el); return; }
       try {
         await this.refreshRoles();
         await this.refreshAsks();
@@ -222,14 +224,23 @@
       el.appendChild(hist);
       this.paintHistory(hist);
 
-      el.appendChild(this.title('群聊（频道）'));
+      const goGroup = document.createElement('button');
+      goGroup.className = 'tk-act';
+      goGroup.id = 'tk-gogroup';
+      goGroup.textContent = '去群聊 →';
+      goGroup.addEventListener('click', () => HP.App.showBoard('group'));
+      el.appendChild(goGroup);
+    },
+
+    /* ---------------- 群聊栏目（独立一页） ---------------- */
+    paintGroup(el) {
+      el.appendChild(this.title('群聊'));
       const stream = document.createElement('div');
       stream.className = 'tk-chat';
       stream.id = 'tk-stream';
       el.appendChild(stream);
       this.paintStream();
 
-      /* 群聊输入框：在群里说话就是广播；要私信某人就点他气泡上的名字 */
       const gline = document.createElement('div');
       gline.className = 'tk-askline';
       const gin = document.createElement('input');
