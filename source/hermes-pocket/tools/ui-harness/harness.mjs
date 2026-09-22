@@ -11,14 +11,18 @@
  *       所以"列数=多少"这类数字不能跨环境比；能比的是"设置生效了没有 / 存住了没有"。
  */
 import { createRequire } from 'module';
-import { pathToFileURL } from 'url';
+import { pathToFileURL, fileURLToPath } from 'url';
 import path from 'path';
 
 const require = createRequire('/vol1/1000/aicache/npm/_npx/e41f203b7505f1fb/node_modules/');
 const { chromium } = require('playwright');
 
 const CHROME = '/vol1/1000/aicache/cache/ms-playwright/chromium-1234/chrome-linux64/chrome';
-const UI = '/home/lwgat/hermes-pocket/app/src/main/assets/ui/index.html';
+/* 被测界面按本文件的位置推出来（tools/ui-harness → app/src/main/assets/ui）：
+ * 以前写死 /home/lwgat/hermes-pocket/…，那份树早就不是真源了 —— 测出来的是别的树。
+ * 要用别的树就设 HP_UI=<index.html 绝对路径>。 */
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const UI = process.env.HP_UI || path.resolve(HERE, '../../app/src/main/assets/ui/index.html');
 const DRIVER = process.argv[2];
 if (!DRIVER) { console.error('用法: node harness.mjs <driver.mjs>'); process.exit(2); }
 

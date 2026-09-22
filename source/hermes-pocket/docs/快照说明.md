@@ -25,9 +25,11 @@ Hermes Pocket 的完整工作树快照（不是某几个文件的片段）。归
 版本串从哪来
 ----------------------------------------------------------------
 `app/src/main/assets/build-info.json` 是**唯一版本源**（打进包、可 `unzip -p … assets/build-info.json` 核对）；
-`tools/stamp-build.py` 把它盖进 `app/src/main/assets/ui/app.js` 的 `HP.BUILD` / `HP.BUILDINFO`，
-界面「设置 → 构建版本」与终端横幅都读它 —— 所以**不存在"界面版本串写死、和包对不上"**这种事。
-打包前先跑 `python3 tools/stamp-build.py --check` 确认两边一致。
+`tools/stamp-build.py` 在**出包时自动写入**这一包的版本串（`轮次名-日期-时分秒`）与打包时间，
+再盖进 `app/src/main/assets/ui/app.js` 的 `HP.BUILD` / `HP.BUILDINFO`，
+界面「设置 → 构建版本」与终端横幅都读它 —— 版本串不再有手写的机会。
+出包用 `bash tools/build.sh --name "…" --feature "…" --feature-id "…"`（盖章 → `--check` → 构建 → 解开包对账 → 归档，对账不过不归档）；
+复核构件用 `python3 tools/stamp-build.py --verify <apk>`（退出码 0 = 包内与源树逐字节一致）。
 
 目录速查（只列要紧的）
 ----------------------------------------------------------------

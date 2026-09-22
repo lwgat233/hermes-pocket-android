@@ -1,0 +1,264 @@
+### F1「版本串/打包时间每包自动更新」原始输出 —— 2026-09-23 00:46 CST
+# 角色 pipeline.author（功能创造者）· 轮次 hermes-pocket-测试轮 第 2 步「按测试结果修」
+# 构件 apk/测试版/hermes-pocket-版本串每包更新-20260923.apk
+#      sha256 75127e45cdb32207fa7db268bc08829b163f9ae8f4408b93106e8a9760eab408
+# 版本串 unified-20260923-004612 · 打包时间 2026-09-23 00:46 CST（出包那一刻自动写）
+
+=== ① 旧毛病复现：拿第 1 步测的那个包来对账（应 FAIL）===
+# python3 source/hermes-pocket/tools/stamp-build.py --verify "apk/测试版/hermes-pocket-修信息窗报错-20260922.apk"
+# 退出码 1
+包：apk/测试版/hermes-pocket-修信息窗报错-20260922.apk
+包 sha256：e6e2f8b4bbd3e96485ea5ef8d7326feca53209b94e8c41fefd56e4a4741ea2c4
+
+=== ① 包内 build-info.json ↔ 源 build-info.json ===
+  包内 testVersion=unified-20260921c builtAt=2026-09-22 00:35 CST
+  源   testVersion=unified-20260923-004541 builtAt=2026-09-23 00:45 CST
+  ✗ 两份逐字段相同
+
+=== ② 包内 ui/app.js 的 HP.BUILD / HP.BUILDINFO ↔ 源 ===
+  包内 HP.BUILD = unified-20260921c
+  ✗ 与 build-info.testVersion 一致
+  ✗ 包内盖章块与源逐字节相同
+     源  ：/* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
+  HP.BUILD = "unified-20260923-004541";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-23 00:45 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "版本串与打包时间每包自动写入（出包时刻盖章）", "featureId": "F1", "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build
+     包内：/* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
+  HP.BUILD = "unified-20260921c";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-22 00:35 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "取消自动回车（写入不带 \\r；回车只由键条 ⏎ 显式发）", "featureId": "R-21,R-24", "note": "装上去先看设置面板「构建版本」这一行；本版起：输入框「写入」只把内容送进终端
+
+=== ③ 包内 ui/ 每个文件 ↔ 源（含 talk.js）===
+  ✗ assets/ui/app.js
+     源  629c39c4e91b94caf5e7dcf9e56c760714d6a0df0e61505148c1e941a2dae876
+     包内69845d011352f91a7323bb0f87ee0eba427de59e4579921a12ec2a840999702e
+  ✓ assets/ui/chatstate.js
+     源  42fcaad2c599f885c379c6f8acd8fb6a59a85c3d20cf022df347fb8257bfc711
+     包内42fcaad2c599f885c379c6f8acd8fb6a59a85c3d20cf022df347fb8257bfc711
+  ✓ assets/ui/index.html
+     源  90a5e832fbbb70066230d18bb449b9643a6793b36ccb20a5ea92e90f8930cf9b
+     包内90a5e832fbbb70066230d18bb449b9643a6793b36ccb20a5ea92e90f8930cf9b
+  ✓ assets/ui/net.js
+     源  df6347e15467b15ca6beb88e2f24aee4b81220cde0f48231a980e3340bba1c9b
+     包内df6347e15467b15ca6beb88e2f24aee4b81220cde0f48231a980e3340bba1c9b
+  ✓ assets/ui/panels.js
+     源  0bc80b0ac22d3c52e27b42d900a1ce96c8b33eff0513dead3594637db6951383
+     包内0bc80b0ac22d3c52e27b42d900a1ce96c8b33eff0513dead3594637db6951383
+  ✓ assets/ui/registry.js
+     源  cbccce4ce0f9140e03831ddac3ff650a2369246f7937b4cf909093d7445dcfa7
+     包内cbccce4ce0f9140e03831ddac3ff650a2369246f7937b4cf909093d7445dcfa7
+  ✓ assets/ui/remote.js
+     源  990465e7dc90f40163e7d6a84d91cf629be53465a9745afa7a6725c9193e6c66
+     包内990465e7dc90f40163e7d6a84d91cf629be53465a9745afa7a6725c9193e6c66
+  ✓ assets/ui/sessions.js
+     源  65d39453135d5a7830e36dc702ef89148190752d6745c6c27c797811e959d0d9
+     包内65d39453135d5a7830e36dc702ef89148190752d6745c6c27c797811e959d0d9
+  ✓ assets/ui/style.css
+     源  97d1a0ce62bc0eea5ee08354f130209bb85fd83ccd07097791723b68c23b9808
+     包内97d1a0ce62bc0eea5ee08354f130209bb85fd83ccd07097791723b68c23b9808
+  ✓ assets/ui/talk.css
+     源  cff08853f4890360b92e0c1f1278ba86255b0ada7ebe93d9346a8c7ea0a8b2fb
+     包内cff08853f4890360b92e0c1f1278ba86255b0ada7ebe93d9346a8c7ea0a8b2fb
+  ✓ assets/ui/talk.js
+     源  4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+     包内4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+  ✓ assets/ui/transport.js
+     源  a7bfa7c20be7d5297b8f234916766a7b73cb31278cf18448c135cb619bbc0f09
+     包内a7bfa7c20be7d5297b8f234916766a7b73cb31278cf18448c135cb619bbc0f09
+  ✓ assets/ui/tui.js
+     源  720d05b82be23797d55564a5d8108eb9e5ddd1cf452d4a9ef7a5c8b5e07780b2
+     包内720d05b82be23797d55564a5d8108eb9e5ddd1cf452d4a9ef7a5c8b5e07780b2
+  ✓ assets/ui/ui.js
+     源  5f1dc0f7f4c8173491c5c1e56f646c40a33f8fa4501040f7278f7fa2f241e7a2
+     包内5f1dc0f7f4c8173491c5c1e56f646c40a33f8fa4501040f7278f7fa2f241e7a2
+  ✓ assets/ui/vendor/addon-fit.js
+     源  bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089
+     包内bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089
+  ✓ assets/ui/vendor/addon-unicode11.js
+     源  b0c3be540a9984713aea996966c24ed1a639d11f60d44986b22661e3a8a148d0
+     包内b0c3be540a9984713aea996966c24ed1a639d11f60d44986b22661e3a8a148d0
+  ✓ assets/ui/vendor/addon-web-links.js
+     源  f230a6c8211ce4614dda5441f27b603c7c1ca95151a655bc0efac6377ee643f0
+     包内f230a6c8211ce4614dda5441f27b603c7c1ca95151a655bc0efac6377ee643f0
+  ✓ assets/ui/vendor/xterm.css
+     源  ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6
+     包内ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6
+  ✓ assets/ui/vendor/xterm.js
+     源  1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+     包内1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+
+FAIL 包内 ↔ 源树 对账
+
+=== ② 这次出包：盖章 → 核对 → 构建 → 包内对账 → 归档（原始输出）===
+# bash tools/build.sh --name "版本串每包更新" --feature "…" --feature-id "F1" --note "…"
+=== ① 盖章（版本串 + 打包时间，按出包时刻自动写）===
+盖章完成：unified-20260923-004612 / F1 / 2026-09-23 00:46 CST
+✓ 打包信息一致：unified-20260923-004612（版本串与打包时间每包自动写入（出包时刻盖章） · 打包 2026-09-23 00:46 CST）
+
+=== ② 核对源里盖的和 JSON 一致 ===
+✓ 打包信息一致：unified-20260923-004612（版本串与打包时间每包自动写入（出包时刻盖章） · 打包 2026-09-23 00:46 CST）
+
+=== ③ gradle assembleDebug ===
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:compressDebugAssets
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeDebugStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 12s
+37 actionable tasks: 4 executed, 33 up-to-date
+
+=== ④ 包内 ↔ 源树 对账 ===
+包：/vol1/1000/airesults/hermes-pocket/source/hermes-pocket/app/build/outputs/apk/debug/app-debug.apk
+包 sha256：75127e45cdb32207fa7db268bc08829b163f9ae8f4408b93106e8a9760eab408
+
+=== ① 包内 build-info.json ↔ 源 build-info.json ===
+  包内 testVersion=unified-20260923-004612 builtAt=2026-09-23 00:46 CST
+  源   testVersion=unified-20260923-004612 builtAt=2026-09-23 00:46 CST
+  ✓ 两份逐字段相同
+
+=== ② 包内 ui/app.js 的 HP.BUILD / HP.BUILDINFO ↔ 源 ===
+  包内 HP.BUILD = unified-20260923-004612
+  ✓ 与 build-info.testVersion 一致
+  ✓ 包内盖章块与源逐字节相同
+
+=== ③ 包内 ui/ 每个文件 ↔ 源（含 talk.js）===
+  ✓ assets/ui/app.js
+     源  d08b3e2f7b16b770696319167a6dc511159815434e5cd899db626f3aa43934c6
+     包内d08b3e2f7b16b770696319167a6dc511159815434e5cd899db626f3aa43934c6
+  ✓ assets/ui/chatstate.js
+     源  42fcaad2c599f885c379c6f8acd8fb6a59a85c3d20cf022df347fb8257bfc711
+     包内42fcaad2c599f885c379c6f8acd8fb6a59a85c3d20cf022df347fb8257bfc711
+  ✓ assets/ui/index.html
+     源  90a5e832fbbb70066230d18bb449b9643a6793b36ccb20a5ea92e90f8930cf9b
+     包内90a5e832fbbb70066230d18bb449b9643a6793b36ccb20a5ea92e90f8930cf9b
+  ✓ assets/ui/net.js
+     源  df6347e15467b15ca6beb88e2f24aee4b81220cde0f48231a980e3340bba1c9b
+     包内df6347e15467b15ca6beb88e2f24aee4b81220cde0f48231a980e3340bba1c9b
+  ✓ assets/ui/panels.js
+     源  0bc80b0ac22d3c52e27b42d900a1ce96c8b33eff0513dead3594637db6951383
+     包内0bc80b0ac22d3c52e27b42d900a1ce96c8b33eff0513dead3594637db6951383
+  ✓ assets/ui/registry.js
+     源  cbccce4ce0f9140e03831ddac3ff650a2369246f7937b4cf909093d7445dcfa7
+     包内cbccce4ce0f9140e03831ddac3ff650a2369246f7937b4cf909093d7445dcfa7
+  ✓ assets/ui/remote.js
+     源  990465e7dc90f40163e7d6a84d91cf629be53465a9745afa7a6725c9193e6c66
+     包内990465e7dc90f40163e7d6a84d91cf629be53465a9745afa7a6725c9193e6c66
+  ✓ assets/ui/sessions.js
+     源  65d39453135d5a7830e36dc702ef89148190752d6745c6c27c797811e959d0d9
+     包内65d39453135d5a7830e36dc702ef89148190752d6745c6c27c797811e959d0d9
+  ✓ assets/ui/style.css
+     源  97d1a0ce62bc0eea5ee08354f130209bb85fd83ccd07097791723b68c23b9808
+     包内97d1a0ce62bc0eea5ee08354f130209bb85fd83ccd07097791723b68c23b9808
+  ✓ assets/ui/talk.css
+     源  cff08853f4890360b92e0c1f1278ba86255b0ada7ebe93d9346a8c7ea0a8b2fb
+     包内cff08853f4890360b92e0c1f1278ba86255b0ada7ebe93d9346a8c7ea0a8b2fb
+  ✓ assets/ui/talk.js
+     源  4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+     包内4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+  ✓ assets/ui/transport.js
+     源  a7bfa7c20be7d5297b8f234916766a7b73cb31278cf18448c135cb619bbc0f09
+     包内a7bfa7c20be7d5297b8f234916766a7b73cb31278cf18448c135cb619bbc0f09
+  ✓ assets/ui/tui.js
+     源  720d05b82be23797d55564a5d8108eb9e5ddd1cf452d4a9ef7a5c8b5e07780b2
+     包内720d05b82be23797d55564a5d8108eb9e5ddd1cf452d4a9ef7a5c8b5e07780b2
+  ✓ assets/ui/ui.js
+     源  5f1dc0f7f4c8173491c5c1e56f646c40a33f8fa4501040f7278f7fa2f241e7a2
+     包内5f1dc0f7f4c8173491c5c1e56f646c40a33f8fa4501040f7278f7fa2f241e7a2
+  ✓ assets/ui/vendor/addon-fit.js
+     源  bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089
+     包内bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089
+  ✓ assets/ui/vendor/addon-unicode11.js
+     源  b0c3be540a9984713aea996966c24ed1a639d11f60d44986b22661e3a8a148d0
+     包内b0c3be540a9984713aea996966c24ed1a639d11f60d44986b22661e3a8a148d0
+  ✓ assets/ui/vendor/addon-web-links.js
+     源  f230a6c8211ce4614dda5441f27b603c7c1ca95151a655bc0efac6377ee643f0
+     包内f230a6c8211ce4614dda5441f27b603c7c1ca95151a655bc0efac6377ee643f0
+  ✓ assets/ui/vendor/xterm.css
+     源  ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6
+     包内ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6
+  ✓ assets/ui/vendor/xterm.js
+     源  1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+     包内1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+
+PASS 包内 ↔ 源树 对账
+
+=== ⑤ 归档 ===
+客户端好了：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-版本串每包更新-20260923.apk
+75127e45cdb32207fa7db268bc08829b163f9ae8f4408b93106e8a9760eab408  /vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-版本串每包更新-20260923.apk
+
+=== ③ 页面读数（本地测试台跑真面板代码，file:// 打开源树 ui/index.html）===
+# cd source/hermes-pocket/tools/ui-harness && node harness.mjs t-pack.mjs    （原始 JSON 见同目录 t-pack-原始输出-20260923.json）
+页面 HP.BUILD            : unified-20260923-004612
+设置面板那一行原文        : 运行通道：Android 原生 SSH（App 内直连，私钥不出设备） 协议版本 v1 构建版本：unified-20260923-004612 · 版本串与打包时间每包自动写入（出包时刻盖章）（F1）· 打包 2026-09-23 00:46 CST
+终端横幅                  : Hermes Pocket  移动端 SSH + Hermes TUI 渲染层  unified-20260923-004612点左上 ☰ 选栏目（主机 / 密钥 / 设置 / Hermes）。
+七条判据                  : {"uiVersionMatchesBundle": true, "injectedFeatureMatchesBundle": true, "settingsShowsBuildVersion": true, "settingsShowsFeatureAndBuiltAt": true, "bannerUsesSameVersion": true, "noMissingPlaceholders": true, "bundleJsonFieldsComplete": true}
+
+=== ④ 手改成上一包的版本串会被拦住（模拟旧毛病）===
+$ 把源里 HP.BUILD 改成 "unified-20260101-000000"
+$ python3 tools/stamp-build.py --check
+✗ 源里盖的打包信息与 build-info.json **不一致**：先跑一次不带参数的盖章      （退出码 1）
+$ python3 tools/stamp-build.py --no-refresh && python3 tools/stamp-build.py --check
+盖章完成：unified-20260923-004612 / F1 / 2026-09-23 00:46 CST
+✓ 打包信息一致：unified-20260923-004612                                                     （退出码 0）
+   app.js 恢复后 sha256 与改动前逐字节相同: d08b3e2f7b16b770696319167a6dc511159815434e5cd899db626f3aa43934c6
+
+=== ⑤ 三方对照表（页面 / 包内 JSON / 包内 app.js）===
+  读哪里                  testVersion            builtAt
+  页面 HP.BUILD           unified-20260923-004612 -
+  包内 build-info.json    unified-20260923-004612 2026-09-23 00:46 CST
+  包内 ui/app.js 的 HP.BUILD unified-20260923-004612 2026-09-23 00:46 CST
+  旧包（修信息窗报错）    unified-20260921c      2026-09-22 00:35 CST    ← F1
+  包内 ui/talk.js sha256  4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a（与源树相同，本轮没动界面逻辑）
+
+=== ⑥ 改了哪些文件 ===
+  source/hermes-pocket/tools/stamp-build.py   出包时自动写 testVersion/builtAt → 盖进 ui/app.js；新增 --verify <apk> 包内对账；ROOT 改成按脚本位置推（原来写死 /home/lwgat/hermes-pocket）
+  tools/build.sh                              ①盖章 ②核对 ③gradle ④包内对账 ⑤归档到 apk/测试版/（对账不过就不归档）
+  source/hermes-pocket/tools/ui-harness/harness.mjs  被测界面按本文件位置推（原来写死 /home/lwgat/hermes-pocket —— 那是份旧树，读出来不是真源）；可用 HP_UI 覆盖
+  source/hermes-pocket/tools/ui-harness/t-pack.mjs   读的 build-info.json 同上改成按位置推；可用 HP_JSON 覆盖
+
+=== ⑦ 本轮没验到的（口径：未验 ≠ 通过）===
+  点角色→信息窗 / 气泡 / 删会话 / 切会话 / 开左栏收起会话键 —— 这 5 条要 app 先 SSH 连上 NAS 才能点；
+  本人已定「不接主机」（不动 NAS 的 authorized_keys），所以本轮照「未验」记，不当通过。
+
+=== ⑧ 设备上的页面读数由第 3 步「复测」的测试者出（装 apk/测试版/hermes-pocket-版本串每包更新-20260923.apk 读设置页那一行）===

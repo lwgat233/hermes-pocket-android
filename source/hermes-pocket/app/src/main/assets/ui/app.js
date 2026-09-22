@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260921c";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-22 00:35 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "取消自动回车（写入不带 \\r；回车只由键条 ⏎ 显式发）", "featureId": "R-21,R-24", "note": "装上去先看设置面板「构建版本」这一行；本版起：输入框「写入」只把内容送进终端、不替用户按回车。", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260921c"};
+  HP.BUILD = "unified-20260923-004612";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-23 00:46 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "版本串与打包时间每包自动写入（出包时刻盖章）", "featureId": "F1", "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build.py 在出包时自动写，不再手写", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260923-004612"};
   /* —— 打包信息结束 —— */
 
   const THEME = {

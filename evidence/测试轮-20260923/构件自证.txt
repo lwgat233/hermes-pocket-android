@@ -1,0 +1,16 @@
+# 构件自证（2026-09-23 测试轮）
+被测 APK：apk/测试版/hermes-pocket-修信息窗报错-20260922.apk
+文件大小：5062500 字节
+APK sha256：e6e2f8b4bbd3e96485ea5ef8d7326feca53209b94e8c41fefd56e4a4741ea2c4
+构建输出同源（源码树里那个包）：e6e2f8b4bbd3e96485ea5ef8d7326feca53209b94e8c41fefd56e4a4741ea2c4
+
+# 包内界面源码 vs 源码树（证明装的就是这一版改了的那份）
+包内 assets/ui/talk.js  sha256：4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+源码树 talk.js          sha256：4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+
+# 版本串对账（失败项）
+页面 HP.BUILD        = unified-20260921c
+包内 build-info.json = unified-20260921c / builtAt 2026-09-22 00:35 CST
+结论：界面上的「构建版本」一行仍是 20260921c、打包时间还写 00:35，
+      而本包实际建于 2026-09-22 23:33（含今晚的 talk.js 修复）
+      → 「先证明设备跑的是这一版」这条判据用版本串做不到，只能靠解包比对。

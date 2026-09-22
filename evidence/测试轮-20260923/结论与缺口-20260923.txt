@@ -1,0 +1,52 @@
+# 测试轮结论（hermes-pocket-测试轮 第 1 步「测试」，pipeline.tester，2026-09-23 00:24 CST）
+
+被测构件：apk/测试版/hermes-pocket-修信息窗报错-20260922.apk
+  sha256 e6e2f8b4bbd3e96485ea5ef8d7326feca53209b94e8c41fefd56e4a4741ea2c4 · 5062500 字节 · 23:33 出包
+  与源码树构建输出 app/build/outputs/apk/debug/app-debug.apk 哈希一致（同一份）
+设备：无头模拟器 hpk34（Android 14 / x86_64 / 1536M），容器 hp-emu
+探针：tools/panel-live.mjs（单条求值）、tools/验收脚本/test-round-20260923.mjs（dev-probe 驱动，真触摸）
+原始读数：evidence/测试轮-20260923/设备复验-原始输出.txt · 截图：截图-左栏收起会话键-20260923.png
+
+## 已验（每条都是页面上读回来的事实）
+
+P1 装的是这一版 —— 解开包比对内容，不看大小/时间：
+   包内 assets/ui/talk.js sha256 = 4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a
+   源码树 talk.js       sha256 = 4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a  → 一致 ✓
+P2 设备端装包启动 —— adb install Success；进程 dev.hermes.pocket 在跑；WebView 页面
+   https://appassets.androidplatform.net/ui/index.html 在；页面读数 HP.BUILD=unified-20260921c、HP.App.state=idle ✓
+P3 频道页渲染 + 降级如实 —— .tabpage.on = tab-talk；页面文字含「服务端：连不上（还没连接）」「（还没拉到角色）」；
+   角色行 0 条；整轮 Runtime.exceptionThrown = 0、console.error = 0（R-18 那类假报错没复现）✓
+P4 左栏（☰）真手指一点 —— 能开：body.drawer-open=true、#drawer.show=true，列出 7 个栏目
+   （主机 / 密钥 / 设置 / 会话 / 技能与记忆 / 频道 / 网络与流量）；点遮罩能关：两个 class 都清掉 ✓
+
+## 失败项（要 author 处理）
+
+F1 版本串没随本轮改动更新 →「先证明设备跑的是这一版」这条判据做不到。
+   读数：页面 HP.BUILD = unified-20260921c；包内 build-info.json testVersion = unified-20260921c、
+   builtAt = 2026-09-22 00:35 CST；设置页那一行显示同样的串与时间。
+   事实：本包实际出包时间 2026-09-22 23:33，且含今晚才改的 talk.js（paintSheet 那处）。
+   → 界面上的「构建版本」无法区分「今晚这版」与「昨晚那版」，只能靠解包比对（P1 那种做法）。
+   判据（要求 author 达到）：本包带自己的版本串（例：unified-20260922-night / 打包时间 23:33），
+   装上去读设置页「构建版本」一行就能对上。
+
+## 没验到的（等放行，不算 pass 也不算 fail）
+
+B1 点角色 → 信息窗弹出（paintSheet 的 el 未定义）     ）四条都要求 app 先 SSH 连上 NAS：
+B2 本人发言在面板上成气泡                              ）没连上，talk.roles / talk.since 全失败，
+B3 信息窗里「删除这个会话」能删                        ）频道页按设计降级、角色行 0 条，
+B4 点会话行能切过去（resume）                          ）没有可点的对象 → 一条都点不了。
+   根因（读回来的）：模拟器里 pocket 存的那台主机（192.168.1.10 · user lwgat · auth=key ·
+   keyId 8090b58a5ec3453d「verify-key」）的公钥不在 NAS 的 ~/.ssh/authorized_keys 里
+   （逐条比对现有 7 把，无一条匹配）；app 侧 keys.json 里那把 origin=imported、hasPassphrase=false。
+B5 「开左栏收起会话键」的可见性判据也判不了 —— tk-sayline / tk-saychips 只在 1:1 角色页里创建
+   （talk.js:795、822），没连主机就没有那一页，DOM 里根本没有这两个元素（读回来是 null）；
+   代码路径存在（app.js:1335 openDrawer → sessionKeys(false)），但没有实物可读 → 不写结论。
+   放行只需一步：把模拟器那台设备的公钥授到 NAS（或本人/经理在自己机器上连一次）。
+
+## 环境侧的两个坑（别人也会踩）
+
+E1 AVD test34 坏了：~/.android/avd/test34.avd/config.ini 丢了 → emulator 报
+   「Failed to process .ini … FATAL | CPU Architecture 'arm' is not supported」，容器起不来。
+   绕法：用 hpk34（config.ini 在，x86_64、1536M）。
+E2 容器 dh-emu 的 CMD 写死 -avd test34，所以 `docker start dh-emu` 必挂；本轮新建了容器 hp-emu
+   （同一镜像 notifbridge-emu:34、同设备/挂载，-memory 1536）。收工后要停：docker rm -f hp-emu。

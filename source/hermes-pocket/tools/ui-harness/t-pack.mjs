@@ -6,8 +6,12 @@
  * 这份 JSON 就是包里的那一份（下面用 node 直接读同一个文件）。
  */
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const jsonPath = '/home/lwgat/hermes-pocket/app/src/main/assets/build-info.json';
+/* 读的就是源树里那一份（按本文件位置推：tools/ui-harness → app/src/main/assets）；要用别的树设 HP_JSON=… */
+const jsonPath = process.env.HP_JSON
+  || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../app/src/main/assets/build-info.json');
 const info = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
 export default {

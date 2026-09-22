@@ -167,8 +167,9 @@ TOFU 主机指纹、tmux/TUI 适配、键条与实时发送栏、流量统计、
   —— 功能矩阵（12 条 log 需求 → 模块 → 验收脚本）、追加缺陷 R-13~R-16、怎么装、**怎么确认装的是这一版**、已知限制。
 - **要整份拷走**：`dist/hermes-pocket-交付-20260921.tar.gz`（`~84.2 MB`，312 个条目，含 README/MANIFEST/apk/docs/evidence/source）
   sha256 `e2bf59ed4bdb6fcc31b2eaacbe249840081a1cade19ea27cf17c03c2b137df46`。
-- **版本串不再手写**：源在 `app/src/main/assets/build-info.json`（打进包），由 `tools/stamp-build.py` 盖进 `ui/app.js`；
-  界面「设置 → 构建版本」与终端横幅都读它。打包流程：改 JSON → `stamp-build.py` → `--check` → 干净构建 → 拷进归档 → 算哈希 → 写说明书。
+- **版本串不再手写**：源在 `app/src/main/assets/build-info.json`（打进包），由 `tools/stamp-build.py` 在**出包时自动写入**这一包的版本串（`轮次名-日期-时分秒`）与打包时间，再盖进 `ui/app.js`；界面「设置 → 构建版本」与终端横幅都读它。
+  出包一条命令：`bash tools/build.sh --name "这包叫什么" --feature "做了什么" --feature-id "F1"` —— ①盖章 ②核对 ③构建 ④**解开包对账**（包内 `build-info.json` / `HP.BUILD` / `ui` 每个文件与源树比哈希）⑤归档；**对账不过就不归档**。
+  复核别人给的包：`python3 tools/stamp-build.py --verify <apk>`（退出码 0 = 包内与源树逐字节一致）。
 - **本轮实测**：
   · 统一验收 **18 个驱动一次跑完，0 条 false**（`evidence/统一打包/`）；
   · **功能覆盖自检**：登记表 11 项全部已做且全挂上，缺口名单（没归属/没挂上/没测/未做/空集合）全空；

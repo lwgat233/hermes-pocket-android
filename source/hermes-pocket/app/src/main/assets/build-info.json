@@ -3,10 +3,10 @@
   "appName": "Hermes Pocket",
   "packageId": "dev.hermes.pocket",
   "entry": "dev.hermes.pocket.MainActivity",
-  "testVersion": "unified-20260921c",
-  "feature": "取消自动回车（写入不带 \\r；回车只由键条 ⏎ 显式发）",
-  "featureId": "R-21,R-24",
+  "testVersion": "unified-20260923-004612",
+  "feature": "版本串与打包时间每包自动写入（出包时刻盖章）",
+  "featureId": "F1",
   "acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动",
-  "builtAt": "2026-09-22 00:35 CST",
-  "note": "装上去先看设置面板「构建版本」这一行；本版起：输入框「写入」只把内容送进终端、不替用户按回车。"
+  "builtAt": "2026-09-23 00:46 CST",
+  "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build.py 在出包时自动写，不再手写"
 }

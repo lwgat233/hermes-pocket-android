@@ -1,0 +1,62 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "hermes-pocket-测试轮-20260923": {
+    "check": {
+      "versionChain": {
+        "pageBuild": "unified-20260921c",
+        "infoTestVersion": "unified-20260921c",
+        "infoBuiltAt": "2026-09-22 00:35 CST",
+        "settingsLine": "运行通道：Android 原生 SSH（App 内直连，私钥不出设备） 协议版本 v1 构建版本：unified-20260921c · 取消自动回车（写入不带 \\r；回车只由键条 ⏎ 显式发）（R-21,R-24）· 打包 2026-09-22 00:35 CST 密钥库：AES-256-GCM 主密钥就绪（TEE "
+      },
+      "talkBoard": {
+        "tabOn": "tab-talk",
+        "roleRows": 0,
+        "text": "实时含私信 🔒服务端：连不上（还没连接）搭服务端跟谁说（还没拉到角色）＋ 新角色建频道（0）▸🗣 全体喊话＋ 新对话（只对我）上次聊过（还没有会话）去群聊 →",
+        "saylineExists": false,
+        "chipsExists": false
+      },
+      "keysBefore": {
+        "sayline": null,
+        "saychips": null,
+        "bodyDrawerOpen": false,
+        "drawerHasShow": false
+      },
+      "drawerBtnRect": {
+        "x": 23,
+        "y": 20,
+        "w": 34,
+        "h": 32
+      },
+      "keysWhileDrawerOpen": {
+        "sayline": null,
+        "saychips": null,
+        "bodyDrawerOpen": true,
+        "drawerHasShow": true
+      },
+      "drawerEntries": [
+        "‹",
+        "主机地址 / 用户 / 启动命令",
+        "密钥生成 / 导入 / 装到服务器",
+        "设置字号 / 回滚 / 省电 / 通知",
+        "会话远端 tmux 会话 · 点一下就切过去（永不终止）",
+        "技能与记忆远端 SKILL.md / USER.md / MEMORY.md",
+        "频道角色与对话 · 点谁就是跟谁说话",
+        "网络与流量连通性 / 丢包 / 上下行"
+      ],
+      "keysAfterClose": {
+        "sayline": null,
+        "saychips": null,
+        "bodyDrawerOpen": false,
+        "drawerHasShow": false
+      },
+      "verdict": {
+        "buildLabelStale": true,
+        "versionCriteriaUsable": false,
+        "talkRendered": true,
+        "talkDegradeHonest": true,
+        "drawerCollapsesSessionKeys": false,
+        "closeRestoresSessionKeys": true
+      }
+    }
+  }
+}
