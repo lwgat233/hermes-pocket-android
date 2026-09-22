@@ -711,71 +711,7 @@
       }
 
       /* 输入行：聊天和终端两种形式都在，敲一句按发送 */
-      const line = document.createElement('div');
-      line.className = 'tk-askline';
-      /* 上半行：这条谁能看见（只给他 / 他人可见）+ 以什么身份说（本人 / 经理）—— 标签写清，不做第二个选择器 */
-      const chips = document.createElement('div');
-      chips.className = 'tk-row';
-      chips.id = 'tk-saychips';
-      chips.style.padding = '4px 0';
-      const kc = document.createElement('button');
-      kc.className = 'tk-chip' + (this.kind === 'default' ? ' on' : '');
-      kc.id = 'tk-kindchip';
-      kc.setAttribute('data-testid', 'talk-kindchip');
-      kc.textContent = this.kind === 'default' ? '可见：他人可见' : '可见：只给他';
-      kc.addEventListener('click', () => {
-        this.kind = (this.kind === 'default' ? 'private' : 'default');
-        this.render();
-      });
-      chips.appendChild(kc);
-      const wc = document.createElement('button');
-      wc.className = 'tk-chip' + (this.asWho === 'owner.me' ? ' on' : '');
-      wc.id = 'tk-whosay';
-      wc.setAttribute('data-testid', 'talk-whosay');
-      wc.textContent = this.asWho === 'owner.me' ? '身份：经理说' : '身份：本人说';
-      wc.addEventListener('click', () => {
-        this.asWho = (this.asWho === 'owner.me' ? 'me' : 'owner.me');
-        this.render();
-      });
-      chips.appendChild(wc);
-      el.appendChild(chips);
 
-      /* 下半行：输入框 + 发送（贴底固定，发送键一定看得见） */
-      const line = document.createElement('div');
-      line.className = 'tk-askline';
-      line.id = 'tk-sayline';
-      line.style.position = 'sticky';
-      line.style.bottom = '0';
-      line.style.background = '#0f1218';
-      line.style.display = 'flex';
-      line.style.gap = '8px';
-      line.style.padding = '8px 0';
-      const inp = document.createElement('input');
-      inp.className = 'tk-askin';
-      inp.id = 'tk-sayin';
-      inp.setAttribute('data-testid', 'talk-sayin');
-      inp.placeholder = this.style === 'chat' ? '说点什么…' : '说点什么（会送进他的会话）…';
-      inp.style.flex = '1 1 auto';
-      inp.style.minWidth = '0';
-      const ok = document.createElement('button');
-      ok.className = 'tk-act';
-      ok.id = 'tk-sayok';
-      ok.setAttribute('data-testid', 'talk-sayok');
-      ok.textContent = '发送';
-      ok.style.flex = '0 0 auto';
-      const fire = async () => {
-        const text = (inp.value || '').trim();
-        if (!text) { HP.App.toast('先说点什么'); return; }
-        inp.value = '';
-        await this.send(r.full_name, this.kind || 'private', text);
-        setTimeout(() => this.pullRoleOutput(r), 2500);
-        setTimeout(() => this.pullRoleOutput(r), 6000);
-      };
-      ok.addEventListener('click', fire);
-      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') fire(); });
-      line.appendChild(inp);
-      line.appendChild(ok);
-      el.appendChild(line);
     },
 
     /* Hermes 的界面是整屏重画的，"行数变多"取不到新行 —— 直接抠他最近一次回答的框
