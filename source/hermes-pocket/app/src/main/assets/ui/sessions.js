@@ -82,7 +82,7 @@
       if (!n) { HP.App.toast('远端没有 tmux 会话'); return false; }
       this.sel = n;
       /* 已经在 tmux 里就切过去；没在 tmux 里才 attach */
-      HP.App.send('tmux switch-client -t ' + q(n) + ' 2>/dev/null || tmux attach -t ' + q(n) + '\r');
+      HP.App.send('tmux attach -t ' + q(n) + '\r');   /* 启动/进入：原版行为，直接 attach 已有会话 */
       HP.App.toast('已切到会话 ' + n);
       return true;
     },
