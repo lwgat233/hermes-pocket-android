@@ -12,6 +12,34 @@
   const rpc = (op, args) => HP.App.rpc(op, args || {}, 20000);
   const KIND = { broadcast: '📢', private: '🔒', default: '· ' };
 
+  /* 气泡样式直接内联：不依赖样式表是否被应用（用户报过"一行一行"，追查成本太高） */
+  const BUB = (el, mine) => {
+    const st = el.style;
+    st.boxSizing = 'border-box';
+    st.maxWidth = '82%';
+    st.padding = '9px 12px';
+    st.borderRadius = '14px';
+    st.fontSize = '14px';
+    st.lineHeight = '1.45';
+    st.whiteSpace = 'pre-wrap';
+    st.wordBreak = 'break-word';
+    st.marginTop = '6px';
+    if (mine) {
+      st.alignSelf = 'flex-end';
+      st.background = '#2b6cff';
+      st.color = '#ffffff';
+      st.borderBottomRightRadius = '4px';
+    } else {
+      st.alignSelf = 'flex-start';
+      st.background = '#22262f';
+      st.color = '#e6e8ee';
+      st.borderBottomLeftRadius = '4px';
+    }
+    return el;
+  };
+
+
+
   /* 本地保存（记录/角色/技巧都留一份在手机上）+ 登录时刷新校验
    * 规矩：网络通 → 拿服务端的并覆写本地；网络不通 → 用本地那份并标"离线"。 */
   const CACHE = {
@@ -241,6 +269,10 @@
       const stream = document.createElement('div');
       stream.className = 'tk-chat';
       stream.id = 'tk-stream';
+      stream.style.display = 'flex';
+      stream.style.flexDirection = 'column';
+      stream.style.maxHeight = '54vh';
+      stream.style.overflowY = 'auto';
       el.appendChild(stream);
       this.paintStream();
 
@@ -342,7 +374,7 @@
       if (!rows.length) { s.textContent = '（还没有消息）'; return; }
       rows.forEach((m) => {
         const me = m.from === 'owner.me';
-        const d = document.createElement('div');
+        const d = BUB(document.createElement('div'), me);
         d.className = 'tk-bub ' + (me ? 'me' : 'him');
         const who = document.createElement('div');
         who.className = 'tk-bubwho';
@@ -536,6 +568,10 @@
         const box = document.createElement('div');
         box.className = 'tk-chat';
         box.id = 'tk-chat';
+        box.style.display = 'flex';
+        box.style.flexDirection = 'column';
+        box.style.maxHeight = '54vh';
+        box.style.overflowY = 'auto';
         el.appendChild(box);
         this.paintChat(r);
       } else {
@@ -623,14 +659,14 @@
       const live = ((this.live || {})[r.full_name] || []);
       if (!items.length && !live.length) { box.textContent = '（还没聊过）'; return; }
       items.forEach((m) => {
-        const bu = document.createElement('div');
+        const bu = BUB(document.createElement('div'), m.who === 'me');
         bu.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
         bu.textContent = m.body;
         box.appendChild(bu);
       });
       /* 他多半是在自己的会话里回话 → 那些新行也画成他的话 */
       live.forEach((t) => {
-        const bu = document.createElement('div');
+        const bu = BUB(document.createElement('div'), false);
         bu.className = 'tk-bub him';
         bu.textContent = t;
         box.appendChild(bu);
