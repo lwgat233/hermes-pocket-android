@@ -344,6 +344,38 @@
       gline.appendChild(gin);
       gline.appendChild(gok);
       el.appendChild(gline);
+
+      /* 投递台账：谁收了、谁没收、为什么 */
+      const db = document.createElement('button');
+      db.className = 'tk-chip';
+      db.id = 'tk-delivbtn';
+      db.setAttribute('data-testid', 'talk-delivbtn');
+      db.textContent = this.delivOpen ? '收起台账' : '投递台账';
+      db.addEventListener('click', () => { this.delivOpen = !this.delivOpen; this.render(); });
+      el.appendChild(db);
+      if (this.delivOpen) {
+        const box = document.createElement('div');
+        box.className = 'tk-hist';
+        box.id = 'tk-deliv';
+        box.textContent = '（读取中…）';
+        el.appendChild(box);
+        this.paintDeliveries(box);
+      }
+    },
+
+    async paintDeliveries(box) {
+      try {
+        const r = await rpcCache('talk.deliveries', { limit: 20 }, 'deliveries');
+        const items = (r && r.items) || [];
+        box.textContent = '';
+        if (!items.length) { box.textContent = '（还没有投递记录）'; return; }
+        items.forEach((d) => {
+          const row = document.createElement('div');
+          row.className = 'tk-hist-row';
+          row.textContent = '#' + d.msg + ' → ' + d.role + '  ' + (d.ok ? '✓ 已投' : '✗ ' + (d.note || '没投成'));
+          box.appendChild(row);
+        });
+      } catch (e) { box.textContent = '读不到台账：' + e.message; }
     },
 
     /* 一个角色 = 一行等高卡片（名称 / 副行 / 能接入的标签） */
