@@ -1,31 +1,29 @@
-/* 频道（多角色）面板样式 —— 只加这一类，不动其它页面 */
-.tk-row { display: flex; gap: 6px; padding: 8px 2px; flex-wrap: wrap; }
-.tk-chip { background: #1e222b; color: #cfd6e4; border: 1px solid #2a2f3a; border-radius: 999px;
-  padding: 5px 10px; font-size: 13px; }
-.tk-chip.on { background: #2b6cff22; border-color: #5b8cff; color: #dfe7ff; }
-.tk-title { color: #8b93a5; font-size: 12px; padding: 10px 2px 4px; }
-.tk-scene { color: #6f7a90; font-size: 12px; padding: 6px 2px 2px; }
-.tk-roles { display: flex; flex-wrap: wrap; gap: 6px; padding: 2px; }
-.tk-role { position: relative; background: #171a21; color: #e6e8ee; border: 1px solid #2a2f3a;
-  border-radius: 10px; padding: 10px 12px; font-size: 14px; text-align: left; }
-.tk-role.paused { opacity: .55; }
-.tk-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #6b7280; margin-right: 7px; }
-.tk-role.online .tk-dot { background: #46d17a; }        /* 在线＝会话活着且没被停 */
-.tk-role.paused .tk-dot { background: #d1a246; }
-.tk-ch { margin-left: 7px; font-size: 11px; color: #8ea0ff; background: #2b6cff1a; border-radius: 999px; padding: 1px 6px; }
+/* 频道页（多角色）：样式跟「主机」页保持一致 —— 复用 style.css 里的 .card / .row-item */
+.tk-row { display: flex; gap: 8px; padding: 8px 2px; flex-wrap: wrap; }
+.tk-chip { background: #1b1f27; color: #cfd3dd; border: 1px solid #2a2f3a; border-radius: 999px; padding: 6px 12px; font-size: 13px; }
+.tk-chip.on { background: #2b6cff; color: #fff; border-color: #2b6cff; }
+.tk-title { color: #8b93a5; font-size: 12px; margin: 12px 2px 6px; }
+.tk-hint { color: #5f6779; font-size: 13px; padding: 6px 2px; }
+.tk-scene { color: #5f6779; font-size: 12px; margin: 10px 2px 6px; }
+
+/* 一个角色 = 一行等高卡片（宽度撑满 = 一行一个，不挤在一行里） */
+.tk-rolecard { display: block; width: 100%; text-align: left; margin: 0 0 8px; }
+.tk-rolecard.paused { opacity: .55; }
+.tk-rolecard .row1 { align-items: center; }
+.tk-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6b7280; margin-right: 8px; }
+.tk-rolecard.online .tk-dot { background: #46d17a; }        /* 在线＝会话活着且没被停 */
+.tk-rolecard.paused .tk-dot { background: #d1a246; }
+.tk-caret { color: #6b7280; font-size: 15px; }
 .tk-badge { margin-left: 8px; background: #2b6cff; color: #fff; border-radius: 999px; padding: 0 6px; font-size: 12px; }
-.tk-acts { display: flex; gap: 8px; padding: 10px 2px; flex-wrap: wrap; }
-.tk-act { background: #2b6cff; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; }
-.tk-hist { display: flex; flex-direction: column; gap: 4px; }
-.tk-hist-row { background: #171a21; color: #cfd6e4; border: 1px solid #2a2f3a; border-radius: 8px;
-  padding: 8px 10px; font-size: 13px; text-align: left; }
-.tk-stream { background: #12151b; border: 1px solid #2a2f3a; border-radius: 10px; padding: 8px;
-  max-height: 40vh; overflow-y: auto; }
-.tk-msg { border-bottom: 1px dashed #232833; padding: 6px 2px; font-size: 13px; color: #dfe3ec; line-height: 1.45; }
-.tk-msg:last-child { border-bottom: 0; }
-.tk-dim { color: #7b8497; }
-.tk-term { background: #0f1115; color: #cfd6e4; border: 1px solid #2a2f3a; border-radius: 10px;
-  padding: 8px; font-size: 12px; line-height: 1.4; max-height: 45vh; overflow: auto; white-space: pre-wrap; }
+.tk-tag { font-size: 11px; color: #8ea0ff; background: #2b6cff1a; border-radius: 999px; padding: 1px 7px; }
+
+/* 频道（可折叠） */
+.tk-sec { width: 100%; }
+.tk-exp { padding: 2px 2px 6px; }
+.tk-chrow { display: flex; gap: 10px; padding: 8px 10px; background: #171a21; border: 1px solid #232833;
+  border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+.tk-chname { color: #e6e8ee; flex: 0 0 auto; font-family: var(--font-mono, monospace); }
+.tk-chwho { color: #8b93a5; flex: 1 1 auto; text-align: right; }
 
 /* 等你授权：一行一个问题，自带输入 + 答复键 */
 .tk-asks { display: flex; flex-direction: column; gap: 8px; padding: 2px 0 6px; }
@@ -35,3 +33,14 @@
 .tk-askline { display: flex; gap: 8px; }
 .tk-askin { flex: 1; background: #12141a; color: #e6e8ee; border: 1px solid #2a2f3a;
   border-radius: 8px; padding: 9px 10px; font-size: 14px; }
+
+.tk-acts { display: flex; gap: 8px; padding: 10px 2px; flex-wrap: wrap; }
+.tk-act { background: #2b6cff; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.tk-hist { display: flex; flex-direction: column; gap: 6px; }
+.tk-hist-row { background: #171a21; color: #cfd3dd; border: 1px solid #232833; border-radius: 8px;
+  padding: 9px 10px; font-size: 13px; text-align: left; }
+.tk-stream { display: flex; flex-direction: column; gap: 6px; padding: 2px 0 10px; font-size: 13px; color: #cfd3dd; }
+.tk-msg { background: #171a21; border: 1px solid #232833; border-radius: 8px; padding: 8px 10px; }
+.tk-dim { color: #6b7280; }
+.tk-term { background: #0e1015; color: #cfd3dd; border: 1px solid #232833; border-radius: 8px;
+  padding: 10px; font-size: 12px; font-family: var(--font-mono, monospace); max-height: 42vh; overflow: auto; white-space: pre-wrap; }

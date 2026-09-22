@@ -1,21 +1,27 @@
-/* Hermes Pocket — 频道（多角色）：角色按钮 + 实时消息流 + 跟某个角色说话
- * 规矩（用户 2026-09-22 定）：**全按键，不输指令** ——
- *   点哪个角色就是跟谁说话（没有"选对象"、没有"选私信/广播"）；用户只敲"要说的话"。
+/* Hermes Pocket — 频道（多角色协作）
+ * 规矩（用户 2026-09-22 定，改版后仍照此）：
+ *   1) **全按键，不输指令** —— 点角色行就是跟谁说话；用户只敲"要说的话"。
+ *   2) **角色分组后一行一个、等高**（照「主机」页的 .card 行样式，不挤在一行里）。
+ *   3) **频道可折叠展开**；1:1 界面按角色**缓存**（看着像多窗口/多条 SSH，实际一条）。
+ *   4) 常驻按键 ≤3；不写说明文字；行里不摆 ⋯。
  * 后端全部走 HP.App.rpc('talk.xxx')（原生侧命令固定，用户数据只进参数）。
- * 失败不连累其它栏目：本模块所有渲染都包在 try/catch 里。
  */
 (function () {
   const HP = (window.HP = window.HP || {});
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const rpc = (op, args) => HP.App.rpc(op, args || {}, 20000);
-
   const KIND = { broadcast: '📢', private: '🔒', default: '· ' };
+
+  /* monospace 的会话名：跟服务端 tmux_session() 一致 */
+  const sess = (full) => 'role-' + String(full || '').replace(/\./g, '-');
 
   const Talk = {
     roles: [], msgs: [], last: 0, view: 'channel', sel: null, busy: false, timer: null,
     withPrivate: true, live: true,
+    chOpen: false,                 /* 「频道」折叠状态 */
+    cache: {},                     /* role -> 上次读到的会话输出（切回来秒显，充当"多窗口"） */
+    asks: [],
 
-    /* 切到频道栏目时开轮询；离开就停（省电、也不在后台刷） */
     onShow() { this.render(); this.startPoll(); },
     onHide() { this.stopPoll(); },
     startPoll() {
@@ -33,12 +39,16 @@
       scenes.forEach((s) => (s.roles || []).forEach((x) => { x.scene = s.scene; this.roles.push(x); }));
     },
 
+    async refreshAsks() {
+      try { const r = await rpc('talk.asks'); this.asks = (r && r.asks) || []; }
+      catch (e) { this.asks = []; }
+    },
+
     async tick() {
       const r = await rpc('talk.since', { id: this.last });
       const list = (r && r.messages) || [];
       if (list.length) {
         list.forEach((m) => this.msgs.push(m));
-        this.last = r.last || this.last;
         if (this.view === 'channel' && this.live) this.paintStream();
       }
       this.last = r && r.last != null ? r.last : this.last;
@@ -50,9 +60,10 @@
       el.textContent = '';
       try {
         await this.refreshRoles();
+        await this.refreshAsks();
         if (!this.last) { const r = await rpc('talk.since', { id: 0 }); this.last = (r && r.last) || 0; this.msgs = (r && r.messages) || []; }
       } catch (e) { HP.App.toast('连不上频道：' + e.message); }
-      try { this.view === 'role' && this.sel ? this.paintRole(el) : this.paintChannel(el); }
+      try { (this.view === 'role' && this.sel) ? this.paintRole(el) : this.paintChannel(el); }
       catch (e) { el.textContent = '频道画不出来：' + e.message; }
     },
 
@@ -64,35 +75,31 @@
       head.appendChild(this.toggle('含私信 🔒', this.withPrivate, (v) => { this.withPrivate = v; this.paintStream(); }));
       el.appendChild(head);
 
-      const title = document.createElement('div');
-      title.className = 'tk-title';
-      title.textContent = '跟谁说';
-      el.appendChild(title);
+      /* 等你授权：谁在等你答、等什么 —— 答完自动消失（放最上面，怕你漏看） */
+      if (this.asks.length) {
+        el.appendChild(this.title('等你授权（' + this.asks.length + '）'));
+        const box = document.createElement('div');
+        box.className = 'tk-asks';
+        box.id = 'tk-asks';
+        this.asks.forEach((k) => box.appendChild(this.askRow(k)));
+        el.appendChild(box);
+      }
 
+      /* 跟谁说：按场景分组，**一个角色一行、等高**（照主机页的 .card） */
+      el.appendChild(this.title('跟谁说'));
       const scenes = {};
       this.roles.forEach((r) => (scenes[r.scene || '?'] = scenes[r.scene || '?'] || []).push(r));
-      Object.keys(scenes).sort().forEach((sc) => {
+      const keys = Object.keys(scenes).sort();
+      if (!keys.length) el.appendChild(this.hint('（还没拉到角色）'));
+      keys.forEach((sc) => {
         const cap = document.createElement('div');
         cap.className = 'tk-scene';
         cap.textContent = sc;
         el.appendChild(cap);
-        const wrap = document.createElement('div');
-        wrap.className = 'tk-roles';
-        scenes[sc].forEach((r) => {
-          const b = document.createElement('button');
-          b.className = 'tk-role' + (r.state === 'paused' ? ' paused' : '') + (r.online ? ' online' : '');
-          b.setAttribute('data-role', r.full_name);
-          const chans = (r.channels || []).join('·');
-          b.innerHTML = '<span class="tk-dot"></span>' + esc(r.title || r.name) +
-            (chans ? '<span class="tk-ch">' + esc(chans) + '</span>' : '') +
-            (r.pending ? '<span class="tk-badge">' + r.pending + '</span>' : '');
-          b.addEventListener('click', () => this.openRole(r.full_name));
-          wrap.appendChild(b);
-        });
-        el.appendChild(wrap);
+        scenes[sc].forEach((r) => el.appendChild(this.roleCard(r)));
       });
 
-      /* ＋ 新角色：在客户端就能建（服务端只记名册，回头 roles-json 就带出来） */
+      /* ＋ 新角色（客户端直接建） */
       const addb = document.createElement('button');
       addb.className = 'tk-act';
       addb.id = 'tk-addrole';
@@ -129,27 +136,32 @@
       el.appendChild(addb);
       el.appendChild(form);
 
-      /* 接入表（经理维护）：哪个频道里谁能收到消息 */
-      const chs = Object.keys(this.channels || {});
-      if (chs.length) {
-        const ct = document.createElement('div');
-        ct.className = 'tk-title';
-        ct.textContent = '频道（谁能接入）';
-        el.appendChild(ct);
+      /* 频道（可折叠）：折着只看一行，展开看谁能收到 */
+      const chs = Object.keys(this.channels || {}).sort();
+      const sec = document.createElement('button');
+      sec.className = 'row-item tk-sec';
+      sec.id = 'tk-channels-toggle';
+      sec.setAttribute('data-testid', 'talk-channels');
+      sec.innerHTML = '<div class="row1"><span class="name">频道（' + chs.length + '）</span>' +
+        '<span class="tk-caret">' + (this.chOpen ? '▾' : '▸') + '</span></div>';
+      sec.addEventListener('click', () => { this.chOpen = !this.chOpen; this.render(); });
+      el.appendChild(sec);
+      if (this.chOpen) {
         const cl = document.createElement('div');
-        cl.className = 'tk-hist';
+        cl.className = 'tk-exp';
         cl.id = 'tk-channels';
-        chs.sort().forEach((c) => {
+        if (!chs.length) cl.appendChild(this.hint('（接入表是空的）'));
+        chs.forEach((c) => {
           const d = document.createElement('div');
-          d.className = 'tk-hist-row';
-          d.textContent = c + ' → ' + (this.channels[c] || []).join('、');
+          d.className = 'tk-chrow';
+          d.innerHTML = '<span class="tk-chname">' + esc(c) + '</span><span class="tk-chwho">' +
+            esc((this.channels[c] || []).join('、')) + '</span>';
           cl.appendChild(d);
         });
         el.appendChild(cl);
       }
 
-      this.paintAsks(el);      /* 异步拉「等你授权」：拉到就插在动作键前面 */
-
+      /* 常驻按键（含上面「＋ 新角色」共 3 个） */
       const acts = document.createElement('div');
       acts.className = 'tk-acts';
       const shout = document.createElement('button');
@@ -166,20 +178,14 @@
       acts.appendChild(solo);
       el.appendChild(acts);
 
-      const h = document.createElement('div');
-      h.className = 'tk-title';
-      h.textContent = '上次聊过';
-      el.appendChild(h);
+      el.appendChild(this.title('上次聊过'));
       const hist = document.createElement('div');
       hist.className = 'tk-hist';
       hist.id = 'tk-hist';
       el.appendChild(hist);
       this.paintHistory(hist);
 
-      const st = document.createElement('div');
-      st.className = 'tk-title';
-      st.textContent = '频道';
-      el.appendChild(st);
+      el.appendChild(this.title('频道'));
       const stream = document.createElement('div');
       stream.className = 'tk-stream';
       stream.id = 'tk-stream';
@@ -187,59 +193,70 @@
       this.paintStream();
     },
 
-    async paintAsks(el) {
-      await this.refreshAsks();
-      if (!this.asks.length) return;
-        /* 等你授权：谁在等你答、等的是什么 —— 答完自动从这儿消失 */
-        if (this.asks.length) {
-          const at = document.createElement('div');
-          at.className = 'tk-title';
-          at.textContent = '等你授权（' + this.asks.length + '）';
-          el.appendChild(at);
-          const box = document.createElement('div');
-          box.className = 'tk-asks';
-          box.id = 'tk-asks';
-          this.asks.forEach((k) => {
-            const row = document.createElement('div');
-            row.className = 'tk-ask';
-            row.setAttribute('data-ask', String(k.id));
-            const head = document.createElement('div');
-            head.className = 'tk-askhead';
-            head.textContent = k.from + '\u3000' + (k.topic || '');
-            const what = document.createElement('div');
-            what.className = 'tk-askbody';
-            what.textContent = (k.body || '').replace(/^\u3010[^\u3011]*\u3011\u6765\u81ea[^\n]*\n/, '');
-            const line = document.createElement('div');
-            line.className = 'tk-askline';
-            const inp = document.createElement('input');
-            inp.className = 'tk-askin';
-            inp.placeholder = '只说你要说的话';
-            const ok = document.createElement('button');
-            ok.className = 'tk-act';
-            ok.textContent = '答复';
-            ok.addEventListener('click', async () => {
-              const text = (inp.value || '').trim();
-              if (!text) { HP.App.toast('先说点什么'); return; }
-              try {
-                await rpc('talk.answer', { id: String(k.id), text: text });
-                HP.App.toast('答复已回给 ' + k.from);
-                this.render();
-              } catch (e) { HP.App.toast('答复失败：' + e.message); }
-            });
-            line.appendChild(inp); line.appendChild(ok);
-            row.appendChild(head); row.appendChild(what); row.appendChild(line);
-            box.appendChild(row);
-          });
-          const anchor = el.querySelector('.tk-acts');
-          if (anchor) el.insertBefore(box, anchor); else el.appendChild(box);
-        }
-
+    /* 一个角色 = 一行等高卡片（名称 / 副行 / 能接入的标签） */
+    roleCard(r) {
+      const b = document.createElement('button');
+      b.className = 'card tk-rolecard' + (r.state === 'paused' ? ' paused' : '') + (r.online ? ' online' : '');
+      b.setAttribute('data-role', r.full_name);
+      b.setAttribute('data-testid', 'talk-role');
+      const row1 = document.createElement('div');
+      row1.className = 'row1';
+      row1.innerHTML = '<span class="tk-dot"></span><span class="name">' + esc(r.title || r.name) + '</span>' +
+        (r.pending ? '<span class="tk-badge">' + r.pending + '</span>' : '') +
+        '<span class="tk-caret">›</span>';
+      const sub = document.createElement('div');
+      sub.className = 'sub';
+      sub.textContent = r.full_name + ' · ' + sess(r.full_name) + (r.online ? '' : (r.state === 'paused' ? ' · 被停' : ' · 不在线'));
+      b.appendChild(row1);
+      b.appendChild(sub);
+      const tags = document.createElement('div');
+      tags.className = 'tags';
+      (r.channels || []).forEach((c) => {
+        const t = document.createElement('span');
+        t.className = 'tk-tag';
+        t.textContent = c;
+        tags.appendChild(t);
+      });
+      if (tags.childNodes.length) b.appendChild(tags);
+      b.addEventListener('click', () => this.openRole(r.full_name));
+      return b;
     },
 
-    async refreshAsks() {
-      try { const r = await rpc('talk.asks'); this.asks = (r && r.asks) || []; }
-      catch (e) { this.asks = []; }
+    /* 一行「等你授权」：谁 / 等什么 / 敲一句就答 */
+    askRow(k) {
+      const row = document.createElement('div');
+      row.className = 'tk-ask';
+      row.setAttribute('data-ask', String(k.id));
+      const head = document.createElement('div');
+      head.className = 'tk-askhead';
+      head.textContent = k.from + '　' + (k.topic || '');
+      const what = document.createElement('div');
+      what.className = 'tk-askbody';
+      what.textContent = (k.body || '').replace(/^【[^】]*】来自[^\n]*\n/, '');
+      const line = document.createElement('div');
+      line.className = 'tk-askline';
+      const inp = document.createElement('input');
+      inp.className = 'tk-askin';
+      inp.placeholder = '只说你要说的话';
+      const ok = document.createElement('button');
+      ok.className = 'tk-act';
+      ok.textContent = '答复';
+      ok.addEventListener('click', async () => {
+        const text = (inp.value || '').trim();
+        if (!text) { HP.App.toast('先说点什么'); return; }
+        try {
+          await rpc('talk.answer', { id: String(k.id), text: text });
+          HP.App.toast('答复已回给 ' + k.from);
+          this.render();
+        } catch (e) { HP.App.toast('答复失败：' + e.message); }
+      });
+      line.appendChild(inp); line.appendChild(ok);
+      row.appendChild(head); row.appendChild(what); row.appendChild(line);
+      return row;
     },
+
+    title(t) { const d = document.createElement('div'); d.className = 'tk-title'; d.textContent = t; return d; },
+    hint(t) { const d = document.createElement('div'); d.className = 'tk-hint'; d.textContent = t; return d; },
 
     paintStream() {
       const s = document.getElementById('tk-stream');
@@ -279,7 +296,7 @@
       return b;
     },
 
-    /* ---------------- 跟某个角色说话 ---------------- */
+    /* ---------------- 跟某个角色单独说（= 一个"窗口"） ---------------- */
     async openRole(full) {
       this.sel = this.roles.find((r) => r.full_name === full) || { full_name: full, title: full };
       this.view = 'role';
@@ -297,18 +314,23 @@
 
       const head = document.createElement('div');
       head.className = 'tk-title';
-      head.textContent = (r.title || r.name) + '　' + (r.state === 'paused' ? '被停' : '在跑') + (r.pending ? ' · 欠 ' + r.pending : '');
+      head.textContent = (r.title || r.name) + '　' + (r.state === 'paused' ? '被停' : (r.online ? '在线' : '不在线')) + (r.pending ? ' · 欠 ' + r.pending : '');
       el.appendChild(head);
 
       const out = document.createElement('pre');
       out.className = 'tk-term';
       out.id = 'tk-term';
-      out.textContent = '（正在读他的会话…）';
+      /* 缓存命中就先铺上（切回来秒显，像另一个窗口一直都开着），再后台刷新 */
+      out.textContent = this.cache[r.full_name] || '（正在读他的会话…）';
       el.appendChild(out);
-      try {
-        const c = await rpc('talk.capture', { role: r.full_name, lines: 200 });
-        out.textContent = (c && (c.raw || '')) || '（没内容）';
-      } catch (e) { out.textContent = '读不到：' + e.message; }
+      rpc('talk.capture', { role: r.full_name, lines: 200 }).then((c) => {
+        const raw = (c && c.raw) || '（没内容）';
+        this.cache[r.full_name] = raw;
+        const box = document.getElementById('tk-term');
+        if (box && this.sel && this.sel.full_name === r.full_name) box.textContent = raw;
+      }).catch((e) => {
+        if (!this.cache[r.full_name]) out.textContent = '读不到：' + e.message;
+      });
 
       const inbox = document.createElement('button');
       inbox.className = 'tk-act';
