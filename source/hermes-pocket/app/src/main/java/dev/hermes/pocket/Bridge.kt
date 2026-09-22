@@ -709,6 +709,9 @@ print('@@OK', '1')
             "talk.sessions" -> if (hasId) ok(id, talkJson(listOf("sessions-json")))
             "talk.since" -> if (hasId) ok(id, talkJson(listOf("since-json", "--id", m.optInt("id", 0).toString())))
             "talk.inbox" -> if (hasId) ok(id, talkJson(listOf("inbox", "--role", talkRole(m.optString("role")))))
+            "talk.switch" -> if (hasId) ok(id, talkJson(listOf("switch", "--role", talkText(m.optString("role", "")))))
+            "talk.doctor" -> if (hasId) ok(id, talkJson(listOf("doctor")))
+            "talk.setup" -> if (hasId) ok(id, talkJson(listOf("setup")))
             "talk.deliveries" -> if (hasId) ok(id, talkJson(listOf("deliveries", "--lines",
                     m.optString("limit", "20"))))
             "talk.thread" -> if (hasId) ok(id, talkJson(listOf("thread", "--role", talkText(m.optString("role", "")),
