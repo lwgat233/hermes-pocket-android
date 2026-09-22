@@ -1,0 +1,13 @@
+### 缺陷 7 功能键条验收（含真实输入事件）  2026-09-17 08:13:34 CST
+
+--- A. 可见性 / 不横滑 / 键盘弹起后布局 ---
+  "value": "  ✓ TUI 主键行不产生横向滚动   内容 393 / 可视 393\n  ✓ TUI 主键 16 个全部可见   16/16：Esc Tab ⇧Tab ↑ ↓ ← → ⏎ PgUp PgDn ⇞回滚 ⌫ ^C ⌨键盘 ▤ ⌄更多\n  ✓ 最右侧键获焦点后 Esc 仍在   scrollLeft=0 完整可见=16\n  ✓ shell 主键行不产生横向滚动   内容 393 / 可视 393\n  ✓ shell 主键 16 个全部可见   16/16\n  ✓ shell：最右侧键获焦点后 Esc 仍在   scrollLeft=0\n  ✗ 「更多」默认收起\n  ✗ 「更多」能展开且不横向滚动   键数=16 内容 0/0\n  ✗ 「更多」能收起\n  ✓ 键盘弹起后键条仍完整可见   键条 187px，底边 778 / 可视 778\n  ✓ 键盘弹起后终端仍有空间   终端 551px\n  ✗ 键条按钮可被命中（没被遮挡）   \n\n失败 4 项: 「更多」默认收起 | 「更多」能展开且不横向滚动 | 「更多」能收起 | 键条按钮可被命中（没被遮挡）"
+
+--- B. 真实输入事件：Esc/⌫/Ctrl+^C 到底发出了什么 ---
+  "value": "hooked"
+  "value": "{\"backspace_sent\":[\"7f\"]}"
+  "value": "cleared"
+  "value": "{\"ctrl_latched\":true,\"latched_style\":true}"
+  "value": "{\"ctrlC_sent\":[\"3\"],\"ctrl_released_after\":true}"
+  "value": "to tui"
+  "value": "{\"tui_ctrlC\":[\"3\"],\"tui_esc_visible\":true}"

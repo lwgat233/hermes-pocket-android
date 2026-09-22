@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hermes Pocket</string>
+    <string name="fgs_channel">保持连接</string>
+    <string name="fgs_title">Hermes Pocket 会话</string>
+</resources>

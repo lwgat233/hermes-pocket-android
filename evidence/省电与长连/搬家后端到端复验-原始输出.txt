@@ -1,0 +1,22 @@
+### 搬家后端到端复验（终版）  2026-09-17 12:56:55 CST
+
+=== 环境 ===
+  SDK 实体: /vol1/1000/aicache/tools/android-sdk
+  JAVA    实体: /vol1/1000/aicache/tools/jdk-17.0.2
+  adb: emulator-5554	device
+  adb: 
+  测试主机绑定的 keyId: b8f3599c9a884054
+
+=== 用「连接实际会用的那把」公钥装 authorized_keys ===
+  {"keyId匹配": true, "公钥": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHic…"}
+  已写入 authorized_keys: 102 字符
+
+=== 连接 ===
+  {"状态": "connected"}
+
+=== 终端回显 + 省电/落盘 ===
+  {"终端回显": true, "心跳": "10s", "终端行数": 32}
+  服务端连接数: 3
+
+=== 收尾 ===
+已停止（镜像 / AVD / SDK 保留，下次 tools/emu.sh start 秒起）

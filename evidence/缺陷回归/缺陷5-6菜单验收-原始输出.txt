@@ -1,0 +1,24 @@
+### 缺陷 5/6 菜单可点性验收（真实输入事件）  2026-09-17 08:06:37 CST
+
+  "value": "cards=3"
+  "tapped": "#tab-hosts .card[data-host]",
+  "value": "{\"菜单弹出\":true,\"菜单项\":[\"▶ 连接 菜单测试主机\",\"编辑\",\"复制 ssh 命令\",\"删除\"]}"
+  "tapped": "#ctxmenu button:nth-child(2)",
+  "value": "{\"菜单已关\":true,\"表单打开\":true,\"回填名称\":\"菜单测试主机\"}"
+  "value": "ok"
+  "tapped": "#termhost",
+  "value": "{\"长按菜单弹出\":true,\"项数\":8}"
+  "tapped": "#ctxmenu button:nth-child(2)",
+  "value": "{\"输入框出现\":true,\"菜单已关\":true}"
+  "value": "opened"
+  "tapped": "#ctxmenu button:nth-child(1)",
+  "value": "{\"命中次数\":1,\"菜单已关\":true}"
+
+--- A/B 对照（把旧那一行插回去）---
+  "value": "flag on, counter menu opened"
+  "value": true
+  "tapped": "#ctxmenu button:nth-child(1)",
+  "value": "{\"A_修复前_点菜单项_命中\":0,\"菜单还在\":false}"
+  "value": "flag off, reopened"
+  "tapped": "#ctxmenu button:nth-child(1)",
+  "value": "{\"B_修复后_点菜单项_命中\":1,\"菜单已关\":true}"

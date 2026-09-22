@@ -1,0 +1,2 @@
+-dontwarn org.slf4j.**
+-keep class com.jcraft.jsch.** { *; }

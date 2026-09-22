@@ -1,0 +1,163 @@
+### F-UI-9「设置生效 / 回读 / 持久化」本地测试台原始输出  2026-09-21 16:37:25 CST
+# 测试台：tools/ui-harness/harness.mjs（Chromium 1234 + 假原生桥，本地不联网）
+# 改动版本：HP.BUILD=uidx-20260921-A；APK sha256 11c6de11c1d7f6d32b6f6b129740843f512a3fc4b32c872825082b4b41c6b2c7
+
+=== ① 字号：改 24 → 当场生效 → 重载后仍在 ===
+{
+  "name": "F-UI-9 字号生效与持久化",
+  "result": {
+    "boot": {
+      "optFont": 13,
+      "cssFont": "13px",
+      "lineHeight": "normal",
+      "cols": 50,
+      "rows": 34,
+      "geomMode": "auto",
+      "baseFont": 13,
+      "tbGeom": "50×34"
+    },
+    "set": {
+      "before": {
+        "optFont": 13,
+        "cssFont": "13px",
+        "lineHeight": "normal",
+        "cols": 50,
+        "rows": 34,
+        "geomMode": "auto",
+        "baseFont": 13,
+        "tbGeom": "50×34"
+      },
+      "after": {
+        "optFont": 24,
+        "cssFont": "24px",
+        "lineHeight": "normal",
+        "cols": 27,
+        "rows": 18,
+        "prefFont": "24",
+        "stashedPref": "24",
+        "geomMode": "auto",
+        "baseFont": 24,
+        "tbGeom": "27×18"
+      },
+      "立刻生效": true
+    },
+    "afterReload": {
+      "optFont": 24,
+      "cssFont": "24px",
+      "lineHeight": "normal",
+      "cols": 27,
+      "rows": 18,
+      "prefFont": "24",
+      "stashedPref": "24",
+      "geomMode": "auto",
+      "baseFont": 24,
+      "tbGeom": "27×18",
+      "重载后仍是24": true
+    }
+  }
+}
+
+=== ② 字号 + 回滚上限 + 开关：生效 / 回读 / 重载保持 ===
+{
+  "name": "F-UI-9 设置生效 / 回读 / 持久化（字号 + 回滚上限 + 开关）",
+  "result": {
+    "boot": {
+      "optFont": 13,
+      "cssFont": "13px",
+      "cols": 50,
+      "rows": 34,
+      "scrollback": 5000,
+      "keybarHidden": false,
+      "composerHidden": false,
+      "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+      "inpFont": "13",
+      "inpScroll": "5000",
+      "inpKeybar": true
+    },
+    "set": {
+      "before": {
+        "optFont": 13,
+        "cssFont": "13px",
+        "cols": 50,
+        "rows": 34,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "13",
+        "inpScroll": "5000",
+        "inpKeybar": true
+      },
+      "font": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "5000",
+        "inpKeybar": true,
+        "prefFont": "20"
+      },
+      "scroll": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 1000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": true,
+        "prefFont": "20",
+        "prefScroll": "1000"
+      },
+      "kb": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 25,
+        "scrollback": 1000,
+        "keybarHidden": true,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": false,
+        "prefFont": "20",
+        "prefScroll": "1000",
+        "prefKeybar": "false"
+      },
+      "字号当场生效": true,
+      "回滚上限当场生效": true,
+      "开关当场生效": true,
+      "界面回读生效值": true,
+      "控件显示与生效一致": true
+    },
+    "afterReload": {
+      "optFont": 20,
+      "cssFont": "20px",
+      "cols": 32,
+      "rows": 25,
+      "scrollback": 1000,
+      "keybarHidden": true,
+      "composerHidden": false,
+      "stEff": "生效中：字号 20px · 终端 32×25 · 回滚 1000 行 · 已保存",
+      "inpFont": "20",
+      "inpScroll": "1000",
+      "inpKeybar": false,
+      "prefFont": "20",
+      "prefScroll": "1000",
+      "prefKeybar": "false",
+      "重载后字号仍是20": true,
+      "重载后回滚上限仍是1000": true,
+      "重载后键条仍是关的": true,
+      "重载后控件显示一致": true
+    }
+  }
+}

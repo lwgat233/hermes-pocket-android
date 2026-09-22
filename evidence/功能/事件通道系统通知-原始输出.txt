@@ -1,0 +1,50 @@
+### 事件 → 手机系统通知  2026-09-17 10:30:05 CST
+
+=== 让 App 回到后台（模拟手机放桌上）+ 重新开启事件通道 ===
+    "value": "{\"事件通道\":\"watching\"}"
+
+=== ① 写 auth（需要授权）===
+    auth: 需要你点一下确认 | 远端在等你输入 sudo 密码
+    android.title=String (需要你点一下确认)
+    android.text=String (远端在等你输入 sudo 密码)
+    android.title=String (首次连接，需要确认主机指纹)
+    android.text=String (10.0.2.2:2222
+    android.title=String (Hermes Pocket 会话)
+    android.text=String (lwgat@10.0.2.2)
+
+=== ② 写 done（做完了）===
+    done: 构建完成 | hermes-pocket 调试包已生成
+    android.title=String (构建完成)
+    android.text=String (hermes-pocket 调试包已生成)
+    android.title=String (需要你点一下确认)
+    android.text=String (远端在等你输入 sudo 密码)
+    android.title=String (首次连接，需要确认主机指纹)
+    android.text=String (10.0.2.2:2222
+    android.title=String (Hermes Pocket 会话)
+    android.text=String (lwgat@10.0.2.2)
+
+=== ③ 写 info ===
+    info: 顺便说一句 | 这条是普通提醒
+    android.title=String (顺便说一句)
+    android.text=String (这条是普通提醒)
+    android.title=String (构建完成)
+    android.text=String (hermes-pocket 调试包已生成)
+    android.title=String (需要你点一下确认)
+    android.text=String (远端在等你输入 sudo 密码)
+    android.title=String (首次连接，需要确认主机指纹)
+    android.text=String (10.0.2.2:2222
+    android.title=String (Hermes Pocket 会话)
+    android.text=String (lwgat@10.0.2.2)
+
+=== ④ App 在前台时：auth 应穿透、done 应被抑制 ===
+    "value": "{\"紧急\":{\"posted\":true,\"foreground\":false},\"普通\":{\"posted\":true,\"foreground\":false}}"
+
+=== 事件文件内容 ===
+  随手写一句没有格式的话
+  auth: 需要你点一下确认 | 远端在等你输入 sudo 密码
+  done: 构建完成 | hermes-pocket 调试包已生成
+  info: 顺便说一句 | 这条是普通提醒
+
+=== ④b App 回到前台后重测：auth 应穿透、done/info 应被抑制 ===
+    "value": "{\"前台\":true,\"紧急事件\":{\"posted\":true},\"普通事件\":{\"posted\":false}}"
+  （真机通知栏里此刻应只有「前台紧急」，没有「前台普通」）

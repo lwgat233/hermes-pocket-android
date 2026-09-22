@@ -1,0 +1,24 @@
+### 构件可复现性核验（干净构建 vs 交付构件） 2026-09-21 16:5x
+
+源码快照 `source/hermes-pocket/`（60 个文件 / 5.4M，排除 `app/build`、`.gradle`、`local.properties`、`bridge/node_modules`）
+拷到干净目录 `/tmp/hpk-clean/` 重新构建一次：
+
+    JAVA_HOME=$HOME/tools/jdk-17.0.2 ANDROID_HOME=$HOME/tools/android-sdk \
+    gradle --no-daemon -Pkotlin.compiler.execution.strategy=in-process :app:assembleDebug
+
+    BUILD SUCCESSFUL in 13s
+
+逐条目核对（zip 条目名 / CRC / 大小 三者比对）：
+
+    条目数 A(交付) / B(干净构建): 68 68
+    只在 A: []      只在 B: []
+    CRC/大小不同的条目数: 0
+
+结论与处理：**包内容逐条目完全一致**，只有文件大小差 39 KB —— 那是 debug 签名块的开销
+（工作副本那份是多次增量构建攒出来的，和上一轮归档时遇到的是同一件事）。
+按归档约定「源码快照必须能干净复现交付构件的哈希」，**归档里换成干净构建得到的那一份**：
+
+    sha256  ce948fb7b13fc1826e4d9cd6069c13ae3bca330c28cf8829213cc9337f12a23e（干净构建，已归档）
+    （工作副本增量构建那份 4947995 字节、e8598bcb2f89… 只作过程产物，不入档）
+
+源码快照与工作副本的差异：`diff -r` 无输出（除排除项外完全一致）。

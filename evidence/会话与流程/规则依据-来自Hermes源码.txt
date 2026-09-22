@@ -1,0 +1,40 @@
+### 聊天状态机规则的依据（取自本机已安装的 Hermes TUI 产物）  2026-09-21 17:01:06 CST
+# 来源目录: /home/lwgat/.hermes/hermes-agent/ui-tui/dist
+# 目的: F-SESS-12 的每条规则都要说清凭什么这么判，不许有凭感觉的规则。
+
+$ grep -rohE "[^\"]{0,60}(compacting|compacted|Compressions|interrupt|Thinking)[^\"]{0,20}" . | sort -u
+`~${compactNumber(tokenCount)} tokens`
+`~${compactNumber(toolTokens)} tokens`
+`${fmtTokens(tokens)} tok`
+"clear draft / interrupt / exit"
+"compacted"
+"compacting"
+`Compressions: ${r.compressions}`
+"control busy enter mode [queue|steer|interrupt|status]"
+"copy selection / clear draft / interrupt / exit"
+"Ctrl+C to interrupt\u2026"
+"inject a message after the next tool call (no interrupt)"
+"Input tokens"
+"interrupt"
+"*[interrupted]*"
+"[interrupted]"
+"interrupted"
+`interrupted`
+"interrupting\u2026"
+"Output tokens"
+"resumed interrupted turn"
+"session.interrupt"
+"subagent.interrupt"
+"subtree tokens"
+"Thinking"
+"tokens"
+"Total tokens"
+"usage: /busy [queue|steer|interrupt|status]"
+
+# 与 chatstate.js 规则表的对应：
+#   interrupt_hint ← "Ctrl+C to interrupt…"（只有在跑的时候才显示）
+#   thinking       ← "Thinking" / "~N tokens" / "N tok"
+#   compacting     ← "compacting"
+#   compacted      ← "compacted"
+#   compressions   ← "Compressions: ${n}" / "cmp ${n}"
+#   interrupted    ← "[interrupted]"

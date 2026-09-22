@@ -1,0 +1,12 @@
+{
+  "project": "hermes-pocket",
+  "appName": "Hermes Pocket",
+  "packageId": "dev.hermes.pocket",
+  "entry": "dev.hermes.pocket.MainActivity",
+  "testVersion": "unified-20260921c",
+  "feature": "取消自动回车（写入不带 \\r；回车只由键条 ⏎ 显式发）",
+  "featureId": "R-21,R-24",
+  "acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动",
+  "builtAt": "2026-09-22 00:35 CST",
+  "note": "装上去先看设置面板「构建版本」这一行；本版起：输入框「写入」只把内容送进终端、不替用户按回车。"
+}

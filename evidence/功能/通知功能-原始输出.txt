@@ -1,0 +1,37 @@
+### 终端事件通知 · 最终验收  2026-09-17 09:46:53 CST
+
+=== 1. 切后台（模拟手机放桌上）===
+  前台应用: {56b7d7a u0 com.google.android.apps.nexuslauncher/.Ne
+
+=== 2. 触发：BEL / OSC777 / 命令完成（sleep 12）===
+  连接: connected  TUI=false
+① 已发送 BEL（printf "\a"）到远端，等 2 秒…
+② 已发送 OSC 777 通知序列，等 2 秒…
+③ 已发送「sleep 12; echo ALL-DONE」，等 18 秒看命令完成通知…
+
+当前前台状态（原生侧）: {"granted":true,"foreground":false,"channel":"hpk-events"}
+
+=== 3. 通知栏实收（本 App）===
+                  android.title=String (命令已完成（15 秒）)
+                  android.text=String ($ sleep 12; echo ALL-DONE
+                  android.title=String (构建完成)
+                  android.text=String (用了 42 秒，3 个警告)
+                  android.title=String (终端响铃)
+                  android.text=String (fp · 远端发出了响铃（常见于命令跑完/出错）)
+                  android.title=String (首次连接，需要确认主机指纹)
+                  android.text=String (10.0.2.2:2222
+                  android.title=String (Hermes Pocket 会话)
+                  android.text=String (lwgat@10.0.2.2)
+                  android.title=String (清场)
+                  android.text=String (清通知栏)
+                  android.title=String (正在运行)
+                  android.text=String (http://10.0.2.15:8765)
+                  android.title=String (Serial console enabled)
+                  android.text=String (Performance is impacted. To disable, check bootloader.)
+
+=== 4. 前台抑制 vs 紧急穿透（把 App 拉回前台再测）===
+  A 前台普通事件 → posted=false  （期望 false，前台不打扰）
+B 前台 urgent 事件 → posted=true  （期望 true，需要人处理）
+   返回: {"posted":true,"foreground":true,"granted":true}
+C 关掉「通知：远端响铃」后触发 BELL （期望本次没有新通知，见外层 dumpsys 计数对比）
+   bell 开关现在 = true

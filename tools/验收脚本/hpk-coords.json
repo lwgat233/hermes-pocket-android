@@ -1,0 +1,5 @@
+[
+ {
+  "eval": "(() => {\n  const A = HP.App;\n  window.__esc = [];\n  if (!window.__escHooked) {\n    window.__escHooked = true;\n    const oSend = A.send.bind(A);\n    A.send = (d) => { if (typeof d === 'string' && d.charCodeAt(0) === 0x1b) window.__esc.push('0x1b'); return oSend(d); };\n  }\n  window.__esc = [];\n  window.__coords = null;\n  const vis = [...document.querySelectorAll('#keybar .key')].filter(e => e.getBoundingClientRect().width > 0);\n  const esc = vis.find(e => e.textContent.trim() === 'Esc');\n  if (esc) { const r = esc.getBoundingClientRect(); window.__coords = { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; }\n  const top = [...document.querySelectorAll('#topbar button, #topbar .tb-btn, #topbar [role=button]')].filter(e => e.getBoundingClientRect().width > 0);\n  window.__topBtn = top.length ? (() => { const r = top[0].getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2), t: top[0].textContent.trim().slice(0, 8) }; })() : null;\n  return JSON.stringify({ Esc坐标: window.__coords, 顶栏对照按钮: window.__topBtn });\n})()"
+ }
+]

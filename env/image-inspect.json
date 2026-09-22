@@ -1,0 +1,51 @@
+[
+    {
+        "Id": "sha256:cd225cc05a6d60f72229fac781bef7e6cc4a24aa5ae7bd7a3db9950b6995c35b",
+        "RepoTags": [
+            "notifbridge-emu:34"
+        ],
+        "RepoDigests": [],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-09-14T20:18:46.502035643+08:00",
+        "DockerVersion": "",
+        "Author": "",
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 371955878,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/vol1/docker/overlay2/3bf4a9d9ca3a410df3b31daad733cfa874fd5f6c63f5afc1251e8b3db2b67718/diff",
+                "MergedDir": "/vol1/docker/overlay2/zsufwrrm4oj337was04bpeb9u/merged",
+                "UpperDir": "/vol1/docker/overlay2/zsufwrrm4oj337was04bpeb9u/diff",
+                "WorkDir": "/vol1/docker/overlay2/zsufwrrm4oj337was04bpeb9u/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:cd482426e5675a31e31f2bddad58815b83b309a587bf56b46a308586d9fd6eb5",
+                "sha256:dc7565ab9bcdff94c9e1bfc5e6e4b2c2798ddd3432c0a8eccb8029574ba07b37"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-09-14T20:18:47.726139228+08:00"
+        },
+        "Config": {
+            "Cmd": [
+                "bash"
+            ],
+            "Entrypoint": null,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "DEBIAN_FRONTEND=noninteractive"
+            ],
+            "Labels": null,
+            "OnBuild": null,
+            "User": "",
+            "Volumes": null,
+            "WorkingDir": ""
+        }
+    }
+]

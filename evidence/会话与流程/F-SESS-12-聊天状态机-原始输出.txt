@@ -1,0 +1,637 @@
+### F-SESS-12「聊天输出状态机」原始输出  2026-09-21 17:01:31 CST
+# 改动版本 HP.BUILD=sess-20260921-B；构件 sha256 c281f66dad4db0eb61eac5b4c031407e82703663e9ff691b493286713a1c7060（干净构建，归档源码可复现）
+# 驱动 tools/ui-harness/t-chatstate.mjs；规则依据见同目录 规则依据-来自Hermes源码.txt
+
+=== ① 状态机：真实 TUI 文案 → 状态 / 命中规则 / 迁移序列 / 顶栏那一行字 ===
+{
+  "name": "F-SESS-12 聊天输出状态机",
+  "result": {
+    "check": {
+      "规则表": [
+        {
+          "id": "compacting",
+          "state": "压缩中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"compacting\""
+        },
+        {
+          "id": "compacted",
+          "state": "压缩中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"compacted\"（刚压完，仍算压缩态，下一次输出会转回运行）"
+        },
+        {
+          "id": "compressions",
+          "state": "压缩中",
+          "有依据": true,
+          "依据": "ui-tui/dist: `Compressions: ${n}` / `cmp ${n}`"
+        },
+        {
+          "id": "interrupted",
+          "state": "已结束",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"[interrupted]\" —— 这一轮被中断"
+        },
+        {
+          "id": "interrupt_hint",
+          "state": "运行中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"Ctrl+C to interrupt…\" —— 只有在跑的时候才显示"
+        },
+        {
+          "id": "thinking",
+          "state": "运行中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"Thinking\" / \"~N tokens\" / \"N tok\" —— 流式输出还在动"
+        }
+      ],
+      "逐条": [
+        {
+          "喂的": "思考",
+          "文本": "✻ Thinking…  ~1.2k tokens",
+          "判成": "运行中",
+          "命中规则": "thinking",
+          "命中片段": " Thinking…"
+        },
+        {
+          "喂的": "可中断",
+          "文本": "Ctrl+C to interrupt…",
+          "判成": "运行中",
+          "命中规则": "interrupt_hint",
+          "命中片段": "Ctrl+C to interrupt"
+        },
+        {
+          "喂的": "压缩中",
+          "文本": "compacting",
+          "判成": "压缩中",
+          "命中规则": "compacting",
+          "命中片段": "compacting"
+        },
+        {
+          "喂的": "压缩计数",
+          "文本": "Compressions: 3",
+          "判成": "压缩中",
+          "命中规则": "compressions",
+          "命中片段": "Compressions: 3"
+        },
+        {
+          "喂的": "压缩完",
+          "文本": "compacted",
+          "判成": "压缩中",
+          "命中规则": "compacted",
+          "命中片段": "compacted"
+        },
+        {
+          "喂的": "被打断",
+          "文本": "  [interrupted]",
+          "判成": "已结束",
+          "命中规则": "interrupted",
+          "命中片段": "[interrupted]"
+        },
+        {
+          "喂的": "普通输出",
+          "文本": "assistant: 好了，做完了。",
+          "判成": "未知",
+          "命中规则": "",
+          "命中片段": ""
+        }
+      ],
+      "迁移": {
+        "中途": "运行中",
+        "序列": [
+          "运行中",
+          "压缩中",
+          "运行中",
+          "已结束"
+        ],
+        "规则": [
+          "interrupt_hint",
+          "compacting",
+          "thinking",
+          "quiet"
+        ],
+        "终态": "已结束"
+      },
+      "说明": "压缩中 ← 规则 compacting｜依据：ui-tui/dist: \"compacting\"｜命中：\"compacting\"｜静默 0s",
+      "真实链路": {
+        "状态": "运行中",
+        "命中规则": "interrupt_hint",
+        "顶栏文字": "shell · 运行中",
+        "顶栏悬停说明": "运行中 ← 规则 interrupt_hint｜依据：ui-tui/dist: \"Ctrl+C to interrupt…\" —— 只有在跑的时候才显示｜命中：\"Ctrl+C to interrupt\"｜静默 0s"
+      },
+      "静默转结束": {
+        "状态": "已结束",
+        "命中规则": "quiet",
+        "顶栏文字": "shell · 已结束"
+      },
+      "覆盖": {
+        "覆盖到": [
+          "thinking",
+          "interrupt_hint",
+          "compacting",
+          "compressions",
+          "compacted",
+          "interrupted",
+          "quiet"
+        ],
+        "没覆盖到": []
+      },
+      "结论": {
+        "每条规则都有依据": true,
+        "思考算运行中": true,
+        "可中断提示算运行中": true,
+        "compacting算压缩中": true,
+        "压缩计数算压缩中": true,
+        "压缩完算压缩中": true,
+        "被打断算已结束": true,
+        "普通输出不改状态": true,
+        "迁移序列对": true,
+        "静默阈值前不算结束": true,
+        "说明里有依据与命中片段": true,
+        "真实链路生效": true,
+        "顶栏带悬停说明": true,
+        "静默后顶栏显示已结束": true,
+        "规则全被覆盖": true
+      }
+    }
+  }
+}
+
+=== ② 模块回归（会话流程 / 抽屉 / 设置 / 长文本 / 启动打点）===
+{
+  "name": "F-SESS-6 会话（tmux）流程：能看 / 能选 / 有就不动 / 永不终止",
+  "result": {
+    "check": {
+      "解析_两条": {
+        "list": [
+          {
+            "name": "hermes",
+            "windows": 3,
+            "attached": 1,
+            "activityMs": 1789980000000,
+            "createdMs": 1789900000000,
+            "ageSec": 81295,
+            "idleSec": 1295
+          },
+          {
+            "name": "work",
+            "windows": 1,
+            "attached": 0,
+            "activityMs": 1789979000000,
+            "createdMs": 1789800000000,
+            "ageSec": 181295,
+            "idleSec": 2295
+          }
+        ],
+        "err": ""
+      },
+      "解析_没有": {
+        "list": [],
+        "err": "no server running on /tmp/tmux-1000/default"
+      },
+      "启动_有会话": {
+        "action": "attach",
+        "name": "hermes",
+        "count": 2
+      },
+      "启动_有会话_发出去的字": "tmux attach -t 'hermes'\r",
+      "启动_没会话_用主机命令": {
+        "action": "startCmd",
+        "cmd": "tmux new -As hermes 'hermes --tui' \\; set -g mouse on",
+        "count": 0
+      },
+      "启动_没会话_发出去的字": "tmux new -As hermes 'hermes --tui' \\; set -g mouse on\r",
+      "启动_没会话_自建": {
+        "action": "create",
+        "name": "hermes",
+        "count": 0
+      },
+      "启动_没会话_自建_发出去的字": "tmux new -As 'hermes' 'hermes --tui' \\; set -g mouse on\r",
+      "界面": {
+        "状态行": [
+          "在线：已连接 · 远端 tmux：2 个会话",
+          "当前选中：hermes"
+        ],
+        "行数": 2,
+        "行": [
+          {
+            "id": "session-hermes",
+            "t": "hermes",
+            "s": "窗口 3 · 建了 23 小时 · 最后活动 22 分钟前",
+            "r": "attach 中",
+            "on": true
+          },
+          {
+            "id": "session-work",
+            "t": "work",
+            "s": "窗口 1 · 建了 2 天 · 最后活动 38 分钟前",
+            "r": "空闲",
+            "on": false
+          }
+        ]
+      },
+      "点第二行": {
+        "选中": "work",
+        "状态行": [
+          "在线：已连接 · 远端 tmux：2 个会话",
+          "当前选中：work"
+        ],
+        "选中记号在第二行": "row-item row-on"
+      },
+      "点第二行_发出去的字": "tmux attach -t 'work'\r",
+      "永不终止": {
+        "发过的负载条数": 1,
+        "含kill": false,
+        "含newAs": false
+      },
+      "结论": {
+        "解析出两个会话": true,
+        "解析没tmux不抛错": true,
+        "有会话时是attach": true,
+        "有会话时没有新建": true,
+        "没会话时按主机命令建": true,
+        "没会话也没命令时自建": true,
+        "界面两行": true,
+        "状态行有在线与会话数": true,
+        "右列是状态": true,
+        "点行就切过去": true,
+        "切换后界面跟着变": true,
+        "全程没有杀会话": true
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-7 左侧隐藏栏 + 功能登记表",
+  "result": {
+    "check": {
+      "自检": {
+        "总数": 10,
+        "已做": 5,
+        "没归属": [],
+        "空集合": [],
+        "界面空集合": [
+          "diag"
+        ],
+        "没挂上": [],
+        "没测": [],
+        "未做": [
+          "model",
+          "prompt",
+          "skills-dl",
+          "net",
+          "status"
+        ]
+      },
+      "抽屉": {
+        "条目数": 5,
+        "登记可用数": 5,
+        "集合": [
+          "连接",
+          "Hermes"
+        ],
+        "条目": [
+          {
+            "id": "hosts",
+            "t": "主机",
+            "s": "地址 / 用户 / 启动命令",
+            "h": 55
+          },
+          {
+            "id": "keys",
+            "t": "密钥",
+            "s": "生成 / 导入 / 装到服务器",
+            "h": 55
+          },
+          {
+            "id": "settings",
+            "t": "设置",
+            "s": "字号 / 回滚 / 省电 / 通知",
+            "h": 55
+          },
+          {
+            "id": "sessions",
+            "t": "会话",
+            "s": "远端 tmux 会话 · 点一下就切过去（永不终止）",
+            "h": 55
+          },
+          {
+            "id": "hermes",
+            "t": "技能与记忆",
+            "s": "远端 SKILL.md / USER.md / MEMORY.md",
+            "h": 55
+          }
+        ],
+        "未做的没摆出来": true
+      },
+      "行样式": {
+        "标题字号": "14px",
+        "标题字重": "600",
+        "次行字号": "12px",
+        "行高": 55,
+        "达标": true
+      },
+      "右列规范": {
+        "flexBasis": "auto",
+        "whiteSpace": "nowrap",
+        "textOverflow": "clip",
+        "scrollWidth": 54,
+        "clientWidth": 54,
+        "数值没被截断": true,
+        "达标": true
+      },
+      "选栏目": [
+        {
+          "id": "settings",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "设置"
+        },
+        {
+          "id": "keys",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "密钥"
+        },
+        {
+          "id": "hermes",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "技能与记忆"
+        },
+        {
+          "id": "hosts",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "主机"
+        },
+        {
+          "点空白收起": true
+        }
+      ],
+      "未做的点不动": {
+        "拿谁试的": "model",
+        "抬头没变": true
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-9 设置生效 / 回读 / 持久化（字号 + 回滚上限 + 开关）",
+  "result": {
+    "boot": {
+      "optFont": 13,
+      "cssFont": "13px",
+      "cols": 50,
+      "rows": 34,
+      "scrollback": 5000,
+      "keybarHidden": false,
+      "composerHidden": false,
+      "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+      "inpFont": "13",
+      "inpScroll": "5000",
+      "inpKeybar": true
+    },
+    "set": {
+      "before": {
+        "optFont": 13,
+        "cssFont": "13px",
+        "cols": 50,
+        "rows": 34,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "13",
+        "inpScroll": "5000",
+        "inpKeybar": true
+      },
+      "font": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "5000",
+        "inpKeybar": true,
+        "prefFont": "20"
+      },
+      "scroll": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 1000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": true,
+        "prefFont": "20",
+        "prefScroll": "1000"
+      },
+      "kb": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 25,
+        "scrollback": 1000,
+        "keybarHidden": true,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": false,
+        "prefFont": "20",
+        "prefScroll": "1000",
+        "prefKeybar": "false"
+      },
+      "字号当场生效": true,
+      "回滚上限当场生效": true,
+      "开关当场生效": true,
+      "界面回读生效值": true,
+      "控件显示与生效一致": true
+    },
+    "afterReload": {
+      "optFont": 20,
+      "cssFont": "20px",
+      "cols": 32,
+      "rows": 25,
+      "scrollback": 1000,
+      "keybarHidden": true,
+      "composerHidden": false,
+      "stEff": "生效中：字号 20px · 终端 32×25 · 回滚 1000 行 · 已保存",
+      "inpFont": "20",
+      "inpScroll": "1000",
+      "inpKeybar": false,
+      "prefFont": "20",
+      "prefScroll": "1000",
+      "prefKeybar": "false",
+      "重载后字号仍是20": true,
+      "重载后回滚上限仍是1000": true,
+      "重载后键条仍是关的": true,
+      "重载后控件显示一致": true
+    }
+  }
+}
+{
+  "name": "F-UI-1 长文本滚动 / 一键到底 / 缓存上限",
+  "result": {
+    "check": {
+      "普通_初始": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 274,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": null,
+        "alt": false,
+        "mouseMode": 0,
+        "发给远端字节数": 0
+      },
+      "普通_下滑后": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 257,
+        "落后行数": 17,
+        "chipVisible": true,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": false,
+        "mouseMode": 0,
+        "发给远端字节数": 0
+      },
+      "普通_点chip后": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 274,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": false,
+        "mouseMode": 0,
+        "发给远端字节数": 0
+      },
+      "普通_结论": {
+        "能往上翻": true,
+        "出现回到底部入口": true,
+        "一键到底后回到最新": true,
+        "入口消失": true
+      },
+      "备用屏_初始": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 0,
+        "落后行数": 1,
+        "chipVisible": false,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": true,
+        "mouseMode": 1000,
+        "发给远端字节数": 0
+      },
+      "备用屏_下滑后": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 0,
+        "落后行数": 1,
+        "chipVisible": true,
+        "chipText": "⇣ 回到最新（TUI 里已往上翻 17 格）",
+        "alt": true,
+        "mouseMode": 1000,
+        "发给远端字节数": 17
+      },
+      "备用屏_点回到最新后": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 0,
+        "落后行数": 1,
+        "chipVisible": false,
+        "chipText": "⇣ 回到最新（TUI 里已往上翻 17 格）",
+        "alt": true,
+        "mouseMode": 1000,
+        "发给远端字节数": 34
+      },
+      "备用屏_结论": {
+        "认出是备用屏": true,
+        "认出远端鼠标": true,
+        "手势变成了发给远端的滚轮": true,
+        "出现回到最新的入口": true,
+        "入口文字对得上": true,
+        "一键回到最新又发了滚轮": true,
+        "回程后入口消失": true,
+        "入口文案不再是上面还有N行": true,
+        "进TUI时旧的入口先藏起来": true
+      },
+      "无鼠标_下滑后": {
+        "bufType": "alternate",
+        "baseY": 0,
+        "viewportY": 0,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": null,
+        "alt": true,
+        "mouseMode": 0,
+        "发给远端字节数": 34
+      },
+      "无鼠标_结论": {
+        "mouseMode": 0,
+        "dialog": true,
+        "按钮": [
+          "打开系统通知设置",
+          "发一条测试通知",
+          "开启 tmux 鼠标",
+          "取消"
+        ]
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-11 启动时间线 + Hermes 页读取策略",
+  "result": {
+    "check": {
+      "启动打点": {
+        "点": {
+          "开始": 168,
+          "通道就绪": 169,
+          "偏好就绪": 169,
+          "字体就绪": 181,
+          "终端可显示": 206,
+          "面板就绪": 236
+        },
+        "阶段数": 6,
+        "终端可显示": 206,
+        "面板就绪": 236
+      },
+      "启动时读远端次数": 0,
+      "第一次进": {
+        "读取次数": 1,
+        "耗时ms": 5,
+        "有读数行": true,
+        "还在读取中": false
+      },
+      "再切回来": {
+        "读取次数": 1,
+        "还在读取中": false,
+        "技能条目数": 1
+      },
+      "结论": {
+        "六个阶段都有读数": true,
+        "终端不等面板": true,
+        "启动时不读远端": true,
+        "第一次进读一次": true,
+        "有耗时读数": true,
+        "切回来命中缓存": true,
+        "技能列表真的渲染了": true
+      }
+    }
+  }
+}

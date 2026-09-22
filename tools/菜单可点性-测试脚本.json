@@ -1,0 +1,47 @@
+[
+ {
+  "eval": "(async()=>{window.__hit=0; await HP.App.rpc('host.save',{host:{name:'菜单测试主机',host:'1.2.3.4',port:22,user:'tester',auth:'password'}}); await HP.Panels.load(true); HP.App.openPanel(); await new Promise(r=>setTimeout(r,400)); document.querySelector('.tabs button[data-tab=\"hosts\"]').click(); await new Promise(r=>setTimeout(r,250)); return 'cards='+document.querySelectorAll('#tab-hosts .card[data-host]').length;})()"
+ },
+ {
+  "tap": "#tab-hosts .card[data-host]",
+  "touch": false
+ },
+ {
+  "eval": "JSON.stringify({菜单弹出:document.getElementById('ctxmenu').classList.contains('show'), 菜单项:[...document.querySelectorAll('#ctxmenu button')].map(b=>b.textContent.slice(0,12))})"
+ },
+ {
+  "tap": "#ctxmenu button:nth-child(2)",
+  "touch": false
+ },
+ {
+  "eval": "JSON.stringify({菜单已关:!document.getElementById('ctxmenu').classList.contains('show'), 表单打开:document.getElementById('host-form').innerHTML.length>10, 回填名称:(document.getElementById('hf-name')||{}).value})"
+ },
+ {
+  "eval": "HP.App.closePanel(); document.getElementById('host-form').innerHTML=''; 'ok'"
+ },
+ {
+  "longPress": "#termhost",
+  "ms": 750,
+  "touch": false
+ },
+ {
+  "eval": "JSON.stringify({长按菜单弹出:document.getElementById('ctxmenu').classList.contains('show'), 项数:document.querySelectorAll('#ctxmenu button').length})"
+ },
+ {
+  "tap": "#ctxmenu button:nth-child(2)",
+  "touch": false
+ },
+ {
+  "eval": "JSON.stringify({输入框出现:!document.getElementById('composer').classList.contains('hidden'), 菜单已关:!document.getElementById('ctxmenu').classList.contains('show')})"
+ },
+ {
+  "eval": "(()=>{HP.App.closePanel(); window.__hit=0; HP.App.ctxMenu([{label:'计数项',fn:()=>{window.__hit++;}}]); return 'opened';})()"
+ },
+ {
+  "tap": "#ctxmenu button:nth-child(1)",
+  "touch": false
+ },
+ {
+  "eval": "JSON.stringify({命中次数:window.__hit, 菜单已关:!document.getElementById('ctxmenu').classList.contains('show')})"
+ }
+]

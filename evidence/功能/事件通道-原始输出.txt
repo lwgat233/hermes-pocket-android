@@ -1,0 +1,36 @@
+### 文件事件通道（独立 SSH + 手机系统通知）  2026-09-17 10:29:28 CST
+
+=== 连接前的连接数（到 :2222）===
+  0 条
+
+=== 连接终端 ===
+    "value": "{\"状态\":\"connected\",\"事件通道\":\"watching\",\"事件通道开\":true,\"事件文件设定\":\"(默认)\"}"
+
+=== 服务端核验：应该有 **2 条** 到 :2222 的连接（终端 + 事件通道）===
+  当前 2 条：
+    0      0          127.0.0.1:2222    127.0.0.1:49688 users:(("sshd",pid=1265213,fd=4),("sshd",pid=1265209,fd=4))
+    0      0          127.0.0.1:2222    127.0.0.1:49684 users:(("sshd",pid=1265206,fd=4),("sshd",pid=1265194,fd=4))
+
+=== ① 写一条 auth（需要授权）→ 应该弹系统通知 ===
+/tmp/hpk-events-run.sh: line 37: ./hpk-notify.sh: No such file or directory
+                  android.title=String (Hermes Pocket 会话)
+                  android.text=String (lwgat@10.0.2.2)
+
+=== ② 写一条 done（做完了）→ 应该弹系统通知 ===
+/tmp/hpk-events-run.sh: line 42: ./hpk-notify.sh: No such file or directory
+                  android.title=String (Hermes Pocket 会话)
+                  android.text=String (lwgat@10.0.2.2)
+
+=== ③ 写一条不带 kind 的（格式写错也不该丢通知）→ 整行当标题 ===
+    "value": "{\"累计收到条数\":1,\"最近一条\":{\"kind\":\"info\",\"title\":\"随手写一句没有格式的话\",\"body\":\"\",\"raw\":\"随手写一句没有格式的话\"}}"
+
+=== ④ 终端会话不受影响（事件通道是另一条连接）===
+    "value": "{\"状态\":\"connected\",\"事件通道\":\"watching\",\"末几行\":[\"lwgat@galaxy-fnos:~$\",\"2\",\"TERM-STILL-OK\",\"(1+1))\",\"lwgat@galaxy-fnos:~$ echo TERM-STILL-OK; echo $(\",\"6.54.35\"]}"
+
+=== ⑤ 事件文件内容（只追加）===
+  随手写一句没有格式的话
+
+=== ⑥ 关掉事件通道开关 → 通道应停止 ===
+    "value": "{\"running\":false,\"state\":\"idle\",\"path\":\"\"}"
+  连接数（关掉后应回到 1）: 1 条
+    "value": "开关已恢复"

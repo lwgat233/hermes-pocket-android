@@ -1,0 +1,2786 @@
+### 用户报的五条 + 源码标识符清理（含设备端真触摸复验）   2026-09-21 21:21:18 CST
+# 构件 apk/hermes-pocket-统一版-20260921b.apk
+# sha256 7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+
+=== ① 构件自证（解开包看内容，不看大小/时间）===
+{
+  "project": "hermes-pocket",
+  "appName": "Hermes Pocket",
+  "packageId": "dev.hermes.pocket",
+  "entry": "dev.hermes.pocket.MainActivity",
+  "testVersion": "unified-20260921b",
+  "feature": "修用户报的五条 + 源码标识符全改英文",
+  "featureId": "N-1~N-5,R-15~R-18",
+  "acceptance": "全部 20 个驱动（含 t-immersive / t-noconn）",
+  "builtAt": "2026-09-21 23:50 CST",
+  "note": "装上去先看设置面板「构建版本」这一行，与文件名、说明书对上才算装对；本版起界面上的中文只出现在文案里，代码标识符全英文。"
+}
+HP.BUILD = "unified-20260921b"
+--- 界面源码里还有没有中文标识符（应当只在注释/文案里）---
+2
+
+=== ② 本地全量（20 个驱动）===
+{
+  "name": "F-UI-11 启动时间线 + Hermes 页读取策略",
+  "result": {
+    "check": {
+      "bootTimeline": {
+        "marks": {
+          "开始": 160,
+          "通道就绪": 162,
+          "偏好就绪": 162,
+          "字体就绪": 173,
+          "终端可显示": 196,
+          "面板就绪": 223
+        },
+        "stageCount": 6,
+        "terminalVisible": 196,
+        "panelReady": 223
+      },
+      "remoteCallsAtBoot": 0,
+      "firstOpen": {
+        "calls": 1,
+        "elapsedMs": 6,
+        "hasReadoutLine": true,
+        "stillLoading": false
+      },
+      "afterReturn": {
+        "calls": 1,
+        "stillLoading": false,
+        "skillCount": 1
+      },
+      "checks": {
+        "sixStagesMeasured": true,
+        "terminalNotWaitingForPanels": true,
+        "noRemoteReadAtBoot": true,
+        "firstOpenReadsOnce": true,
+        "hasElapsedReadout": true,
+        "returnHitsCache": true,
+        "skillListRendered": true
+      }
+    }
+  }
+}
+{
+  "name": "F-SESS-10 主机指纹提示 / 是否每次上传公钥",
+  "result": {
+    "check": {
+      "trustedHost": {
+        "calls": {},
+        "dialogs": 0
+      },
+      "firstConnect": {
+        "calls": {
+          "app.notify": 1
+        },
+        "dialogText": " 127.0.0.1:22 算法 ssh-ed25519 指纹 SHA256:AbCdEf1234567890 首次连接，是否信任并记住？ 信任并保存 取消 "
+      },
+      "fingerprintChanged": {
+        "calls": {
+          "app.notify": 1
+        },
+        "dialogText": " 127.0.0.1:22 密钥类型 ssh-ed25519 已保存的指纹： SHA256:AbCdEf1234567890 本次收到的指纹： SHA256:NEW999 同一类型"
+      },
+      "newKeyType": {
+        "calls": {
+          "app.notify": 1
+        },
+        "dialogs": 1
+      },
+      "firstConnection": {
+        "keyInstallCount": 1,
+        "authAfterInstall": "key"
+      },
+      "secondConnection": {
+        "keyInstallCount": 0
+      },
+      "verdict": {
+        "trustedHostSilent": true,
+        "firstConnectAsks": true,
+        "fingerprintChangeAsks": true,
+        "newKeyTypeAsks": true,
+        "firstTimeInstallsKey": true,
+        "switchesToKeyAuth": true,
+        "secondTimeNoInstall": true
+      }
+    }
+  }
+}
+{
+  "name": "F-SESS-12 聊天输出状态机",
+  "result": {
+    "check": {
+      "ruleTable": [
+        {
+          "id": "compacting",
+          "state": "压缩中",
+          "hasNote": true,
+          "note": "ui-tui/dist: \"compacting\""
+        },
+        {
+          "id": "compacted",
+          "state": "压缩中",
+          "hasNote": true,
+          "note": "ui-tui/dist: \"compacted\"（刚压完，仍算压缩态，下一次输出会转回运行）"
+        },
+        {
+          "id": "compressions",
+          "state": "压缩中",
+          "hasNote": true,
+          "note": "ui-tui/dist: `Compressions: ${n}` / `cmp ${n}`"
+        },
+        {
+          "id": "interrupted",
+          "state": "已结束",
+          "hasNote": true,
+          "note": "ui-tui/dist: \"[interrupted]\" —— 这一轮被中断"
+        },
+        {
+          "id": "interrupt_hint",
+          "state": "运行中",
+          "hasNote": true,
+          "note": "ui-tui/dist: \"Ctrl+C to interrupt…\" —— 只有在跑的时候才显示"
+        },
+        {
+          "id": "thinking",
+          "state": "运行中",
+          "hasNote": true,
+          "note": "ui-tui/dist: \"Thinking\" / \"~N tokens\" / \"N tok\" —— 流式输出还在动"
+        }
+      ],
+      "perInput": [
+        {
+          "fed": "thinking",
+          "text": "✻ Thinking…  ~1.2k tokens",
+          "verdict": "运行中",
+          "matchedRule": "thinking",
+          "matchedSample": " Thinking…"
+        },
+        {
+          "fed": "interruptible",
+          "text": "Ctrl+C to interrupt…",
+          "verdict": "运行中",
+          "matchedRule": "interrupt_hint",
+          "matchedSample": "Ctrl+C to interrupt"
+        },
+        {
+          "fed": "compacting",
+          "text": "compacting",
+          "verdict": "压缩中",
+          "matchedRule": "compacting",
+          "matchedSample": "compacting"
+        },
+        {
+          "fed": "compressions",
+          "text": "Compressions: 3",
+          "verdict": "压缩中",
+          "matchedRule": "compressions",
+          "matchedSample": "Compressions: 3"
+        },
+        {
+          "fed": "compacted",
+          "text": "compacted",
+          "verdict": "压缩中",
+          "matchedRule": "compacted",
+          "matchedSample": "compacted"
+        },
+        {
+          "fed": "interrupted",
+          "text": "  [interrupted]",
+          "verdict": "已结束",
+          "matchedRule": "interrupted",
+          "matchedSample": "[interrupted]"
+        },
+        {
+          "fed": "plainOutput",
+          "text": "assistant: 好了，做完了。",
+          "verdict": "未知",
+          "matchedRule": "",
+          "matchedSample": ""
+        }
+      ],
+      "transitions": {
+        "midway": "运行中",
+        "sequence": [
+          "运行中",
+          "压缩中",
+          "运行中",
+          "已结束"
+        ],
+        "rules": [
+          "interrupt_hint",
+          "compacting",
+          "thinking",
+          "quiet"
+        ],
+        "finalState": "已结束"
+      },
+      "explain": "压缩中 ← 规则 compacting｜依据：ui-tui/dist: \"compacting\"｜命中：\"compacting\"｜静默 0s",
+      "livePath": {
+        "state": "运行中",
+        "matchedRule": "interrupt_hint",
+        "badgeText": "shell · 运行中",
+        "badgeTitle": "运行中 ← 规则 interrupt_hint｜依据：ui-tui/dist: \"Ctrl+C to interrupt…\" —— 只有在跑的时候才显示｜命中：\"Ctrl+C to interrupt\"｜静默 0s"
+      },
+      "quietToEnd": {
+        "state": "已结束",
+        "matchedRule": "quiet",
+        "badgeText": "shell · 已结束"
+      },
+      "coverage": {
+        "covered": [
+          "thinking",
+          "interrupt_hint",
+          "compacting",
+          "compressions",
+          "compacted",
+          "interrupted",
+          "quiet"
+        ],
+        "missing": []
+      },
+      "verdict": {
+        "everyRuleHasNote": true,
+        "thinkingCountsRunning": true,
+        "interruptHintCountsRunning": true,
+        "compactingCountsCompressing": true,
+        "compressionsCountCompressing": true,
+        "compactedCountsCompressing": true,
+        "interruptedCountsEnded": true,
+        "plainOutputLeavesStateUnknown": true,
+        "transitionSequenceOk": true,
+        "notEndedBeforeQuietThreshold": true,
+        "explainHasNoteAndSample": true,
+        "livePathWorks": true,
+        "badgeHasTitle": true,
+        "badgeShowsEndedAfterQuiet": true,
+        "allRulesCovered": true
+      }
+    }
+  }
+}
+{
+  "name": "F-SESS-6 会话（tmux）流程：能看 / 能选 / 有就不动 / 永不终止",
+  "result": {
+    "check": {
+      "parseTwo": {
+        "list": [
+          {
+            "name": "hermes",
+            "windows": 3,
+            "attached": 1,
+            "activityMs": 1789980000000,
+            "createdMs": 1789900000000,
+            "ageSec": 96894,
+            "idleSec": 16894
+          },
+          {
+            "name": "work",
+            "windows": 1,
+            "attached": 0,
+            "activityMs": 1789979000000,
+            "createdMs": 1789800000000,
+            "ageSec": 196894,
+            "idleSec": 17894
+          }
+        ],
+        "err": ""
+      },
+      "parseNone": {
+        "list": [],
+        "err": "no server running on /tmp/tmux-1000/default"
+      },
+      "bootHasSession": {
+        "action": "attach",
+        "name": "hermes",
+        "count": 2
+      },
+      "bootHasSessionSent": "tmux attach -t 'hermes'\r",
+      "bootNoSessionHostCmd": {
+        "action": "startCmd",
+        "cmd": "tmux new -As hermes 'hermes --tui' \\; set -g mouse on",
+        "count": 0
+      },
+      "bootNoSessionSent": "tmux new -As hermes 'hermes --tui' \\; set -g mouse on\r",
+      "bootNoSessionCreate": {
+        "action": "create",
+        "name": "hermes",
+        "count": 0
+      },
+      "bootNoSessionCreateSent": "tmux new -As 'hermes' 'hermes --tui' \\; set -g mouse on\r",
+      "ui": {
+        "statusLine": [
+          "在线：已连接 · 远端 tmux：2 个会话",
+          "当前选中：hermes"
+        ],
+        "rowCount": 2,
+        "rows": [
+          {
+            "id": "session-hermes",
+            "t": "hermes",
+            "s": "窗口 3 · 建了 1 天 · 最后活动 5 小时前",
+            "r": "attach 中",
+            "on": true
+          },
+          {
+            "id": "session-work",
+            "t": "work",
+            "s": "窗口 1 · 建了 2 天 · 最后活动 5 小时前",
+            "r": "空闲",
+            "on": false
+          }
+        ]
+      },
+      "clickSecondRow": {
+        "selected": "work",
+        "statusLine": [
+          "在线：已连接 · 远端 tmux：2 个会话",
+          "当前选中：work"
+        ],
+        "selectedMarker": "row-item row-on"
+      },
+      "clickSecondRowSent": "tmux attach -t 'work'\r",
+      "neverKill": {
+        "payloadCount": 1,
+        "hasKill": false,
+        "hasNewAs": false
+      },
+      "verdict": {
+        "parsedTwoSessions": true,
+        "parseNoTmuxNoThrow": true,
+        "attachWhenSessionsExist": true,
+        "noCreateWhenSessionsExist": true,
+        "hostCmdWhenNoSessions": true,
+        "createWhenNoSessionsNoCmd": true,
+        "twoUiRows": true,
+        "statusLineHasOnlineAndCount": true,
+        "rightColumnIsState": true,
+        "clickRowSwitches": true,
+        "uiFollowsSwitch": true,
+        "neverKillsSession": true
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-7 左侧隐藏栏 + 功能登记表",
+  "result": {
+    "check": {
+      "renderAllBoards": true,
+      "selfCheck": {
+        "total": 11,
+        "readyCount": 11,
+        "notRendered": [],
+        "ungrouped": [],
+        "emptyGroups": [],
+        "uiEmptyGroups": [],
+        "notMounted": [],
+        "untested": [],
+        "notDone": []
+      },
+      "drawer": {
+        "rowCount": 6,
+        "registryReadyCount": 6,
+        "groups": [
+          "连接",
+          "Hermes",
+          "诊断"
+        ],
+        "rows": [
+          {
+            "id": "hosts",
+            "t": "主机",
+            "s": "地址 / 用户 / 启动命令",
+            "h": 55
+          },
+          {
+            "id": "keys",
+            "t": "密钥",
+            "s": "生成 / 导入 / 装到服务器",
+            "h": 55
+          },
+          {
+            "id": "settings",
+            "t": "设置",
+            "s": "字号 / 回滚 / 省电 / 通知",
+            "h": 55
+          },
+          {
+            "id": "sessions",
+            "t": "会话",
+            "s": "远端 tmux 会话 · 点一下就切过去（永不终止）",
+            "h": 55
+          },
+          {
+            "id": "hermes",
+            "t": "技能与记忆",
+            "s": "远端 SKILL.md / USER.md / MEMORY.md",
+            "h": 55
+          },
+          {
+            "id": "net",
+            "t": "网络与流量",
+            "s": "连通性 / 丢包 / 上下行",
+            "h": 55
+          }
+        ],
+        "plannedHidden": true
+      },
+      "rowStyle": {
+        "titleFontSize": "14px",
+        "titleFontWeight": "600",
+        "subFontSize": "12px",
+        "rowHeight": 55,
+        "pass": true
+      },
+      "rightColumn": {
+        "flexBasis": "auto",
+        "whiteSpace": "nowrap",
+        "textOverflow": "clip",
+        "scrollWidth": 54,
+        "clientWidth": 54,
+        "valueNotTruncated": true,
+        "pass": true
+      },
+      "selectBoard": [
+        {
+          "id": "settings",
+          "drawerClosed": true,
+          "panelOpen": true,
+          "tabSwitched": true,
+          "title": "设置"
+        },
+        {
+          "id": "keys",
+          "drawerClosed": true,
+          "panelOpen": true,
+          "tabSwitched": true,
+          "title": "密钥"
+        },
+        {
+          "id": "hermes",
+          "drawerClosed": true,
+          "panelOpen": true,
+          "tabSwitched": true,
+          "title": "技能与记忆"
+        },
+        {
+          "id": "hosts",
+          "drawerClosed": true,
+          "panelOpen": true,
+          "tabSwitched": true,
+          "title": "主机"
+        },
+        {
+          "id": "sessions",
+          "drawerClosed": true,
+          "panelOpen": true,
+          "tabSwitched": true,
+          "title": "会话"
+        },
+        {
+          "id": "net",
+          "drawerClosed": true,
+          "panelOpen": true,
+          "tabSwitched": true,
+          "title": "网络与流量"
+        },
+        {
+          "scrimClosed": true
+        }
+      ],
+      "plannedNotClickable": {
+        "probeId": "__tmp__",
+        "titleUnchanged": true,
+        "toast": "这个栏目还没做",
+        "plannedNotInDrawer": true
+      },
+      "conclusion": {
+        "drawerRowCountMatchesReadyBoards": true,
+        "drawerHasThreeGroups": true,
+        "plannedNotShown": true,
+        "rowStyleCompliant": true,
+        "rightColumnNotTruncated": true,
+        "everyBoardOpens": true,
+        "titleFollowsBoard": true,
+        "scrimCollapsesDrawer": true,
+        "plannedNotClickableWithToast": true,
+        "selfCheckFourGapsEmpty": true
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-9 设置生效 / 回读 / 持久化（字号 + 回滚上限 + 开关）",
+  "result": {
+    "boot": {
+      "optFont": 13,
+      "cssFont": "13px",
+      "cols": 50,
+      "rows": 34,
+      "scrollback": 5000,
+      "keybarHidden": false,
+      "composerHidden": false,
+      "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+      "inpFont": "13",
+      "inpScroll": "5000",
+      "inpKeybar": true
+    },
+    "set": {
+      "before": {
+        "optFont": 13,
+        "cssFont": "13px",
+        "cols": 50,
+        "rows": 34,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "13",
+        "inpScroll": "5000",
+        "inpKeybar": true
+      },
+      "font": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "5000",
+        "inpKeybar": true,
+        "prefFont": "20"
+      },
+      "scroll": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 1000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": true,
+        "prefFont": "20",
+        "prefScroll": "1000"
+      },
+      "kb": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 25,
+        "scrollback": 1000,
+        "keybarHidden": true,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": false,
+        "prefFont": "20",
+        "prefScroll": "1000",
+        "prefKeybar": "false"
+      },
+      "fontSizeAppliedImmediately": true,
+      "scrollbackAppliedImmediately": true,
+      "toggleAppliedImmediately": true,
+      "uiReadsBackEffectiveValues": true,
+      "controlsMatchEffective": true
+    },
+    "afterReload": {
+      "optFont": 20,
+      "cssFont": "20px",
+      "cols": 32,
+      "rows": 25,
+      "scrollback": 1000,
+      "keybarHidden": true,
+      "composerHidden": false,
+      "stEff": "生效中：字号 20px · 终端 32×25 · 回滚 1000 行 · 已保存",
+      "inpFont": "20",
+      "inpScroll": "1000",
+      "inpKeybar": false,
+      "prefFont": "20",
+      "prefScroll": "1000",
+      "prefKeybar": "false",
+      "fontSizeStill20AfterReload": true,
+      "scrollbackStill1000AfterReload": true,
+      "keybarStillOffAfterReload": true,
+      "controlsConsistentAfterReload": true
+    }
+  }
+}
+{
+  "name": "F-UI-1 长文本滚动 / 一键到底 / 缓存上限",
+  "result": {
+    "check": {
+      "normalInitial": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 274,
+        "linesBehind": 0,
+        "chipVisible": false,
+        "chipText": null,
+        "alt": false,
+        "mouseMode": 0,
+        "sentWriteCount": 0
+      },
+      "normalAfterSwipe": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 257,
+        "linesBehind": 17,
+        "chipVisible": true,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": false,
+        "mouseMode": 0,
+        "sentWriteCount": 0
+      },
+      "normalAfterChipClick": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 274,
+        "linesBehind": 0,
+        "chipVisible": false,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": false,
+        "mouseMode": 0,
+        "sentWriteCount": 0
+      },
+      "normalVerdict": {
+        "scrolledUp": true,
+        "backToBottomEntryShown": true,
+        "backToLatestAfterTap": true,
+        "entryGone": true
+      },
+      "altInitial": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 0,
+        "linesBehind": 1,
+        "chipVisible": false,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": true,
+        "mouseMode": 1000,
+        "sentWriteCount": 0
+      },
+      "altAfterSwipe": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 0,
+        "linesBehind": 1,
+        "chipVisible": true,
+        "chipText": "⇣ 回到最新（TUI 里已往上翻 17 格）",
+        "alt": true,
+        "mouseMode": 1000,
+        "sentWriteCount": 17
+      },
+      "altAfterBackToLatest": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 0,
+        "linesBehind": 1,
+        "chipVisible": false,
+        "chipText": "⇣ 回到最新（TUI 里已往上翻 17 格）",
+        "alt": true,
+        "mouseMode": 1000,
+        "sentWriteCount": 34
+      },
+      "altVerdict": {
+        "altScreenDetected": true,
+        "remoteMouseDetected": true,
+        "gestureBecomesRemoteWheel": true,
+        "backToLatestEntryShown": true,
+        "entryTextMatches": true,
+        "wheelSentOnBackToLatest": true,
+        "entryGoneAfterReturn": true,
+        "entryTextNotLinesAbove": true,
+        "oldEntryHiddenOnTuiEnter": true
+      },
+      "noMouseAfterSwipe": {
+        "bufType": "alternate",
+        "baseY": 0,
+        "viewportY": 0,
+        "linesBehind": 0,
+        "chipVisible": false,
+        "chipText": null,
+        "alt": true,
+        "mouseMode": 0,
+        "sentWriteCount": 34
+      },
+      "noMouseVerdict": {
+        "mouseMode": 0,
+        "dialog": true,
+        "buttonLabels": [
+          "打开系统通知设置",
+          "发一条测试通知",
+          "开启 tmux 鼠标",
+          "取消"
+        ]
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-9 字号生效与持久化",
+  "result": {
+    "boot": {
+      "optFont": 13,
+      "cssFont": "13px",
+      "lineHeight": "normal",
+      "cols": 50,
+      "rows": 34,
+      "geomMode": "auto",
+      "baseFont": 13,
+      "tbGeom": "50×34"
+    },
+    "set": {
+      "before": {
+        "optFont": 13,
+        "cssFont": "13px",
+        "lineHeight": "normal",
+        "cols": 50,
+        "rows": 34,
+        "geomMode": "auto",
+        "baseFont": 13,
+        "tbGeom": "50×34"
+      },
+      "after": {
+        "optFont": 24,
+        "cssFont": "24px",
+        "lineHeight": "normal",
+        "cols": 27,
+        "rows": 18,
+        "prefFont": "24",
+        "stashedPref": "24",
+        "geomMode": "auto",
+        "baseFont": 24,
+        "tbGeom": "27×18"
+      },
+      "appliedImmediately": true
+    },
+    "afterReload": {
+      "optFont": 24,
+      "cssFont": "24px",
+      "lineHeight": "normal",
+      "cols": 27,
+      "rows": 18,
+      "prefFont": "24",
+      "stashedPref": "24",
+      "geomMode": "auto",
+      "baseFont": 24,
+      "tbGeom": "27×18",
+      "still24AfterReload": true
+    }
+  }
+}
+{
+  "name": "F-HERM-4 系统提示词可见（来源 state.db）",
+  "result": {
+    "check": {
+      "parse": {
+        "ok": true,
+        "err": "",
+        "files": 20,
+        "maxChars": 21891,
+        "minChars": 17658,
+        "hash": "84bab0584d4b",
+        "total": 21732,
+        "head": "You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply",
+        "text": "You are Hermes Agent, built by Nous Research. 这是正文开头。"
+      },
+      "parseBadData": {
+        "ok": false,
+        "err": "打不开 state.db: no such file or directory",
+        "files": 0,
+        "maxChars": 0,
+        "minChars": 0,
+        "hash": "",
+        "total": 0,
+        "head": "",
+        "text": ""
+      },
+      "row": {
+        "title": "系统提示词",
+        "sub": "20 份 · 当前会话 5135 字符 · 最长 21891 字符",
+        "right": "5135 字符",
+        "titleSize": "14px",
+        "rowHeight": 55
+      },
+      "dialog": {
+        "heading": "系统提示词（1–1200 / 5135 字符）",
+        "fields": [
+          "来源=远端 state.db · system_prompts · 20 份 · hash 84bab0584d4b",
+          "开头一行=You are Hermes Agent, built by Nous Research."
+        ],
+        "bodyLen": 1199,
+        "bodyHead": "You are Hermes Agent, built by Nous Rese",
+        "buttons": [
+          "看更多",
+          "复制",
+          "关闭"
+        ]
+      },
+      "more": {
+        "heading": "系统提示词（1201–2400 / 5135 字符）",
+        "bodyHead": "第 97 行提示词内容\n第 98 行提示",
+        "bodyLen": 1200
+      },
+      "bottom": {
+        "heading": "系统提示词（5125–5135 / 5135 字符）",
+        "buttons": [
+          "已到底",
+          "复制",
+          "关闭"
+        ]
+      },
+      "unavailable": {
+        "sub": "取不到：打不开 state.db: no such file or directory",
+        "dialogCountUnchanged": true,
+        "toast": "取不到系统提示词：打不开 state.db: no such file or directory"
+      },
+      "verdict": {
+        "filesAndTotal": true,
+        "hashAndHead": true,
+        "badDataReported": true,
+        "rowRendersOk": true,
+        "rowShowsFilesAndTotal": true,
+        "dialogHeadingRange": true,
+        "dialogSourceShown": true,
+        "bodyIsSegment": true,
+        "moreFetchesNextSegment": true,
+        "bottomSaysEnd": true,
+        "unavailableReported": true
+      }
+    }
+  }
+}
+{
+  "name": "F-HERM-5 远端模型：看 / 改 / 还原",
+  "result": {
+    "check": {
+      "parse": {
+        "ok": true,
+        "err": "",
+        "path": "/home/lwgat/.hermes/config.yaml",
+        "writable": true,
+        "model": "deepseek-v4-flash",
+        "provider": "deepseek",
+        "base": "https://api.deepseek.com/v1",
+        "candidates": [
+          "deepseek-v4-pro",
+          "deepseek-flash"
+        ],
+        "backups": [
+          "config.yaml.hpk-bak-20260921-120000"
+        ]
+      },
+      "parseBadData": {
+        "ok": false,
+        "err": "打不开 config.yaml",
+        "path": "",
+        "writable": false,
+        "model": "",
+        "provider": "",
+        "base": "",
+        "candidates": [],
+        "backups": []
+      },
+      "row": {
+        "title": "模型",
+        "right": "deepseek-v4-flash",
+        "sub": "deepseek · 可改（改前自动备份） · 有 1 份备份"
+      },
+      "sheet": {
+        "title": "远端模型（deepseek）",
+        "fields": [
+          {
+            "label": "模型名（改完点「写回并校验」）",
+            "editable": true,
+            "value": "deepseek-v4-flash"
+          },
+          {
+            "label": "配置文件",
+            "editable": false,
+            "value": "/home/lwgat/.hermes/config.yaml"
+          },
+          {
+            "label": "接口地址",
+            "editable": false,
+            "value": "https://api.deepseek.com/v1"
+          }
+        ],
+        "candidates": [
+          "deepseek-v4-pro",
+          "deepseek-flash"
+        ],
+        "buttons": [
+          "写回并校验",
+          "还原上次",
+          "关闭"
+        ]
+      },
+      "inputAfterPick": "deepseek-v4-pro",
+      "writeBack": {
+        "bridgeCalls": {
+          "hermes.model.set": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "sheetsLeft": 0,
+        "toast": "模型已改为 deepseek-v4-pro（读回校验通过 · yaml ok）",
+        "row": {
+          "title": "模型",
+          "right": "deepseek-v4-pro",
+          "sub": "deepseek · 可改（改前自动备份） · 有 1 份备份"
+        }
+      },
+      "undo": {
+        "bridgeCalls": {
+          "hermes.model.undo": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "toast": "已还原到 deepseek-v4-flash（来自 config.yaml.hpk-bak-20260921-120000）",
+        "row": {
+          "title": "模型",
+          "right": "deepseek-v4-flash",
+          "sub": "deepseek · 可改（改前自动备份） · 有 1 份备份"
+        }
+      },
+      "writeFail": {
+        "toast": "写回失败：写不进去（config.yaml 只读）",
+        "sheetOpen": true,
+        "inputValue": "some-other-model"
+      },
+      "unchangedSubmit": {
+        "bridgeCalls": {},
+        "toast": "和现在一样，没改"
+      },
+      "verdict": {
+        "parseModelAndCandidates": true,
+        "badDataReportsError": true,
+        "rowShowsCurrentModel": true,
+        "sheetHasEditableField": true,
+        "sheetHasCandidatesAndThreeActions": true,
+        "candidateTapFillsOnly": true,
+        "writeBackSendsCorrectArgs": true,
+        "writeBackClosesSheet": true,
+        "writeBackShowsVerifyToast": true,
+        "writeBackUpdatesRow": true,
+        "undoSendsRequest": true,
+        "undoRestoresRow": true,
+        "writeFailReportsError": true,
+        "unchangedSubmitsNothing": true
+      }
+    }
+  }
+}
+{
+  "name": "F-HERM-3 skill：下载到手机 / 编辑并回写",
+  "result": {
+    "check": {
+      "roundTrip": {
+        "same": true,
+        "empty": true
+      },
+      "parse": {
+        "ok": true,
+        "size": 107,
+        "sha": "abc",
+        "bodySame": true,
+        "bodyLen": 69
+      },
+      "parseBadData": {
+        "ok": false,
+        "err": "读不到: 文件不存在",
+        "size": 0,
+        "sha": "",
+        "text": ""
+      },
+      "dialog": {
+        "heading": "demo-skill",
+        "fields": [
+          {
+            "label": "远端路径",
+            "value": "~/.hermes/test/demo-skill/SKILL.md"
+          },
+          {
+            "label": "字节数 / sha256",
+            "value": "107 字节 · 6306c021a533"
+          }
+        ],
+        "hasBody": true,
+        "bodyHead": "---\nname: tmp-x\ndescription: 试",
+        "hasEditor": false,
+        "editorHead": "",
+        "buttons": [
+          "下载到手机",
+          "编辑并回写",
+          "关闭"
+        ]
+      },
+      "dialogBytes": 107,
+      "download": {
+        "toast": "已存到 Download/hermes-skills/demo-skill.md（107 字节 · sha 6306c021a533 · 与远端一致）",
+        "bridgeCalls": {
+          "local.save": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "savedFile": {
+          "name": "demo-skill.md",
+          "size": 107,
+          "sha": "6306c021a533f902e941bdcf416ac37e6ef4a9dbdf325b7c76268048f312cc86",
+          "contentSame": true
+        },
+        "dialogsLeft": 0
+      },
+      "afterSavedReopen": {
+        "heading": "demo-skill",
+        "fields": [
+          {
+            "label": "远端路径",
+            "value": "~/.hermes/test/demo-skill/SKILL.md"
+          },
+          {
+            "label": "字节数 / sha256",
+            "value": "107 字节 · 6306c021a533"
+          },
+          {
+            "label": "已存到手机",
+            "value": "Download/hermes-skills/demo-skill.md（sha 6306c021a533）"
+          }
+        ],
+        "hasBody": true,
+        "bodyHead": "---\nname: tmp-x\ndescription: 试",
+        "hasEditor": false,
+        "editorHead": "",
+        "buttons": [
+          "下载到手机",
+          "编辑并回写",
+          "关闭"
+        ]
+      },
+      "editDialog": {
+        "heading": "编辑 demo-skill",
+        "fields": [
+          {
+            "label": "正文",
+            "value": "---\nname: tmp-x\ndescription: 试试下载 ✅\n---\n\n# 标题\n\n正文一行（中文）/ emoji ✅\n第二行\n"
+          }
+        ],
+        "hasBody": true,
+        "bodyHead": "打开时 sha256 6306c021a533 · 107 ",
+        "hasEditor": true,
+        "editorHead": "---\nname: tmp-x\ndesc",
+        "buttons": [
+          "回写",
+          "关闭"
+        ]
+      },
+      "writeBack": {
+        "toast": "已回写（123 字节 · 新 sha e4b9c6c2ffa8 · 备份 SKILL.md.hpk-bak-20260921-120000）",
+        "bridgeCalls": {
+          "skill.write": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "writtenSkill": {
+          "path": "test/demo-skill/SKILL.md",
+          "sha": "e4b9c6c2ffa880198071f0d1ccad735cdc778688264374889b9bdcf8007ec948",
+          "size": 123,
+          "text": "---\nname: tmp-x\ndescription: 试试下载 ✅\n---\n\n# 标题\n\n正文一行（中文）/ emoji ✅\n第二行\n新加的一行\n"
+        },
+        "dialogsLeft": 0
+      },
+      "clickedWithoutEdit": {
+        "toast": "和打开时一样，没改",
+        "bridgeCalls": {}
+      },
+      "remoteChanged": {
+        "toast": "回写失败：远端文件已变（现在是 ffffffffffff，你手上的是 e4b9c6c2ffa8），先重新打开再改",
+        "dialogStillOpen": true
+      },
+      "unavailable": {
+        "toast": "读技能失败：读不到: 文件不存在",
+        "dialogCount": 0
+      },
+      "saveFailed": {
+        "toast": "存到手机失败：写不进手机：Permission denied",
+        "dialogStillOpen": true
+      },
+      "savedButMismatch": {
+        "toast": "存到手机失败：存完之后读回来对不上（sha256/字节数不一致）"
+      },
+      "verdict": {
+        "base64RoundTripSafe": true,
+        "sizeAndBody": true,
+        "badDataReported": true,
+        "dialogShowsSkillAndSource": true,
+        "dialogShowsSizeAndSha": true,
+        "dialogThreeActions": true,
+        "downloadSentRequest": true,
+        "savedFileNameAndBody": true,
+        "savedShaMatchesRemote": true,
+        "downloadToastPathAndMatch": true,
+        "dialogClosedAfterDownload": true,
+        "reopenShowsSaved": true,
+        "editorHasFullText": true,
+        "writeBackSentRequest": true,
+        "writeBackShaIsOpened": true,
+        "writeBackContentEdited": true,
+        "writeBackToastShaAndBackup": true,
+        "dialogClosedAfterWriteBack": true,
+        "noChangeNoRequest": true,
+        "remoteChangedRejectsOverwrite": true,
+        "unavailableNoEmptyDialog": true,
+        "saveFailReported": true,
+        "mismatchNotSuccess": true
+      }
+    }
+  }
+}
+{
+  "name": "F-NET-2 连通性 / 丢包 / 延迟（真样本解析 + 界面流程）",
+  "result": {
+    "check": {
+      "loopback": {
+        "ok": true,
+        "err": "",
+        "transmitted": 3,
+        "received": 3,
+        "loss": 0,
+        "min": 0.03,
+        "avg": 0.058,
+        "max": 0.076,
+        "times": [
+          0.03,
+          0.076,
+          0.069
+        ],
+        "text": "PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.030 ms\n64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.076 ms\n64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.069 ms\n\n--- 127.0.0.1 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 628ms\nrtt min/avg/max/mdev = 0.030/0.058/0.076/0.020 ms"
+      },
+      "allLost": {
+        "ok": true,
+        "err": "",
+        "transmitted": 2,
+        "received": 0,
+        "loss": 100,
+        "min": null,
+        "avg": null,
+        "max": null,
+        "times": [],
+        "text": "PING 192.0.2.1 (192.0.2.1) 56(84) bytes of data.\n\n--- 192.0.2.1 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 305ms"
+      },
+      "parseFail": {
+        "ok": false,
+        "err": "ping: no-such-host.invalid: Name or service not known",
+        "transmitted": 0,
+        "received": 0,
+        "loss": null,
+        "min": null,
+        "avg": null,
+        "max": null,
+        "times": [],
+        "text": "ping: no-such-host.invalid: Name or service not known"
+      },
+      "tcpOpen": {
+        "ok": true,
+        "err": "",
+        "ms": 4,
+        "text": "@@OK 1\n@@MS 4"
+      },
+      "tcpClosed": {
+        "ok": false,
+        "err": "[Errno 111] Connection refused",
+        "ms": 3,
+        "text": "@@OK 0\n@@ERR [Errno 111] Connection refused\n@@MS 3"
+      },
+      "boardOpen": true,
+      "rows": [
+        "net-target",
+        "net-ping",
+        "net-tcp"
+      ],
+      "neverTested": {
+        "title": "延迟与丢包",
+        "sub": "没测过",
+        "right": "",
+        "hasRight": false
+      },
+      "afterPing": {
+        "row": {
+          "title": "延迟与丢包",
+          "sub": "3 个包 · 0% 丢包 · 平均 0.1 ms（0–0.1 ms）",
+          "right": "0.1 ms",
+          "hasRight": true
+        },
+        "bridgeCalls": {
+          "net.ping": 1
+        },
+        "bridgeArgs": {
+          "host": "192.168.1.10",
+          "count": 5
+        }
+      },
+      "afterTcp": {
+        "row": {
+          "title": "端口连通",
+          "sub": "通 · 4 ms",
+          "right": "通",
+          "hasRight": true
+        },
+        "bridgeArgs": {
+          "host": "192.168.1.10",
+          "port": 22
+        }
+      },
+      "targetSheet": {
+        "title": "测试目标",
+        "fields": [
+          {
+            "label": "地址（域名或 IP）",
+            "editable": true,
+            "value": "192.168.1.10"
+          },
+          {
+            "label": "ping 次数（1–20）",
+            "editable": true,
+            "value": "5"
+          },
+          {
+            "label": "端口（1–65535）",
+            "editable": true,
+            "value": "22"
+          }
+        ],
+        "text": "",
+        "buttons": [
+          "保存",
+          "关闭"
+        ]
+      },
+      "afterTargetChange": {
+        "toast": "已保存：example.local · ping 4 次 · 端口 2222",
+        "storedPref": "{\"host\":\"example.local\",\"count\":4,\"port\":2222}",
+        "targetRow": {
+          "title": "测试目标",
+          "sub": "点行改地址 / 次数 / 端口",
+          "right": "example.local",
+          "hasRight": true
+        },
+        "pingRow": {
+          "title": "延迟与丢包",
+          "sub": "没测过",
+          "right": "",
+          "hasRight": false
+        },
+        "sheetsLeft": 0
+      },
+      "pingFail": {
+        "row": {
+          "title": "延迟与丢包",
+          "sub": "测不了：ping: no-such-host.invalid: Name or service not known",
+          "right": "",
+          "hasRight": false
+        },
+        "toast": "ping 没跑成：ping: no-such-host.invalid: Name or service not known"
+      },
+      "tcpFail": {
+        "row": {
+          "title": "端口连通",
+          "sub": "不通：[Errno 111] Connection refused",
+          "right": "不通",
+          "hasRight": true
+        },
+        "toast": "端口不通：[Errno 111] Connection refused"
+      },
+      "rawSheet": {
+        "title": "原始输出",
+        "fields": [
+          {
+            "label": "目标",
+            "editable": false,
+            "value": "example.local · 端口 2222"
+          }
+        ],
+        "text": "$ ping -c 4 example.local（这一把远端跑了 620 ms）\nPING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.030 ms\n64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.076 ms\n64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.069 ms\n\n--- 127.0.0.1 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 628ms\nrtt min/avg/max/mdev = 0.030/0.058/0.076/0.020 ms\n\n$ 连接 example.local:2222\n@@OK 1\n@@MS 4",
+        "buttons": [
+          "重测 ping",
+          "重测端口",
+          "关闭"
+        ]
+      },
+      "selfCheck": {
+        "total": 11,
+        "readyCount": 11,
+        "notRendered": [
+          "prompt(row)",
+          "model(row)",
+          "skills-dl(row)"
+        ],
+        "ungrouped": [],
+        "emptyGroups": [],
+        "uiEmptyGroups": [],
+        "notMounted": [],
+        "untested": [],
+        "notDone": []
+      },
+      "stats": {
+        "sampleCount": 10,
+        "bucketCount": 2,
+        "up": 5500,
+        "down": 11000,
+        "total": 16500,
+        "share": [
+          {
+            "name": "下行",
+            "value": 11000,
+            "pct": 66.7
+          },
+          {
+            "name": "上行",
+            "value": 5500,
+            "pct": 33.3
+          }
+        ],
+        "barCount": 2,
+        "barUpSum": 5500,
+        "barDownSum": 11000,
+        "pieNumbers": [
+          {
+            "name": "下行",
+            "value": 11000,
+            "pct": 66.7,
+            "text": "下行 10.7KB · 66.7%"
+          },
+          {
+            "name": "上行",
+            "value": 5500,
+            "pct": 33.3,
+            "text": "上行 5.4KB · 33.3%"
+          }
+        ],
+        "sumText": "合计 16.1KB（10 条区间 → 2 组）",
+        "barHeights": [
+          "34px",
+          "90px"
+        ],
+        "human": [
+          "0B",
+          "999B",
+          "1KB",
+          "1.5KB",
+          "1MB"
+        ]
+      },
+      "verdict": {
+        "loopbackSampleParses": true,
+        "allLostSampleParses": true,
+        "parseFailReportsError": true,
+        "tcpSampleParses": true,
+        "netBoardOpens": true,
+        "neverTestedShownAsSuch": true,
+        "rowTapRunsRealPing": true,
+        "rowTapRunsRealTcp": true,
+        "targetSheetHasThreeEditableFields": true,
+        "saveWritesPref": true,
+        "targetChangeClearsOldResult": true,
+        "pingFailureExplained": true,
+        "tcpDownExplained": true,
+        "rawSheetHasBothTextsAndThreeActions": true,
+        "registryNoLongerReportsNetMissing": true,
+        "bucketStatsMatchNumbers": true,
+        "shareAndTotalMatch": true,
+        "chartNumbersMatchHumanText": true
+      }
+    }
+  }
+}
+{
+  "name": "F-NET-8 历史上下行：采集区间 → 统计 → 柱/饼",
+  "result": {
+    "check": {
+      "collected": {
+        "initialCount": 0,
+        "afterIdleCount": 0,
+        "count": 2,
+        "firstSample": {
+          "t0": 1789996964615,
+          "t1": 1789996966615,
+          "up": 100,
+          "down": 300
+        },
+        "lastSample": {
+          "t0": 1789996964615,
+          "t1": 1789996966615,
+          "up": 200,
+          "down": 700
+        },
+        "sumUpDown": {
+          "up": 300,
+          "down": 1000
+        },
+        "timeWindowOk": true
+      },
+      "cap": {
+        "MAX": 120,
+        "count": 120,
+        "oldest": 81,
+        "newest": 200
+      },
+      "persistence": {
+        "savedOk": true,
+        "countSame": true,
+        "lastSame": true,
+        "cumWritten": true,
+        "badDataEmpty": true
+      },
+      "dialog": {
+        "heading": "流量统计",
+        "rows": [
+          {
+            "id": "tf-down",
+            "title": "下行（本次会话）",
+            "sub": "当前 106B/s · 峰值 213B/s",
+            "right": "44.6K"
+          },
+          {
+            "id": "tf-up",
+            "title": "上行（本次会话）",
+            "sub": "当前 31B/s",
+            "right": "12.1K"
+          },
+          {
+            "id": "tf-avg",
+            "title": "平均下行",
+            "sub": "会话 1 分 6 secs · 收到数据块 42 次",
+            "right": "696B/s"
+          },
+          {
+            "id": "tf-cum",
+            "title": "累计下行（跨会话）",
+            "sub": "每 30 秒落一次盘",
+            "right": "1000B"
+          }
+        ],
+        "statusLines": [
+          "历史上下行：每 1 条合一组（12 条区间 → 12 组）"
+        ],
+        "bars": [
+          {
+            "up": 100,
+            "down": 200,
+            "upHeight": "4px",
+            "downHeight": "8px",
+            "toast": "200B ↓ / 100B ↑"
+          },
+          {
+            "up": 200,
+            "down": 400,
+            "upHeight": "8px",
+            "downHeight": "15px",
+            "toast": "400B ↓ / 200B ↑"
+          },
+          {
+            "up": 300,
+            "down": 600,
+            "upHeight": "11px",
+            "downHeight": "23px",
+            "toast": "600B ↓ / 300B ↑"
+          },
+          {
+            "up": 400,
+            "down": 800,
+            "upHeight": "15px",
+            "downHeight": "30px",
+            "toast": "800B ↓ / 400B ↑"
+          },
+          {
+            "up": 500,
+            "down": 1000,
+            "upHeight": "19px",
+            "downHeight": "38px",
+            "toast": "1000B ↓ / 500B ↑"
+          },
+          {
+            "up": 600,
+            "down": 1200,
+            "upHeight": "23px",
+            "downHeight": "45px",
+            "toast": "1.2KB ↓ / 600B ↑"
+          },
+          {
+            "up": 700,
+            "down": 1400,
+            "upHeight": "26px",
+            "downHeight": "53px",
+            "toast": "1.4KB ↓ / 700B ↑"
+          },
+          {
+            "up": 800,
+            "down": 1600,
+            "upHeight": "30px",
+            "downHeight": "60px",
+            "toast": "1.6KB ↓ / 800B ↑"
+          },
+          {
+            "up": 900,
+            "down": 1800,
+            "upHeight": "34px",
+            "downHeight": "68px",
+            "toast": "1.8KB ↓ / 900B ↑"
+          },
+          {
+            "up": 1000,
+            "down": 2000,
+            "upHeight": "38px",
+            "downHeight": "75px",
+            "toast": "2KB ↓ / 1000B ↑"
+          },
+          {
+            "up": 1100,
+            "down": 2200,
+            "upHeight": "41px",
+            "downHeight": "83px",
+            "toast": "2.1KB ↓ / 1.1KB ↑"
+          },
+          {
+            "up": 1200,
+            "down": 2400,
+            "upHeight": "45px",
+            "downHeight": "90px",
+            "toast": "2.3KB ↓ / 1.2KB ↑"
+          }
+        ],
+        "legend": [
+          {
+            "name": "下行",
+            "value": 15600,
+            "pct": 66.7,
+            "labelText": "下行 15.2KB · 66.7%"
+          },
+          {
+            "name": "上行",
+            "value": 7800,
+            "pct": 33.3,
+            "labelText": "上行 7.6KB · 33.3%"
+          }
+        ],
+        "sumText": "合计 22.9KB（12 条区间 → 12 组）",
+        "hasBars": true,
+        "hasPie": true,
+        "buttons": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "uiNumbers": {
+        "up": 7800,
+        "down": 15600,
+        "total": 23400,
+        "sampleCount": 12,
+        "bucketCount": 12
+      },
+      "grouped": {
+        "heading": "流量统计",
+        "rows": [
+          {
+            "id": "tf-down",
+            "title": "下行（本次会话）",
+            "sub": "当前 22.3K/s · 峰值 22.3K/s",
+            "right": "44.6K"
+          },
+          {
+            "id": "tf-up",
+            "title": "上行（本次会话）",
+            "sub": "当前 6.0K/s",
+            "right": "12.1K"
+          },
+          {
+            "id": "tf-avg",
+            "title": "平均下行",
+            "sub": "会话 1 分 6 secs · 收到数据块 42 次",
+            "right": "689B/s"
+          },
+          {
+            "id": "tf-cum",
+            "title": "累计下行（跨会话）",
+            "sub": "每 30 秒落一次盘",
+            "right": "44.6K"
+          }
+        ],
+        "statusLines": [
+          "历史上下行：每 10 条合一组（120 条区间 → 12 组）"
+        ],
+        "bars": [
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "upHeight": "1px",
+            "downHeight": "1px",
+            "toast": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 12495,
+            "down": 45308,
+            "upHeight": "25px",
+            "downHeight": "90px",
+            "toast": "44.2KB ↓ / 12.2KB ↑"
+          }
+        ],
+        "legend": [
+          {
+            "name": "下行",
+            "value": 53008,
+            "pct": 74.7,
+            "labelText": "下行 51.8KB · 74.7%"
+          },
+          {
+            "name": "上行",
+            "value": 17995,
+            "pct": 25.3,
+            "labelText": "上行 17.6KB · 25.3%"
+          }
+        ],
+        "sumText": "合计 69.3KB（120 条区间 → 12 组）",
+        "hasBars": true,
+        "hasPie": true,
+        "buttons": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "emptyHistory": {
+        "heading": "流量统计",
+        "rows": [
+          {
+            "id": "tf-down",
+            "title": "下行（本次会话）",
+            "sub": "当前 11.2K/s · 峰值 22.3K/s",
+            "right": "44.6K"
+          },
+          {
+            "id": "tf-up",
+            "title": "上行（本次会话）",
+            "sub": "当前 3.0K/s",
+            "right": "12.1K"
+          },
+          {
+            "id": "tf-avg",
+            "title": "平均下行",
+            "sub": "会话 1 分 7 secs · 收到数据块 42 次",
+            "right": "681B/s"
+          },
+          {
+            "id": "tf-cum",
+            "title": "累计下行（跨会话）",
+            "sub": "每 30 秒落一次盘",
+            "right": "44.6K"
+          }
+        ],
+        "statusLines": [
+          "还没有历史采样（老版本只存了一个累计总数，没有时间窗、折不成桶 —— 宁可不画，也不伪造一根巨柱）"
+        ],
+        "bars": [],
+        "legend": [],
+        "sumText": "",
+        "hasBars": false,
+        "hasPie": false,
+        "buttons": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "cleared": {
+        "toast": "已清掉 2 条历史区间",
+        "memoryCount": 0,
+        "persistence": "[]"
+      },
+      "resetCounter": {
+        "toast": "本次会话计数已归零（历史不动）",
+        "sessionDown": 0
+      },
+      "oldData": {
+        "count": 0,
+        "cum": 5000000,
+        "legacy": 5000000
+      },
+      "registry": {
+        "total": 11,
+        "readyCount": 11,
+        "notRendered": [],
+        "ungrouped": [],
+        "emptyGroups": [],
+        "uiEmptyGroups": [],
+        "notMounted": [],
+        "untested": [],
+        "notDone": []
+      },
+      "verdict": {
+        "recordsOnlyOnDelta": true,
+        "segmentHasTimeWindow": true,
+        "segmentsSumEqualsDelta": true,
+        "capIsRing": true,
+        "persistedMatchesMemory": true,
+        "badPersistedEmpty": true,
+        "dialogHeadingAndFourRows": true,
+        "threeActionsPresent": true,
+        "barsEqualGroups": true,
+        "barsSumEqualsTotal": true,
+        "piePercentAndTotal": true,
+        "barHeightSameDenominator": true,
+        "oneTwentyIntoTwelveBars": true,
+        "emptyHistoryNoChart": true,
+        "clearHistoryReallyClears": true,
+        "resetOnlySession": true,
+        "legacyCumNoFakeBuckets": true,
+        "registryHasTraffic": true
+      }
+    }
+  }
+}
+{
+  "name": "点上面那块屏幕不弹键盘（真实鼠标点 + 焦点判据）",
+  "result": {
+    "check": {
+      "hiddenInput": {
+        "exists": true,
+        "pointerEvents": "none",
+        "size": "7.796875×20.671875"
+      },
+      "tapTerminalHit": {
+        "point": {
+          "x": 206,
+          "y": 395
+        },
+        "hitChain": "DIV. < DIV.xterm-rows < DIV.xterm-screen < DIV.terminal xterm xterm-dom-renderer-owner-1 < #termsizer < #termhost",
+        "landedInTerminal": true,
+        "sentThisTap": []
+      },
+      "tapTerminalFocus": {
+        "tag": "BODY",
+        "cls": "",
+        "isInputEl": false,
+        "isXtermTextarea": false,
+        "inputValue": ""
+      },
+      "tapOnHiddenInput": {
+        "elAtPoint": "xterm-cursor xterm-cursor-outline",
+        "hitsHiddenInput": false
+      },
+      "tapKeyboardButton": {
+        "tag": "TEXTAREA",
+        "cls": "xterm-helper-textarea",
+        "isInputEl": true,
+        "isXtermTextarea": true,
+        "inputValue": ""
+      },
+      "focusWithInputFocused": {
+        "tag": "TEXTAREA",
+        "cls": "",
+        "isInputEl": true,
+        "isXtermTextarea": false,
+        "inputValue": "打了一半的一句"
+      },
+      "secondTapHit": {
+        "point": {
+          "x": 206,
+          "y": 395
+        },
+        "hitChain": "DIV. < DIV.xterm-rows < DIV.xterm-screen < DIV.terminal xterm xterm-dom-renderer-owner-1 < #termsizer < #termhost",
+        "landedInTerminal": true,
+        "sentThisTap": []
+      },
+      "focusAfterSecondTap": {
+        "tag": "BODY",
+        "cls": "",
+        "isInputEl": false,
+        "isXtermTextarea": false,
+        "inputValue": "打了一半的一句"
+      },
+      "thirdTapHit": {
+        "point": {
+          "x": 206,
+          "y": 395
+        },
+        "hitChain": "DIV. < DIV.xterm-rows < DIV.xterm-screen < DIV.terminal xterm xterm-dom-renderer-owner-1 < #termsizer < #termhost",
+        "landedInTerminal": true,
+        "sentThisTap": []
+      },
+      "prefOnMouseOff": {
+        "tag": "TEXTAREA",
+        "cls": "xterm-helper-textarea",
+        "isInputEl": true,
+        "isXtermTextarea": true,
+        "inputValue": "打了一半的一句"
+      },
+      "setMouseMode": {
+        "mouseMode": 1,
+        "touchMouse": true
+      },
+      "prefOnMouseOnHit": {
+        "point": {
+          "x": 206,
+          "y": 395
+        },
+        "hitChain": "DIV. < DIV.xterm-rows xterm-focus < DIV.xterm-screen < DIV.terminal xterm xterm-dom-renderer-owner-1 focus < #termsizer < #termhost",
+        "landedInTerminal": true,
+        "sentThisTap": [
+          "\u001b[M ;2",
+          "\u001b[M ;2"
+        ]
+      },
+      "prefOnMouseOn": {
+        "tag": "TEXTAREA",
+        "cls": "xterm-helper-textarea",
+        "isInputEl": true,
+        "isXtermTextarea": true,
+        "inputValue": "打了一半的一句"
+      },
+      "focusAfterKeyboardButton": {
+        "tag": "TEXTAREA",
+        "cls": "xterm-helper-textarea",
+        "isInputEl": true,
+        "isXtermTextarea": true,
+        "inputValue": "这句还在吗"
+      },
+      "focusGuard": {
+        "whenNotAllowed": {
+          "focusTag": "BODY",
+          "stillOnInput": false,
+          "flagThen": false,
+          "flagNow": false,
+          "log": [
+            "blur",
+            "focus",
+            "blur"
+          ]
+        },
+        "whenAllowed": {
+          "stillOnInput": true
+        }
+      },
+      "verdict": {
+        "stolenFocusReclaimedWhenNotWanted": true,
+        "focusStaysWhenKeyboardWanted": true,
+        "tapsLandInTerminal": true,
+        "hiddenInputNotClickable": true,
+        "tapTerminalKeepsFocusOffInput": true,
+        "tapOverCursorNeverHitsHiddenInput": true,
+        "keyboardButtonFocusesTerminalInput": true,
+        "tapTerminalHidesKeyboardKeepsText": true,
+        "prefOnWithoutMouseModeStillFocuses": true,
+        "mouseModeSendsClickToRemote": true,
+        "keyboardButtonKeepsInputText": true
+      }
+    }
+  }
+}
+{
+  "name": "输入框：实时就实时 · 不存储在框里（真实按键）",
+  "result": {
+    "check": {
+      "focusAfterClick": {
+        "tag": "TEXTAREA",
+        "isInput": true
+      },
+      "pressA": {
+        "sent": [
+          "a"
+        ],
+        "input": ""
+      },
+      "pressBc": {
+        "sent": [
+          "b",
+          "c"
+        ],
+        "input": ""
+      },
+      "backspace": {
+        "sent": [
+          ""
+        ],
+        "sentCodes": [
+          [
+            127
+          ]
+        ],
+        "input": ""
+      },
+      "arrowUp": {
+        "sent": [
+          "\u001b[A"
+        ],
+        "input": ""
+      },
+      "enter": {
+        "sent": [
+          "\r"
+        ],
+        "sentCodes": [
+          [
+            13
+          ]
+        ],
+        "input": ""
+      },
+      "composition": {
+        "sentDuringComposition": [],
+        "sentAfterCommit": [
+          "你好"
+        ],
+        "inputAfterCommit": ""
+      },
+      "batchTyping": {
+        "sent": [],
+        "input": "mk"
+      },
+      "batchSendClick": {
+        "sent": [
+          "mk\r"
+        ],
+        "input": ""
+      },
+      "outputNotInInput": {
+        "before": "",
+        "after": ""
+      },
+      "modeSwitchKeepsDraft": {
+        "afterLive": "草稿ABC",
+        "afterBatch": "草稿ABC"
+      },
+      "conclusion": {
+        "focusAfterClickIsInput": true,
+        "livePressASentAtOnceAndBoxEmpty": true,
+        "liveTwoCharsSentOneByOne": true,
+        "liveBackspaceSendsDel": true,
+        "liveArrowUpSendsEscapeSequence": true,
+        "liveEnterSendsSingleCr": true,
+        "imeCompositionSendsNothing": true,
+        "imeCommitSendsOnceAndClearsBox": true,
+        "batchTypingSendsNothingAndStaysInBox": true,
+        "batchSendClickSendsWholeLineAndClears": true,
+        "terminalOutputNeverLandsInBox": true,
+        "modeSwitchKeepsDraft": true
+      }
+    }
+  }
+}
+{
+  "name": "对话框一直攒着（切栏目 / 断线重连 / 后台补发 / 输入框草稿）",
+  "result": {
+    "check": {
+      "initial": {
+        "lineCount": 34,
+        "tail": ""
+      },
+      "afterBoardRoundTrip": {
+        "lineCount": 34,
+        "tail": "",
+        "hasLine12": true
+      },
+      "afterReconnect": {
+        "lineCount": 34,
+        "tail": "",
+        "hasLine1": true,
+        "hasReopenLine": true
+      },
+      "backgroundFlush": {
+        "flushBufferArmed": true,
+        "noGrowthWhilePaused": true,
+        "queuedCount": 4,
+        "last10NonEmpty": [
+          "攒着第 7 行",
+          "攒着第 8 行",
+          "攒着第 9 行",
+          "攒着第 10 行",
+          "攒着第 11 行",
+          "攒着第 12 行",
+          "重连后再来一行",
+          "落盘缓存里的一段\\r\\n后台第 1 条",
+          "后台第 2 条",
+          "后台第 3 条"
+        ]
+      },
+      "draftAfterBoard": "草稿不许丢",
+      "draftAfterReconnect": "草稿不许丢",
+      "conclusion": {
+        "boardRoundTripKeepsContent": true,
+        "reconnectDoesNotClearScreen": true,
+        "backgroundQueuesBeforePainting": true,
+        "flushedInOrderAfterResume": true,
+        "diskCacheSegmentRendersFirst": true,
+        "duplicateStaleMessageDropped": true,
+        "draftSurvivesBoardSwitch": true,
+        "draftSurvivesReconnect": true
+      }
+    }
+  }
+}
+{
+  "name": "打包信息：界面版本串与包内 build-info.json 对账",
+  "result": {
+    "check": {
+      "pageInfo": {
+        "BUILD": "unified-20260921b",
+        "BUILDINFO": {
+          "acceptance": "全部 20 个驱动（含 t-immersive / t-noconn）",
+          "appName": "Hermes Pocket",
+          "builtAt": "2026-09-21 23:50 CST",
+          "entry": "dev.hermes.pocket.MainActivity",
+          "feature": "修用户报的五条 + 源码标识符全改英文",
+          "featureId": "N-1~N-5,R-15~R-18",
+          "note": "装上去先看设置面板「构建版本」这一行，与文件名、说明书对上才算装对；本版起界面上的中文只出现在文案里，代码标识符全英文。",
+          "packageId": "dev.hermes.pocket",
+          "project": "hermes-pocket",
+          "testVersion": "unified-20260921b"
+        },
+        "settingsCardText": "运行通道：Android 原生 SSH（App 内直连，私钥不出设备） 协议版本 v1 构建版本：unified-20260921b · 修用户报的五条 + 源码标识符全改英文（N-1~N-5,R-15~R-18）· 打包 2026-09-21 23:50 CST",
+        "banner": "Hermes Pocket  移动端 SSH + Hermes TUI 渲染层  unified-20260921b点左上 ☰ 选栏目（主机 / 密钥 / 设置 / Hermes）。"
+      },
+      "bundleJson": {
+        "project": "hermes-pocket",
+        "appName": "Hermes Pocket",
+        "packageId": "dev.hermes.pocket",
+        "entry": "dev.hermes.pocket.MainActivity",
+        "testVersion": "unified-20260921b",
+        "feature": "修用户报的五条 + 源码标识符全改英文",
+        "featureId": "N-1~N-5,R-15~R-18",
+        "acceptance": "全部 20 个驱动（含 t-immersive / t-noconn）",
+        "builtAt": "2026-09-21 23:50 CST",
+        "note": "装上去先看设置面板「构建版本」这一行，与文件名、说明书对上才算装对；本版起界面上的中文只出现在文案里，代码标识符全英文。"
+      },
+      "verdict": {
+        "uiVersionMatchesBundle": true,
+        "injectedFeatureMatchesBundle": true,
+        "settingsShowsBuildVersion": true,
+        "settingsShowsFeatureAndBuiltAt": true,
+        "bannerUsesSameVersion": true,
+        "noMissingPlaceholders": true,
+        "bundleJsonFieldsComplete": true
+      }
+    }
+  }
+}
+{
+  "name": "功能覆盖自检：登记表 11 项全挂上、没归属/没测/未做 全空",
+  "result": {
+    "check": {
+      "notMountedBeforeRender": [],
+      "selfCheck": {
+        "total": 11,
+        "readyCount": 11,
+        "notRendered": [],
+        "ungrouped": [],
+        "emptyGroups": [],
+        "uiEmptyGroups": [],
+        "notMounted": [],
+        "untested": [],
+        "notDone": []
+      },
+      "drawer": {
+        "expected": 6,
+        "itemCount": 6,
+        "names": [
+          "hosts",
+          "keys",
+          "settings",
+          "sessions",
+          "hermes",
+          "net"
+        ]
+      },
+      "hermesRowsPresent": {
+        "promptRow": true,
+        "modelRow": true,
+        "skillDetailRow": true
+      },
+      "conclusion": {
+        "registryAll11Ready": true,
+        "ungroupedEmpty": true,
+        "notMountedEmpty": true,
+        "untestedEmpty": true,
+        "notDoneEmpty": true,
+        "emptyGroupsAllEmpty": true,
+        "drawerBoardsMatchRegistry": true,
+        "hermesRowsAllInDom": true
+      }
+    }
+  }
+}
+{
+  "name": "沉浸（全屏）模式：保留输入框 · 退出后 ☰ 与上下滑照旧",
+  "result": {
+    "check": {
+      "visibility": {
+        "before": {
+          "composerDisplay": "flex",
+          "composerInViewport": true,
+          "topbarDisplay": "flex",
+          "keybarDisplay": "block"
+        },
+        "mid": {
+          "composerDisplay": "flex",
+          "composerInViewport": true,
+          "topbarDisplay": "none",
+          "keybarDisplay": "none"
+        },
+        "after": {
+          "composerDisplay": "flex",
+          "composerInViewport": true,
+          "topbarDisplay": "flex",
+          "keybarDisplay": "block"
+        }
+      },
+      "drag": {
+        "beforeImmersive": {
+          "label": "beforeImmersive",
+          "viewportBefore": 174,
+          "viewportAfter": 166,
+          "scrolled": true
+        },
+        "afterImmersive": {
+          "label": "afterImmersive",
+          "viewportBefore": 174,
+          "viewportAfter": 166,
+          "scrolled": true
+        }
+      },
+      "afterTap": {
+        "drawerBefore": false,
+        "drawerAfter": true,
+        "topElement": "BUTTON.tb-btn"
+      },
+      "verdict": {
+        "composerVisibleInImmersive": true,
+        "topbarAndKeybarHiddenInImmersive": true,
+        "allThreeBackAfterExit": true,
+        "swipeScrollsBeforeImmersive": true,
+        "swipeScrollsAfterExit": true,
+        "tapHamburgerOpensDrawerAfterExit": true,
+        "tapHitsButton": true
+      }
+    }
+  }
+}
+{
+  "name": "没连接时开抽屉：不报错 · 照样能用 · 自检分清「未渲染」",
+  "result": {
+    "check": {
+      "readings": {
+        "drawerOpen": true,
+        "itemCount": 6,
+        "itemNames": [
+          "hosts",
+          "keys",
+          "settings",
+          "sessions",
+          "hermes",
+          "net"
+        ],
+        "toastText": "",
+        "toastVisible": false,
+        "consoleErrors": [],
+        "thrownError": null,
+        "selfCheckNotRendered": [
+          "prompt(row)",
+          "model(row)",
+          "skills-dl(row)"
+        ],
+        "selfCheckNotMounted": []
+      },
+      "tapMenu": {
+        "drawerOpen": true,
+        "itemCount": 6
+      },
+      "verdict": {
+        "openDrawerNoThrow": true,
+        "openDrawerNoConsoleError": true,
+        "openDrawerStillWorks": true,
+        "tapMenuOpensDrawer": true,
+        "noErrorToast": true,
+        "notRenderedNotMissing": true,
+        "noDeadEntries": true
+      }
+    }
+  }
+}
+
+=== ③ 设备端复验（emulator-5554 + 真 WebView + 真触摸）===
+Success
+--- 从设备取回的包装的 sha256（必须等于归档件）---
+7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23  /tmp/f1-installed.apk
+归档件：7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "设备端复验（版本 / 键盘 / 沉浸 / ☰ / 滚动）": {
+    "check": {
+      "version": {
+        "error": "Error: 页面里抛错: ReferenceError: BUILD_LABEL is not defined\n    at <anonymous>:5:90\n    at Array.find (<anonymous>)\n    at <anonymous>:5:56\n    at Object.evaluate (file:///home/lwgat/hermes-pocket/tools/ui-harness/dev-probe.mjs:57:35)\n    at async Object.check (file:///home/lwgat/hermes-pocket/tools/ui-harness/device-check.mjs:145:25)\n    at async file:///home/lwgat/hermes-pocket/tools/ui-harness/dev"
+      },
+      "keyboard": {
+        "before": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterTapTerminal": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterWantedKeyboard": {
+          "inputmode": "text",
+          "focused": true
+        },
+        "afterRelease": {
+          "inputmode": "none"
+        },
+        "conclusions": {
+          "startsWithKeyboardGateOff": true,
+          "tapTerminalDoesNotFocusHiddenTextarea": true,
+          "tapTerminalKeepsKeyboardGateOff": true,
+          "keyboardButtonOpensGate": true,
+          "releasingKeyboardClosesGate": true
+        }
+      },
+      "immersive": {
+        "inOut": {
+          "before": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          },
+          "middle": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "none",
+            "keybarDisplay": "none"
+          },
+          "after": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          }
+        },
+        "conclusions": {
+          "composerKeptInImmersive": true,
+          "chromeHiddenInImmersive": true,
+          "chromeBackAfterExit": true
+        }
+      },
+      "hamburger": {
+        "buttonRect": {
+          "x": 23,
+          "y": 20,
+          "w": 34,
+          "h": 32
+        },
+        "afterTap": {
+          "drawerOpen": true,
+          "items": 6
+        },
+        "conclusions": {
+          "hamburgerOpensDrawer": true
+        }
+      },
+      "scroll": {
+        "geom": {
+          "y": 240,
+          "x": 197,
+          "before": 176,
+          "base": 176
+        },
+        "after": {
+          "viewportY": 176
+        },
+        "scrolled": false,
+        "conclusions": {
+          "singleFingerDragScrolls": false
+        }
+      }
+    }
+  }
+}
+--- 收尾：停模拟器 ---
+               total        used        free      shared  buff/cache   available
+Mem:            7851        2757        3881          85        1572        5093
+
+=== 设备端复验（第二遍：版本读取传参 + 滑动改走 CDP 手势管线）  2026-09-21 21:25:00 CST ===
+# 构件 /vol1/1000/airesults/hermes-pocket/apk/hermes-pocket-统一版-20260921b.apk  sha256 7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+Success
+WebView devtools socket: webview_devtools_remote_2285
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+file:///home/lwgat/hermes-pocket/tools/ui-harness/dev-probe.mjs:40
+    const t = setTimeout(() => { pending.delete(id); rej(new Error(method + timeoutSuffix)); }, 60000);
+                                                         ^
+
+Error: Page.enable 超时
+    at Timeout._onTimeout (file:///home/lwgat/hermes-pocket/tools/ui-harness/dev-probe.mjs:40:58)
+    at listOnTimeout (node:internal/timers:685:17)
+    at process.processTimers (node:internal/timers:618:7)
+
+Node.js v26.8.2
+--- 收尾：停模拟器 ---
+               total        used        free      shared  buff/cache   available
+Mem:            7851        2731        3942          61        1517        5120
+
+=== 设备端复验（第二遍：版本读取传参 + 滑动改走 CDP 手势管线）  2026-09-21 21:27:01 CST ===
+# 构件 /vol1/1000/airesults/hermes-pocket/apk/hermes-pocket-统一版-20260921b.apk  sha256 7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+Success
+WebView devtools socket: webview_devtools_remote_2654
+/tmp/device-again.sh: line 45: `试': not a valid identifier
+三次都没连上页面
+--- 收尾：停模拟器 ---
+               total        used        free      shared  buff/cache   available
+Mem:            7851        2634        3704          61        1846        5217
+
+=== 设备端复验（第二遍：版本读取传参 + 滑动改走 CDP 手势管线）  2026-09-21 21:27:57 CST ===
+# 构件 /vol1/1000/airesults/hermes-pocket/apk/hermes-pocket-统一版-20260921b.apk  sha256 7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+Success
+WebView devtools socket: webview_devtools_remote_3140
+--- attempt 1 ---
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "设备端复验（版本 / 键盘 / 沉浸 / ☰ / 滚动）": {
+    "check": {
+      "version": {
+        "build": "unified-20260921b",
+        "info": {
+          "acceptance": "全部 20 个驱动（含 t-immersive / t-noconn）",
+          "appName": "Hermes Pocket",
+          "builtAt": "2026-09-21 23:50 CST",
+          "entry": "dev.hermes.pocket.MainActivity",
+          "feature": "修用户报的五条 + 源码标识符全改英文",
+          "featureId": "N-1~N-5,R-15~R-18",
+          "note": "装上去先看设置面板「构建版本」这一行，与文件名、说明书对上才算装对；本版起界面上的中文只出现在文案里，代码标识符全英文。",
+          "packageId": "dev.hermes.pocket",
+          "project": "hermes-pocket",
+          "testVersion": "unified-20260921b"
+        },
+        "settingsCard": "运行通道：Android 原生 SSH（App 内直连，私钥不出设备） 协议版本 v1 构建版本：unified-20260921b · 修用户报的五条 + 源码标识符全改英文（N-1~N-5,R-15~R-18）· 打包 2026-09-21 23:50 CST 密钥库：AES-256-GCM 主密钥就绪（TEE 可信执行环境）"
+      },
+      "keyboard": {
+        "before": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterTapTerminal": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterWantedKeyboard": {
+          "inputmode": "text",
+          "focused": true
+        },
+        "afterRelease": {
+          "inputmode": "none"
+        },
+        "conclusions": {
+          "startsWithKeyboardGateOff": true,
+          "tapTerminalDoesNotFocusHiddenTextarea": true,
+          "tapTerminalKeepsKeyboardGateOff": true,
+          "keyboardButtonOpensGate": true,
+          "releasingKeyboardClosesGate": true
+        }
+      },
+      "immersive": {
+        "inOut": {
+          "before": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          },
+          "middle": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "none",
+            "keybarDisplay": "none"
+          },
+          "after": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          }
+        },
+        "conclusions": {
+          "composerKeptInImmersive": true,
+          "chromeHiddenInImmersive": true,
+          "chromeBackAfterExit": true
+        }
+      },
+      "hamburger": {
+        "buttonRect": {
+          "x": 23,
+          "y": 20,
+          "w": 34,
+          "h": 32
+        },
+        "afterTap": {
+          "drawerOpen": true,
+          "items": 6
+        },
+        "conclusions": {
+          "hamburgerOpensDrawer": true
+        }
+      },
+      "scroll": {
+        "geom": {
+          "y": 240,
+          "x": 197,
+          "before": 176,
+          "base": 176
+        },
+        "after": {
+          "viewportY": 176
+        },
+        "scrolled": false,
+        "conclusions": {
+          "singleFingerDragScrolls": false
+        }
+      }
+    }
+  }
+}
+--- 收尾：停模拟器 ---
+               total        used        free      shared  buff/cache   available
+Mem:            7851        2638        4016          60        1530        5213
+
+=== 设备端复验（第二遍：版本读取传参 + 滑动改走 CDP 手势管线）  2026-09-21 21:29:16 CST ===
+# 构件 /vol1/1000/airesults/hermes-pocket/apk/hermes-pocket-统一版-20260921b.apk  sha256 7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+Success
+WebView devtools socket: webview_devtools_remote_2377
+--- attempt 1 ---
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "设备端复验（版本 / 键盘 / 沉浸 / ☰ / 滚动）": {
+    "check": {
+      "version": {
+        "build": "unified-20260921b",
+        "info": {
+          "acceptance": "全部 20 个驱动（含 t-immersive / t-noconn）",
+          "appName": "Hermes Pocket",
+          "builtAt": "2026-09-21 23:50 CST",
+          "entry": "dev.hermes.pocket.MainActivity",
+          "feature": "修用户报的五条 + 源码标识符全改英文",
+          "featureId": "N-1~N-5,R-15~R-18",
+          "note": "装上去先看设置面板「构建版本」这一行，与文件名、说明书对上才算装对；本版起界面上的中文只出现在文案里，代码标识符全英文。",
+          "packageId": "dev.hermes.pocket",
+          "project": "hermes-pocket",
+          "testVersion": "unified-20260921b"
+        },
+        "settingsCard": null
+      },
+      "keyboard": {
+        "before": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterTapTerminal": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterWantedKeyboard": {
+          "inputmode": "text",
+          "focused": true
+        },
+        "afterRelease": {
+          "inputmode": "none"
+        },
+        "conclusions": {
+          "startsWithKeyboardGateOff": true,
+          "tapTerminalDoesNotFocusHiddenTextarea": true,
+          "tapTerminalKeepsKeyboardGateOff": true,
+          "keyboardButtonOpensGate": true,
+          "releasingKeyboardClosesGate": true
+        }
+      },
+      "immersive": {
+        "inOut": {
+          "before": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          },
+          "middle": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "none",
+            "keybarDisplay": "none"
+          },
+          "after": {
+            "composerDisplay": "flex",
+            "composerInViewport": false,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          }
+        },
+        "conclusions": {
+          "composerKeptInImmersive": true,
+          "chromeHiddenInImmersive": true,
+          "chromeBackAfterExit": true
+        }
+      },
+      "hamburger": {
+        "buttonRect": {
+          "x": 23,
+          "y": 20,
+          "w": 34,
+          "h": 32
+        },
+        "afterTap": {
+          "drawerOpen": true,
+          "items": 6
+        },
+        "conclusions": {
+          "hamburgerOpensDrawer": true
+        }
+      },
+      "scroll": {
+        "geom": {
+          "y": 240,
+          "x": 197,
+          "before": 176,
+          "base": 176
+        },
+        "swipe": {
+          "from": "540,1000",
+          "to": "540,1700"
+        },
+        "after": {
+          "viewportY": 176
+        },
+        "scrolled": false,
+        "conclusions": {
+          "singleFingerDragScrolls": false
+        }
+      }
+    }
+  }
+}
+--- 收尾：停模拟器 ---
+               total        used        free      shared  buff/cache   available
+Mem:            7851        2644        3919          59        1620        5206
+
+=== 设备端复验（第二遍：版本读取传参 + 滑动改走 CDP 手势管线）  2026-09-21 21:31:55 CST ===
+# 构件 /vol1/1000/airesults/hermes-pocket/apk/hermes-pocket-统一版-20260921b.apk  sha256 7073f1cc84bba23c75a466af407dafff53935189225cf2be28fed5aad1122f23
+Success
+WebView devtools socket: webview_devtools_remote_3033
+--- attempt 1 ---
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "设备端复验（版本 / 键盘 / 沉浸 / ☰ / 滚动）": {
+    "check": {
+      "version": {
+        "build": "unified-20260921b",
+        "info": {
+          "acceptance": "全部 20 个驱动（含 t-immersive / t-noconn）",
+          "appName": "Hermes Pocket",
+          "builtAt": "2026-09-21 23:50 CST",
+          "entry": "dev.hermes.pocket.MainActivity",
+          "feature": "修用户报的五条 + 源码标识符全改英文",
+          "featureId": "N-1~N-5,R-15~R-18",
+          "note": "装上去先看设置面板「构建版本」这一行，与文件名、说明书对上才算装对；本版起界面上的中文只出现在文案里，代码标识符全英文。",
+          "packageId": "dev.hermes.pocket",
+          "project": "hermes-pocket",
+          "testVersion": "unified-20260921b"
+        },
+        "settingsCard": "运行通道：Android 原生 SSH（App 内直连，私钥不出设备） 协议版本 v1 构建版本：unified-20260921b · 修用户报的五条 + 源码标识符全改英文（N-1~N-5,R-15~R-18）· 打包 2026-09-21 23:50 CST 密钥库：AES-256-GCM 主密钥就绪（TEE 可信执行环境）"
+      },
+      "keyboard": {
+        "before": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterTapTerminal": {
+          "tag": "BODY",
+          "id": "",
+          "isHiddenTextarea": false,
+          "inputmode": "none"
+        },
+        "afterWantedKeyboard": {
+          "inputmode": "text",
+          "focused": true
+        },
+        "afterRelease": {
+          "inputmode": "none"
+        },
+        "conclusions": {
+          "startsWithKeyboardGateOff": true,
+          "tapTerminalDoesNotFocusHiddenTextarea": true,
+          "tapTerminalKeepsKeyboardGateOff": true,
+          "keyboardButtonOpensGate": true,
+          "releasingKeyboardClosesGate": true
+        }
+      },
+      "immersive": {
+        "inOut": {
+          "before": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          },
+          "middle": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "none",
+            "keybarDisplay": "none"
+          },
+          "after": {
+            "composerDisplay": "flex",
+            "composerInViewport": true,
+            "topbarDisplay": "flex",
+            "keybarDisplay": "block"
+          }
+        },
+        "conclusions": {
+          "composerKeptInImmersive": true,
+          "chromeHiddenInImmersive": true,
+          "chromeBackAfterExit": true
+        }
+      },
+      "hamburger": {
+        "buttonRect": {
+          "x": 23,
+          "y": 20,
+          "w": 34,
+          "h": 32
+        },
+        "afterTap": {
+          "drawerOpen": true,
+          "items": 6
+        },
+        "conclusions": {
+          "hamburgerOpensDrawer": true
+        }
+      },
+      "scroll": {
+        "geom": {
+          "x": 197,
+          "y": 240,
+          "before": 176,
+          "base": 176,
+          "landedOn": "DIV",
+          "landedInTerminal": true
+        },
+        "after": {
+          "viewportY": 167
+        },
+        "scrolled": true,
+        "swipedBy": "cdp-drag",
+        "conclusions": {
+          "dragStartLandsInTerminal": true,
+          "singleFingerDragScrolls": true
+        }
+      }
+    }
+  }
+}
+--- 收尾：停模拟器 ---
+               total        used        free      shared  buff/cache   available
+Mem:            7851        2621        3975          60        1588        5230

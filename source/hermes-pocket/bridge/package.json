@@ -1,0 +1,15 @@
+{
+  "name": "hermes-pocket-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WebSocket ⇄ SSH 参考实现：给 Hermes Pocket 的同一套前端 UI 提供桌面/浏览器运行通道",
+  "scripts": {
+    "start": "node server.mjs",
+    "testssh": "node ../tools/testssh.mjs"
+  },
+  "dependencies": {
+    "ssh2": "^1.16.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,15 @@
+### Ctrl+b d 退出 tmux  2026-09-17 09:58:38 CST
+
+=== 连上 + 起真 tmux（独立 socket hpk-cb）===
+    "value": "{\"状态\":\"connected\",\"TUI\":true,\"鼠标\":0,\"顶栏\":\"TUI·滚动受限\"}"
+
+=== 真实点击键条 Ctrl → 真实键盘敲 b、d ===
+  hooked
+  找不到可见的 Ctrl
+  点 Ctrl 后: {"锁定Ctrl":false,"焦点在终端":false,"TUI":true,"顶栏":"TUI·滚动受限","发送":[]}
+  敲 b 后: {"锁定Ctrl":false,"焦点在终端":false,"TUI":true,"顶栏":"TUI·滚动受限","发送":[]}
+  敲 d 后: {"锁定Ctrl":false,"焦点在终端":false,"TUI":true,"顶栏":"TUI·滚动受限","发送":[]}
+
+=== tmux 端核对 ===
+  客户端: /dev/pts/1: cb1 [48x32 xterm-256color] (attached,focused)   ← 空表示已脱离
+  会话:   cb1: 1 windows (created Thu Sep 17 09:58:38 2026) (attached)   ← 还在表示只是 detach，没杀会话

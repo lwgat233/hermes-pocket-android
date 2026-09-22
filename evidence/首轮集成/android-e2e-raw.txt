@@ -1,0 +1,33 @@
+### 运行环境
+  2026-09-16 23:54:57 CST
+  可用=1953 MB  已用=5897 MB  swap剩余=1770 MB  负载=3.29
+  内存前 3:
+       3120 MB  qemu-system-x86
+        262 MB  hermes
+        236 MB  hermes
+  模拟器进程数=1
+
+### 构建与部署
+— 拉起
+  进程 pid=5814  CDP=http://127.0.0.1:9222
+  可用=1945 MB  已用=5905 MB  swap剩余=1765 MB  负载=3.66
+  内存前 3:
+       3146 MB  qemu-system-x86
+        262 MB  hermes
+        236 MB  hermes
+  模拟器进程数=1
+
+### 应用内集成测试（真机路径：WebView → 原生桥 → jsch → testsshd）
+[cdp] target: Hermes Pocket  url=https://appassets.androidplatform.net/ui/index.html
+{
+  "ok": true,
+  "value": "  ✓ Keystore 主密钥就绪（AES-256-GCM）   AES-256-GCM 主密钥就绪（TEE 可信执行环境）\n  ✓ 走原生 SSH 通道（私钥不出设备）\n  ✓ 私钥导入 + 指纹计算   Ed25519 SHA256:UsmprTonLnHC49NcRrDqZfo5FJwg73XgHFVJ6MyXDlE\n  ✓ key.list 只回元数据（含私钥字段=失败）\n  ✓ 主机保存并回读   lwgat@10.0.2.2:2222\n  ✓ host.list 不回传口令/密文\n  ✓ SSH 会话建立（jsch 原生直连）   state=connected\n  ✓ 首次连接弹主机密钥确认（TOFU）\n  ✓ 信任后会话仍在\n  ✓ 远端命令回显 HPK_MARKER_42\n  ✓ resize 传到远端 PTY   本地 48x39 / 远端出现 \"39 48\"\n  ✓ TUI 备用屏被嗅探到\n  ✓ 鼠标模式被嗅探到   mode=1002 sgr=false\n  ✓ TUI 下列数被顶到 ≥80（手机原本只有 48 列）   cols 48 → 80，字号 13 → 10px\n  ✓ 字号没有低于可读下限 10px   10px\n  ✓ 功能键条切到 TUI 那一行\n  ✓ 状态栏徽标显示 TUI   TUI·鼠标\n  ✓ 横向平移状态与实际溢出一致   可见 62 列 / 需要 80 列 → pan=true\n  ✓ tmux 在备用屏里真的渲染出内容   \"tmux -L hpk-and kill-session -t app exit [app] 0:sleep* \\\"gal\"\n  ✓ Ctrl-B d 从 tmux 退出回到 shell   alt=false\n  ✓ 远端 exit 后掉线被感知   状态序列 disconnected → reconnecting → connected\n  ✓ 掉线后自动重连成功（原生层自愈）   状态序列 disconnected → reconnecting → connected\n  ✓ 保活/重连状态栏有反馈   rtt 栏= ↑1.7K\n\n全部通过"
+}
+
+### 测试后资源
+  可用=1970 MB  已用=5881 MB  swap剩余=1761 MB  负载=3.99
+  内存前 3:
+       3142 MB  qemu-system-x86
+        262 MB  hermes
+        235 MB  hermes
+  模拟器进程数=1

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="format-detection" content="telephone=no">
+<title>Hermes Pocket</title>
+<link rel="stylesheet" href="vendor/xterm.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="talk.css">
+<script src="talk.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <header id="topbar">
+    <button class="tb-btn" id="btn-panel" aria-label="菜单">☰</button>
+    <div id="tb-stat">
+      <span id="dot"></span>
+      <span id="tb-title">未连接</span>
+      <span id="tb-badge" data-testid="chat-state">—</span>
+    </div>
+    <div id="tb-meta"><span id="tb-geom">—</span><span id="tb-rtt">—</span><span id="tb-traffic" title="下行流量（点开看详情）">↓ 0B</span></div>
+    <button class="tb-btn" id="btn-keys" aria-label="功能键">⌨</button>
+    <button class="tb-btn" id="btn-immersive" aria-label="沉浸">⛶</button>
+  </header>
+
+  <main id="stage">
+    <div id="panner"><div id="termhost"><div id="termsizer"></div></div></div>
+
+    <div id="drawer-scrim" class="hidden"></div>
+
+    <aside id="drawer" aria-label="栏目">
+      <div class="dw-head">
+        <span class="dw-title">Hermes Pocket</span>
+        <button class="tb-btn" id="btn-drawer-close" aria-label="收起">‹</button>
+      </div>
+      <div class="dw-body" id="dw-body"></div>
+    </aside>
+
+    <div id="overlay">
+      <div class="panel-head">
+        <button class="tb-btn" id="btn-board-list" aria-label="栏目">☰</button>
+        <h2 id="board-title">主机</h2>
+        <div class="tabs hidden">
+          <button data-tab="hosts" class="on">主机</button>
+          <button data-tab="keys">密钥</button>
+          <button data-tab="settings">设置</button>
+          <button data-tab="hermes">Hermes</button>
+          <button data-tab="sessions">会话</button>
+          <button data-tab="net">网络</button>
+          <button data-tab="talk">频道</button>
+        </div>
+        <button class="tb-btn" id="btn-close-panel" aria-label="关闭">✕</button>
+      </div>
+      <div class="panel-body">
+        <section class="tabpage on" id="tab-hosts"></section>
+        <section class="tabpage" id="tab-keys"></section>
+        <section class="tabpage" id="tab-settings"></section>
+        <section class="tabpage" id="tab-hermes"></section>
+        <section class="tabpage" id="tab-sessions"></section>
+        <section class="tabpage" id="tab-net"></section>
+        <section class="tabpage" id="tab-talk"></section>
+      </div>
+    </div>
+
+    <div id="ctxmenu"></div>
+    <div id="toast"></div>
+  </main>
+
+  <div id="composer" class="hidden">
+    <button id="cmode" title="实时＝敲一个字就送进终端；攒着＝写完点发送整行送">实时</button>
+    <textarea id="cinput" rows="1" placeholder="实时输入：敲一个字就送进终端（和点功能键条一样）"
+      autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+    <button id="csend">⏎</button>
+  </div>
+
+  <nav id="keybar">
+    <div class="kkeywrap" id="krow-shell"></div>
+    <div class="kkeywrap" id="krow-tui"></div>
+    <div class="kkeywrap hidden" id="krow-extra"></div>
+  </nav>
+
+</div>
+
+<script src="vendor/xterm.js"></script>
+<script src="vendor/addon-fit.js"></script>
+<script src="vendor/addon-unicode11.js"></script>
+<script src="vendor/addon-web-links.js"></script>
+<script src="transport.js"></script>
+<script src="tui.js"></script>
+<script src="ui.js"></script>
+<script src="registry.js"></script>
+<script src="sessions.js"></script>
+<script src="chatstate.js"></script>
+<script src="remote.js"></script>
+<script src="net.js"></script>
+<script src="panels.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

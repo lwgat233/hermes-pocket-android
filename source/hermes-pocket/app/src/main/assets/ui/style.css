@@ -1,0 +1,556 @@
+/* Hermes Pocket — 移动端 WebView 终端外壳样式
+   布局约束：所有高度都走 --vh（由 visualViewport 实时写入），
+   这样软键盘弹出时 keybar / composer 永远贴在键盘上沿。 */
+
+:root {
+  --bg:        #0b0f14;
+  --bg-bar:    #0f1620;
+  --bg-raise:  #16202c;
+  --fg:        #c8d3e0;
+  --fg-dim:    #7b8a9c;
+  --line:      #1e2a38;
+  --accent:    #1de9b6;
+  --accent-2:  #8ab4f8;
+  --gold:      #ffd166;
+  --warn:      #ffb020;
+  --err:       #ff5c5c;
+  --ok:        #33d17a;
+
+  --vh: 100dvh;
+  --vtop: 0px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+
+  --topbar-h: 40px;
+  --keybar-h: 46px;
+  --composer-h: 48px;
+
+  --font-mono: "JetBrainsMono Nerd Font", "JetBrains Mono", "MesloLGL Nerd Font",
+               "Noto Sans Mono", "DejaVu Sans Mono", "Droid Sans Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  font-family: -apple-system, system-ui, "Noto Sans SC", "Noto Sans CJK SC", sans-serif;
+}
+
+button, input, textarea {
+  font-family: inherit;
+  color: inherit;
+  font-size: 15px;
+}
+
+/* ---------------------------------------------------------------- 骨架 */
+
+#app {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--vtop);
+  height: var(--vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 顶部状态条 */
+#topbar {
+  flex: 0 0 auto;
+  height: calc(var(--topbar-h) + var(--safe-t));
+  padding-top: var(--safe-t);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 6px;
+  padding-right: 6px;
+  background: var(--bg-bar);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  z-index: 30;
+}
+
+#topbar .tb-btn {
+  flex: 0 0 auto;
+  height: 32px;
+  min-width: 34px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fg-dim);
+  font-size: 15px;
+  line-height: 1;
+}
+#topbar .tb-btn:active { background: var(--bg-raise); color: var(--fg); }
+#topbar .tb-btn.on { color: var(--accent); border-color: var(--line); }
+
+#tb-stat {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+#dot {
+  flex: 0 0 auto;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--fg-dim);
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  transition: background .2s;
+}
+#dot.connected    { background: var(--ok); }
+#dot.connecting   { background: var(--warn); animation: pulse 1s infinite; }
+#dot.reconnecting { background: var(--warn); animation: pulse 1s infinite; }
+#dot.error        { background: var(--err); }
+@keyframes pulse { 50% { opacity: .25; } }
+
+#tb-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+#tb-badge {
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--fg-dim);
+  font-size: 10px;
+  letter-spacing: .04em;
+}
+#tb-badge.tui { color: var(--gold); border-color: #3a3320; background: #241f10; }
+#tb-meta {
+  flex: 0 0 auto;
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  display: flex;
+  gap: 8px;
+}
+
+/* 终端舞台 */
+#stage {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 0;
+  /*
+   * 手势必须由我们自己处理，不能交给浏览器仲裁。
+   * 不写 touch-action 时，竖向拖动会被浏览器当成页面滚动手势**接管**：
+   * 实测真实触摸的事件序列是 pointerdown → 1 个 pointermove → **pointercancel**，
+   * pointermove 直接被掐断，应用收不到拖动 —— 表现就是「下拉看不到上面的文本」。
+   * （之前用合成 PointerEvent 测过，绕过了这一层，所以是假阳性。）
+   */
+  touch-action: none;
+  overflow: hidden;
+  background: #080c11;
+}
+
+/* 面板/弹窗里要能正常上下滚，把 pan-y 还回去 */
+#overlay, #overlay * { touch-action: pan-y; }
+#panner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* termhost 负责横向平移，尺寸恒等于可视区；
+   termsizer 是 fit 插件的测量基准，必须始终等于可视区尺寸，
+   否则「内容比屏幕宽 → 撑宽父容器 → 量出更多列 → 内容更宽」会失控。 */
+#termhost {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+#termsizer {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+/* xterm 元素自身尺寸由 JS 控制（固定 cols 时需要横向平移） */
+#termhost .xterm { padding: 2px 0 0 2px; }
+#termhost .xterm-viewport { background: transparent !important; }
+/* 点上面那块屏幕不弹键盘（用户要求：要能放心复制 / 长按 / 拖动）：
+   xterm 自带的隐藏输入框只有 1×1 像素、就压在光标那儿，手指点过去浏览器会自己 focus 它 → 弹键盘。
+   让指针永远落不到它身上最省事（键盘输入与 term.focus() 都不受影响）。 */
+#termhost .xterm-helper-textarea { pointer-events: none; }
+
+/* 空态 / 连接面板 */
+#overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: rgba(8, 12, 17, .96);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#overlay.hidden { display: none; }
+
+.panel-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.panel-head h2 { margin: 0; font-size: 15px; font-weight: 650; flex: 1 1 auto; }
+.tabs { display: flex; gap: 4px; }
+.tabs button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+.tabs button.on { color: var(--accent); border-color: var(--accent); background: #0e2a26; }
+
+.panel-body { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 12px 24px; }
+.tabpage { display: none; }
+.tabpage.on { display: block; }
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: var(--bg-bar);
+}
+.card:active { background: var(--bg-raise); }
+.card .row1 { display: flex; align-items: baseline; gap: 8px; }
+.card .name { font-weight: 620; font-size: 15px; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .sub { color: var(--fg-dim); font-size: 12px; margin-top: 2px; font-family: var(--font-mono); word-break: break-all; }
+.card .tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.tag { font-size: 10px; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg-dim); }
+.tag.key { color: var(--accent); border-color: #17403a; }
+
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 12px; color: var(--fg-dim); margin-bottom: 4px; }
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0a1119;
+  -webkit-user-select: text;
+  user-select: text;
+  font-size: 15px;
+}
+.field textarea { min-height: 96px; font-family: var(--font-mono); font-size: 12px; resize: vertical; }
+.field .hint { font-size: 11px; color: var(--fg-dim); margin-top: 4px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-raise);
+  font-size: 14px;
+  font-weight: 600;
+}
+.btn:active { opacity: .7; }
+.btn.primary { background: #0e2a26; border-color: var(--accent); color: var(--accent); }
+.btn.danger  { color: var(--err); border-color: #40222a; }
+.btn.wide    { width: 100%; }
+.btnrow { display: flex; gap: 8px; margin-top: 12px; }
+.btnrow .btn { flex: 1 1 0; }
+
+.empty { color: var(--fg-dim); font-size: 13px; text-align: center; padding: 28px 12px; line-height: 1.7; }
+
+/* ---------------------------------------------------------------- 键盘条 */
+
+#keybar {
+  flex: 0 0 auto;
+  background: var(--bg-bar);
+  border-top: 1px solid var(--line);
+  padding: 3px 0 calc(3px + var(--safe-b));
+  z-index: 30;
+}
+#keybar.hidden, #composer.hidden { display: none; }
+
+/* 功能键条：**网格铺满，绝不横向滚动**。
+   之前是 overflow-x:auto 的横滑条，两个后果：
+     1) 20+ 个键里只有 8 个可见，Ctrl/⌫/^C 这些压根看不到；
+     2) 某个右侧键获得焦点时浏览器会把整行滚进视野（scrollLeft 0 → 675），
+        把 Esc/Tab/方向键整排卷出屏幕左边，而且不会自己滚回来。
+   所以改成 8 列的网格按行铺开：键变小但全都在，也不会被卷走。 */
+.kkeywrap {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  padding: 3px 6px;
+}
+.kkeywrap.hidden { display: none; }
+#keybar { padding-bottom: calc(3px + var(--safe-b)); }
+
+.key {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 2px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-raise);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.key:active { background: #24313f; }
+.key.mod { color: var(--fg-dim); }
+.key.mod.latched { background: #0e2a26; border-color: var(--accent); color: var(--accent); }
+.key.acc { color: var(--gold); }
+.key.act-more { color: var(--accent-2); }
+
+/* ---------------------------------------------------------------- composer */
+
+#composer {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px 6px calc(6px + var(--safe-b));
+  background: var(--bg-bar);
+  border-top: 1px solid var(--line);
+  z-index: 30;
+}
+#composer.hidden { display: none; }
+#cinput {
+  flex: 1 1 auto;
+  min-height: 38px;
+  max-height: 132px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0a1119;
+  resize: none;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.35;
+  -webkit-user-select: text;
+  user-select: text;
+  overflow-y: auto;
+}
+#csend {
+  flex: 0 0 auto;
+  height: 38px;
+  min-width: 60px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: #0e2a26;
+  color: var(--accent);
+  font-weight: 650;
+  font-size: 14px;
+}
+#csend:active { opacity: .7; }
+
+/* 输入框的「实时 / 攒着」开关 */
+#cmode {
+  flex: 0 0 auto;
+  height: 38px;
+  min-width: 52px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0a1119;
+  color: #7c8b9b;
+  font-size: 12.5px;
+  font-weight: 650;
+}
+#cmode.on { color: var(--accent); border-color: var(--accent); background: #0e2a26; }
+#cmode:active { opacity: .7; }
+
+/* 顶栏的流量读数：点击看详情 */
+#tb-traffic {
+  cursor: pointer;
+  color: #9fb3c8;
+  padding: 0 2px;
+}
+#tb-traffic:active { color: var(--accent); }
+#tb-traffic.hidden { display: none; }
+
+/* 浮动提示 */
+#toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--keybar-h) + 24px);
+  transform: translateX(-50%);
+  max-width: 82%;
+  /*
+   * 提示条浮在终端上方，绝不能吃掉手势 ——
+   * 不加 pointer-events:none 时，它盖住的那一块开始拖动就被算成"点到了浮层"，
+   * 手势被忽略，表现就是"有时候怎么滑都滑不动"。
+   */
+  pointer-events: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(22, 32, 44, .96);
+  border: 1px solid var(--line);
+  color: var(--fg);
+  font-size: 13px;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s, transform .18s;
+  white-space: pre-wrap;
+  text-align: center;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+/* 长按菜单 */
+#ctxmenu {
+  position: absolute;
+  z-index: 70;
+  min-width: 148px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 28px rgba(0,0,0,.55);
+  display: none;
+}
+#ctxmenu.show { display: block; }
+#ctxmenu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 14px;
+}
+#ctxmenu button:active { background: #25323f; }
+
+/* 沉浸式（隐藏 chrome，留给纯 TUI 阅读） */
+/* 沉浸（全屏）模式：只藏顶栏与功能键条 —— **输入框留着**（用户要求：
+   "全屏模式也要保留这个输入框"；否则全屏里就没法打字了）。 */
+body.immersive #topbar,
+body.immersive #keybar { display: none; }
+body.immersive #stage { border-top: 0; }
+
+/* 「回到底部」胶囊：往上翻看历史时浮出来，给一条明显的路回底部 */
+.sb-chip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 12px;
+  z-index: 30;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-2);
+  background: rgba(11, 17, 23, .94);
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.sb-chip.hidden { display: none; }
+.sb-chip:active { background: #17242e; }
+
+/* 宽屏 / 横屏：键盘条与 composer 并排，少占竖向空间 */
+@media (min-width: 720px) {
+  :root { --topbar-h: 36px; --keybar-h: 44px; }
+}
+
+/* ------------------------------------------------------- 栏目抽屉 / 信息行（HP.UI 规范） */
+
+/* 左侧隐藏栏：默认在屏幕外，点「☰」滑进来（用 transform 控制，不用 display:none，
+   否则滑动动画没了；滑出屏幕后也收不到触摸） */
+#drawer {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 78%; max-width: 320px;
+  background: var(--bg-bar); border-right: 1px solid var(--line);
+  z-index: 86; display: flex; flex-direction: column;
+  transform: translateX(-102%); transition: transform .18s ease-out;
+  box-shadow: 0 0 24px rgba(0, 0, 0, .5);
+}
+#drawer.show { transform: none; }
+.dw-head { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.dw-title { flex: 1 1 auto; font-size: 14px; font-weight: 650; }
+.dw-body { flex: 1 1 auto; overflow-y: auto; padding: 8px 10px 16px; }
+.dw-group { margin: 14px 4px 6px; font-size: 12px; color: var(--fg-dim); }
+#drawer-scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, .45); z-index: 85; }
+#drawer-scrim.hidden { display: none; }
+.tabs.hidden { display: none; }
+
+/* 一行信息 = 两行制：左列可压缩（超长用「…」），右列固定且数值**绝不省略** */
+.row-item {
+  display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 10px;
+  border-radius: 10px; background: #0a1119; border: 1px solid var(--line); margin: 6px 0;
+}
+.row-item:active { background: var(--bg-raise); }
+.ri-main { flex: 1 1 auto; min-width: 0; }
+.ri-t { font-size: 14px; font-weight: 600; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ri-s { font-size: 12px; color: var(--fg-dim); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ri-r {
+  flex: 0 0 auto; text-align: right; white-space: nowrap; overflow: visible;
+  font-size: 12px; color: var(--fg-dim); font-variant-numeric: tabular-nums;
+}
+
+/* 点行弹出的小窗（键小字在上、值大字在下、每对一条横线、底部一组动作） */
+.sheet-t { font-size: 13px; font-weight: 600; color: var(--fg); margin-bottom: 6px; }
+.sheet-body { flex: 1 1 auto; overflow-y: auto; }
+.sheet-body .field { border-bottom: 1px solid var(--line); padding: 8px 0; }
+.sheet-body .field label { display: block; font-size: 11px; color: var(--fg-dim); }
+.sheet-body .field .val { font-size: 15px; color: var(--fg); margin-top: 3px; word-break: break-all; }
+.ui-status { margin: 6px 2px; }
+
+/* 会话板块：当前选中的那一行给个明确的记号（不靠颜色区分状态，只标"就是它"） */
+.row-item.row-on { border-color: var(--accent); }
+
+/* 小窗里的长文本块（系统提示词这类只读内容）：可滚动、等宽、保留换行 */
+.sheet-pre {
+  white-space: pre-wrap; word-break: break-word;
+  font-family: var(--font-mono); font-size: 11.5px; line-height: 1.45;
+  background: #0a1119; border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px; margin: 8px 0; max-height: 46vh; overflow: auto;
+}
+
+/* 小窗里可编辑的字段（改模型这类） */
+.sheet-input {
+  width: 100%; margin-top: 4px; padding: 8px 10px; font-size: 15px;
+  background: #0a1119; color: var(--fg); border: 1px solid var(--line); border-radius: 8px;
+}
+.sheet-input:focus { outline: none; border-color: var(--accent); }
+/* 候选：一行最多三个小键，点一下填进上面的输入框 */
+.sheet-choice { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.sheet-choice .btn { flex: 0 1 auto; font-size: 13px; padding: 6px 10px; }
+
+/* 流量图（M4：区间 → 统计 → 绘图；柱状 + 饼都只用 DOM/CSS，不引外部库） */
+.net-bars { display: flex; align-items: flex-end; gap: 2px; height: 96px; padding: 6px 4px 0; background: #0a1119; border-radius: 8px; }
+.net-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; min-width: 2px; }
+.net-stack { display: flex; flex-direction: column; justify-content: flex-end; }
+.net-seg { width: 100%; }
+.net-up { background: #3f8f6f; }
+.net-down { background: var(--accent, #4ea1ff); }
+.net-pie-row { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.net-pie { width: 84px; height: 84px; border-radius: 50%; flex: 0 0 auto; background: #123; }
+.net-legend { flex: 1; }
+.net-legend-row { font-size: 13px; }
+.net-sum { color: #8aa; margin-top: 2px; }

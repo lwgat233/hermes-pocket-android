@@ -1,0 +1,11 @@
+### 真实触摸下拉翻历史（touch-action 修复后）  2026-09-17 09:49:26 CST
+
+=== 先造 200 行历史 ===
+
+=== 真实触摸注入：下拉 / 上滑 / 横拖 ===
+  hooked
+  起点 距底部=0
+  ① 下拉后: {"事件":{"down":1,"move":1,"up":0,"cancel":1},"距底部":0,"顺序":["down@300","move@321","cancel@0"]}
+  ② 再下拉: {"事件":{"down":2,"move":2,"up":0,"cancel":2},"距底部":0,"顺序":["down@300","move@321","cancel@0","down@300","move@321","cancel@0"]}
+  ③ 上滑后: {"事件":{"down":2,"move":2,"up":0,"cancel":2},"距底部":0,"顺序":["down@300","move@321","cancel@0","down@300","move@321","cancel@0"]}
+  ④ 横拖后: {"事件":{"down":3,"move":16,"up":1,"cancel":2},"距底部":0,"顺序":["down@300","move@321","cancel@0","down@300","move@321","cancel@0","down@400","move@400"]}

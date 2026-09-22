@@ -1,0 +1,25 @@
+### 最终验收：键条手势 / 焦点保留 / 修饰键 / tmux detach  2026-09-17 10:19:29 CST
+
+    "value": "{\"状态\":\"connected\"}"
+
+  ok
+  warm
+  ① 起点 → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行":false,"TUI":false,"顶栏":"shell","发出":[]}
+   · "tapGesture": "#krow-shell .key:nth-child(1)",
+  ② 点 Esc → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行":false,"TUI":false,"顶栏":"shell","发出":["0x1b"]}
+   · "tapGesture": "#krow-shell .key:nth-child(16)",
+  ③ 点「⌄更多」（不该有杂散字节）→ {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行":true,"TUI":false,"顶栏":"shell","发出":["0x1b"]}
+  warm2
+   · "tapGesture": "#krow-shell .key:nth-child(9)",
+  ④ 输入框里点 Ctrl → {"焦点":"cinput","锁定Ctrl":true,"更多行":true,"TUI":false,"顶栏":"shell","发出":["0x1b"]}
+  ⑤ 打字母 x（应 0x18，且焦点仍在输入框）→ {"焦点":"cinput","锁定Ctrl":false,"更多行":true,"TUI":false,"顶栏":"shell","发出":["0x1b","0x18"]}
+  start tmux
+  ⑥ tmux 起来了 → {"焦点":"cinput","锁定Ctrl":false,"更多行":true,"TUI":true,"顶栏":"TUI·滚动受限","发出":["0x1b","0x18","clear; tmux -L hpk-cb -f /dev/null new -s cb10xd","0x1b[>0;276;0c"]}
+   · "tapGesture": "#krow-tui .key:nth-child(9)",
+  ⑦ TUI 里点 Ctrl → {"焦点":"cinput","锁定Ctrl":true,"更多行":true,"TUI":true,"顶栏":"TUI·滚动受限","发出":["0x1b","0x18","clear; tmux -L hpk-cb -f /dev/null new -s cb10xd","0x1b[>0;276;0c"]}
+  ⑧ 敲 b（应 0x02）→ {"焦点":"cinput","锁定Ctrl":false,"更多行":true,"TUI":true,"顶栏":"TUI·滚动受限","发出":["0x1b","0x18","clear; tmux -L hpk-cb -f /dev/null new -s cb10xd","0x1b[>0;276;0c","0x2"]}
+  ⑨ 敲 d → {"焦点":"cinput","锁定Ctrl":false,"更多行":true,"TUI":false,"顶栏":"shell","发出":["0x1b","0x18","clear; tmux -L hpk-cb -f /dev/null new -s cb10xd","0x1b[>0;276;0c","0x2","d"]}
+
+=== tmux 端核对 ===
+  客户端:   ← 空＝已脱离
+  会话:   cb1: 1 windows (created Thu Sep 17 10:19:40 2026)   ← 还在＝只是 detach

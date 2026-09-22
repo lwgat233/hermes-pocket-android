@@ -1,0 +1,4 @@
+apk/
+*.apk
+source/hermes-pocket/app/build/
+source/hermes-pocket/.gradle/

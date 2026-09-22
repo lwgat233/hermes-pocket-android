@@ -1,0 +1,36 @@
+### 省电板块验收  2026-09-17 11:40:44 CST
+
+=== 连接 ===
+  connected
+
+=== ① 基线（前台）：唤醒锁应被持有 ===
+  {"省电中": false, "原生": {"save": false, "keepAwake": true, "wakeHeld": true, "interactive": true}, "定时器": {"流量": true, "命令判定": true, "心跳": true}, "看门狗": true}
+    PARTIAL_WAKE_LOCK              'hermes-pocket:ssh' ACQ=-6s593ms (uid=10192 pid=16723)
+    (空=没有持有唤醒锁)
+  服务端连接数: 2
+
+=== ② 切到后台（模式=background）→ 应进入省电 ===
+  模式=background
+  {"省电中": true, "原生": {"save": true, "keepAwake": true, "wakeHeld": false, "interactive": true}, "定时器": {"流量": false, "命令判定": false, "心跳": false}, "看门狗": false, "页面隐藏": true}
+    (空=没有持有唤醒锁)
+  服务端连接数（应仍是 2 = 终端 + 事件通道，**没断**）: 2
+
+=== ③ 睡着期间让远端产生输出（连接还在，输出不该丢）===
+  sent
+
+=== ④ 回到前台 → 应退出省电、收回唤醒锁 ===
+  {"省电中": false, "原生": {"save": false, "keepAwake": true, "wakeHeld": true, "interactive": true}, "定时器": {"流量": true, "命令判定": true, "心跳": true}, "看门狗": true, "会话状态": "connected"}
+    PARTIAL_WAKE_LOCK              'hermes-pocket:ssh' ACQ=-5s15ms (uid=10192 pid=16723)
+    (空=没有持有唤醒锁)
+  服务端连接数: 2
+
+=== ⑤ 睡着期间那条输出在不在（终端缓冲）===
+  {"命中": ["SECOND-LINE", "DOZE-OUTPUT-1789616455", "); echo SECOND-LINE", "lwgat@galaxy-fnos:~$ echo DOZE-OUTPUT-$(date +%s"], "收到总量": 238}
+
+=== ⑥ 息屏路径（模式=screenOff）：息屏应省电、亮屏应恢复 ===
+  模式=screenOff
+  {"省电中": true, "原生": {"save": true, "keepAwake": true, "wakeHeld": false, "interactive": false}, "页面隐藏": true}
+    (空=没有持有唤醒锁)
+  {"省电中": false, "原生": {"save": false, "keepAwake": true, "wakeHeld": true, "interactive": true}, "页面隐藏": false}
+    PARTIAL_WAKE_LOCK              'hermes-pocket:ssh' ACQ=-4s105ms (uid=10192 pid=16723)
+    (空=没有持有唤醒锁)

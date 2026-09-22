@@ -1,0 +1,31 @@
+### Hermes Pocket — 缺陷修复后的完整验收  2026-09-17 01:34:20 CST
+
+--- 环境 ---
+  可用=1858 MB  已用=5993 MB  swap剩余=1445 MB  负载=3.16
+  内存前 3:
+       3269 MB  qemu-system-x86
+        375 MB  hermes
+        286 MB  chromium
+  模拟器进程数=1
+
+--- A. 应用内完整集成套件（真机路径）---
+[cdp] target: Hermes Pocket  url=https://appassets.androidplatform.net/ui/index.html
+{
+  "ok": true,
+  "value": "  ✓ Keystore 主密钥就绪（AES-256-GCM）   AES-256-GCM 主密钥就绪（TEE 可信执行环境）\n  ✓ 走原生 SSH 通道（私钥不出设备）\n  ✓ 私钥导入 + 指纹计算   Ed25519 SHA256:UsmprTonLnHC49NcRrDqZfo5FJwg73XgHFVJ6MyXDlE\n  ✓ key.list 只回元数据（含私钥字段=失败）\n  ✓ 主机保存并回读   lwgat@10.0.2.2:2222\n  ✓ host.list 不回传口令/密文\n  ✓ SSH 会话建立（jsch 原生直连）   state=connected\n  ✓ 首次连接弹主机密钥确认（TOFU）\n  ✓ 信任后会话仍在\n  ✓ 远端命令回显 HPK_MARKER_42\n  ✓ resize 传到远端 PTY   本地 48x39 / 远端出现 \"39 48\"\n  ✓ TUI 备用屏被嗅探到\n  ✓ 鼠标模式被嗅探到   mode=1002 sgr=false\n  ✓ TUI 下列数被顶到 ≥80（手机原本只有 48 列）   cols 48 → 80，字号 13 → 10px\n  ✓ 字号没有低于可读下限 10px   10px\n  ✓ 功能键条切到 TUI 那一行\n  ✓ 状态栏徽标显示 TUI   TUI·鼠标\n  ✓ 横向平移状态与实际溢出一致   可见 62 列 / 需要 80 列 → pan=true\n  ✓ tmux 在备用屏里真的渲染出内容   \" [app] 0:sleep* \\\"galaxy-fnos\\\" 01:34 17-Sep-26\"\n  ✓ Ctrl-B d 从 tmux 退出回到 shell   alt=false\n  ✓ 远端 exit 后掉线被感知   状态序列 disconnected → reconnecting → connected\n  ✓ 掉线后自动重连成功（原生层自愈）   状态序列 disconnected → reconnecting → connected\n  ✓ 保活/重连状态栏有反馈   rtt 栏= ↑1.6K\n\n全部通过"
+}
+
+--- B. 用户报告的四条缺陷回归 ---
+[cdp] target: Hermes Pocket  url=https://appassets.androidplatform.net/ui/index.html
+{
+  "ok": true,
+  "value": "== 缺陷 2：设备端生成密钥 ==\n  ✓ 生成并读回 ed25519   Ed25519 SHA256:QyQ8nE+Kmuqm+3o…  生成 38ms  PEM 419 字节\n  ✓ 生成并读回 ecdsa   ECDSA SHA256:uUcRc+2DEUPQUsj…  生成 15ms  PEM 227 字节\n  ✓ 生成并读回 rsa   RSA SHA256:relpj0RhFlk6Sdv…  生成 1778ms  PEM 3243 字节\n== 缺陷 1：单击终端不该弹键盘 ==\n  ✓ 单击终端不抢焦点   activeElement=BODY\n  ✓ 「⌨ 键盘」能打开\n  ✓ 再按能收起\n== 缺陷 3：草稿 / 表单不被清掉 ==\n  ✓ 未连接时点发送不清草稿   \"未连接时的草稿\"\n  ✓ 面板重绘后表单内容还在   name=草稿名\n== 缺陷 4：TUI 滚动 ==\n  ✓ 已连接   state=connected\n  ✓ 无鼠标模式滚动 → 给出可操作提示   \"TUI 回滚需要远端开启鼠标：\\ntmux set -g mouse on\"\n  ✓ tmux mouse on 后客户端请求了鼠标模式   mouseMode=1002\n  ✓ 滚轮序列真的写出去了   bytesOut undefined → 0\n  ✓ Ctrl-B d 从 tmux 退出   alt=false\n  ✓ 「⇞ 回滚」发 tmux prefix+[\n\n全部通过"
+}
+
+--- C. 资源 ---
+  可用=1808 MB  已用=6042 MB  swap剩余=1446 MB  负载=4.71
+  内存前 3:
+       3279 MB  qemu-system-x86
+        376 MB  hermes
+        289 MB  chromium
+  模拟器进程数=1

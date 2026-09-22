@@ -1,0 +1,16 @@
+### 键条改用 pointerup 触发 + 焦点不被抢走  2026-09-17 10:16:24 CST
+
+    "value": "{\"状态\":\"connected\"}"
+
+=== 取可见键的坐标 ===
+    "value": "{\"Esc\":{\"x\":28,\"y\":708},\"Ctrl\":{\"x\":28,\"y\":752},\"more\":{\"x\":365,\"y\":752},\"PgUp\":null}"
+  Esc=(28,708)  Ctrl=(28,752)  更多=(365,752)
+
+=== 真实触摸逐个点键 ===
+  {}
+  focus term
+  ① 焦点终端 → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"已发送":[]}
+  ② 点 Esc 后 → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"已发送":[]}
+  ③ 点 Ctrl 后 → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"已发送":[]}
+  ④ 点「⌄更多」后 → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"已发送":[]}
+  ⑤ 再点一次「⌄更多」→ {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"已发送":[]}

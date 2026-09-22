@@ -1,0 +1,282 @@
+### Hermes Pocket — 设备复验（模拟器 + 真远端）原始输出
+# 日期：2026-09-21 18:14:30 CST
+# 设备：emulator-5554（Android 14 / sdk_gphone64_x86_64 / WebView Chrome 113.0.5672.136），容器镜像 notifbridge-emu:34
+# 被测构件：
+#   ① dev-20260921-A  sha256 a1dec78d002790efddcbc9b980b37ff70dd8071207e6b496fad4a253700f2d61  （复验中发现两个缺陷）
+#   ② dev-20260921-B  sha256 a3d3c39232d79deb460199ef645ba74c57629862244d4bf177993eb94f6d14e6  （修完复验通过）
+# 方法：adb install → adb forward tcp:9222 localwebview_devtools_remote_<pid> → 页面级 CDP 驱动真 WebView 里的页面
+#       （Android WebView 不支持 Browser 级 CDP，所以 dev-probe.mjs 用手写的最小 CDP 客户端，见 tools/ui-harness/dev-probe.mjs）
+#       远端就是宿主自己（192.168.1.10:22，用户 lwgat），用的是**一次性密钥**（验证完已从 authorized_keys 删掉，文件 sha256 已还原）
+# 安全：startCmd 与「进哪个会话」都指向一次性 tmux 会话 hpk-verify —— 绝不碰用户自己在用的 hermes 会话（第一轮误 attach 上去过，见报告）
+
+================ 第一批：版本 / 自检 / 各栏目 / 真远端读 ================
+（本批读数见同目录报告里的表：版本戳 net-20260921-B、native 通道、BOOT 六阶段、自检全空、net 栏目 3 行、主机/密钥 0）
+
+================ 第二批：导入密钥 / 新建主机 / 连接 / 真远端读 ================
+================ 第一批：版本 / 自检 / 各栏目 / 真远端读（dev 之前，M4B 包 net-20260921-B）================
+页面：https://appassets.androidplatform.net/ui/index.html ｜ title "Hermes Pocket"
+版本戳（页面里读到的，证明设备跑的就是归档那一版）：
+  HP.BUILD = "net-20260921-B"（与归档 APK sha256 af22293f…3db36a6 对应）
+  HP.PROTO = 1 ｜ 原生桥在（HermesPocket.postMessage 是函数）｜ 通道 = native ｜ UA = Android 14 sdk_gphone64_x86_64
+启动时间线（HP.BOOT，模拟器 swiftshader 软件渲染，比真机慢很多，仅作趋势参考）：
+  开始 2685ms ｜ 通道就绪 2783ms ｜ 偏好就绪 2817ms ｜ 字体就绪 5441ms ｜ 终端可显示 5602ms ｜ 面板就绪 6355ms
+登记表自检：总数 11 / 已做 11 / 没归属 [] / 空集合 [] / 界面空集合 [] / 没测 [] / 未做 []
+  （此时「没挂上」列了 prompt(行)/model(行)/skills-dl(行) —— 因为还没配主机、没连上，Hermes 栏目渲染的是
+   "还没连接"提示，那三行当然不存在；连上之后同一项自检为空，见第三批。）
+各栏目行数：hosts 0 行（还没建主机）/ keys 0 行 / settings 一段设置文字 / net 3 行（网络栏目已渲染）
+主机数 0、密钥数 0（全新安装）
+
+================ 第二批：导入密钥 / 新建主机 / 连接 / 真远端读 ================
+导入密钥（走真界面：密钥页 →「导入私钥」→ 填 PEM →「导入并加密保存」）：
+  导入前密钥数 0 → 导入后 1；指纹 SHA256:ex2+qroRlUZvqwh8hlk6XYStJg8KulXGwCpoJ/eUVro（= 宿主侧临时公钥指纹）
+新建主机（走真界面表单：名称/地址 192.168.1.10/端口 22/用户 lwgat/认证 密钥/启动命令 bash -l）：
+  主机页 1 台、行渲染正常
+连接（点主机卡片 → 菜单「▶ 连接 复验主机」）：状态序列 connecting ×5 → connected；transport = native
+  —— 走的是**真原生 SSH 通道**，不是 WebSocket 回退
+真远端读（同一个 App、同一个通道）：
+  hermes.info → 技能 72 条（样本：autonomous-ai-agents/codex/SKILL.md 等）
+  hermes.prompt → 20 份 / 最长 21891 字符 / 当前会话 21823 字符 / 开头 "You are Hermes Agent, built by Nous Rese"
+  hermes.model → deepseek-v4-flash（provider deepseek，可写，候选 deepseek-v4-pro / deepseek-flash）
+
+================ 第三批（修复后）：一次性会话 + M3/M4 全流程 ================
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "真机·M3/M4（一次性会话，安全版）": {
+    "check": {
+      "①指定会话并连接": {
+        "state": "connected",
+        "sessionId": "e1f0ebcbbd7b4550",
+        "transport": "native"
+      },
+      "②会话板块": {
+        "抬头": "在线：已连接 · 远端 tmux：2 个会话当前选中：hpk-verify刷新hermes窗口 1 · 建了 5 天 · 最后活动 11 分钟前attach 中hpk-verify窗口 1 · 建了 6 分钟 · 最后活动 6 分钟前空闲",
+        "行": [
+          {
+            "id": "session-hermes",
+            "标题": "hermes",
+            "次行": "窗口 1 · 建了 5 天 · 最后活动 11 分钟前",
+            "右列": "attach 中"
+          },
+          {
+            "id": "session-hpk-verify",
+            "标题": "hpk-verify",
+            "次行": "窗口 1 · 建了 6 分钟 · 最后活动 6 分钟前",
+            "右列": "空闲"
+          }
+        ],
+        "选中": "hpk-verify"
+      },
+      "③Hermes 三行": {
+        "提示词行": {
+          "标题": "系统提示词",
+          "次行": "20 份 · 当前会话 21823 字符 · 最长 21891 字符",
+          "右列": "21823 字符"
+        },
+        "模型行": {
+          "标题": "模型",
+          "次行": "deepseek · 可改（改前自动备份）",
+          "右列": "deepseek-v4-flash"
+        },
+        "技能行数": 73,
+        "临时技能在": true
+      },
+      "④临时技能：下载到手机": {
+        "到了": true,
+        "小窗": {
+          "抬头": "",
+          "字段": [],
+          "有正文": false,
+          "正文开头": "",
+          "有编辑框": false,
+          "柱数": 0,
+          "图例": [],
+          "合计": "",
+          "按钮": [
+            "信任并保存",
+            "取消"
+          ]
+        },
+        "点了下载": false,
+        "提示": "读技能失败：读不到: [Errno 2] No such file or directory: '/home/lwgat/.hermes/skills\\\\/hpk-verify-tmp\\\\/SKILL.md'",
+        "小窗还剩": 2
+      },
+      "⑤临时技能：编辑并回写": {
+        "点了编辑": false,
+        "编辑小窗": {
+          "有编辑框": null,
+          "正文开头": null,
+          "按钮": null
+        },
+        "点了回写": false,
+        "提示": "读技能失败：读不到: [Errno 2] No such file or directory: '/home/lwgat/.hermes/skills\\\\/hpk-verify-tmp\\\\/SKILL.md'"
+      },
+      "⑥网络栏目": {
+        "ping行": {
+          "标题": "延迟与丢包",
+          "次行": "5 个包 · 0% 丢包 · 平均 0.1 ms（0–0.1 ms）",
+          "右列": "0.1 ms"
+        },
+        "端口行": {
+          "标题": "端口连通",
+          "次行": "通 · 7 ms",
+          "右列": "通"
+        },
+        "原文开头": "$ ping -c 5 192.168.1.10（这一把远端跑了 1345 ms）\nPING 192",
+        "原文按钮": [
+          "重测 ping",
+          "重测端口",
+          "关闭"
+        ]
+      },
+      "⑦流量小窗（真流量）": {
+        "计数": {
+          "采样条数": 1,
+          "下行": 144,
+          "上行": 25
+        },
+        "抬头": "流量统计",
+        "柱数": 1,
+        "图例": [
+          "下行 144B · 85.2%",
+          "上行 25B · 14.8%"
+        ],
+        "合计": "合计 169B（1 条区间 → 1 组）",
+        "按钮": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "⑧终端与断开": {
+        "终端": {
+          "总行": 32,
+          "末几行": [
+            "lwgat@galaxy-fnos:/tmp$ ls /home/lwgat | head -5",
+            "Ciyue",
+            "ciyue-release.jks",
+            "clashctl",
+            "clash-for-linux-install",
+            "class-remind.sh",
+            "lwgat@galaxy-fnos:/tmp$ ",
+            "[hpk-verif0:bash*  \"galaxy-fnos\" 18:08 21-Sep-26"
+          ]
+        },
+        "断开后状态": "disconnected"
+      }
+    }
+  }
+}
+
+================ 第四批（修复后）：技能读/下载/回写 全流程 ================
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "真机·技能路径排查 + 下载/回写": {
+    "check": {
+      "确保连接": {
+        "之前": "idle",
+        "动作": "主机卡片 → 连接",
+        "点了菜单": true,
+        "之后": "connected",
+        "提示": "原生 SSH 通道就绪"
+      },
+      "指纹小窗": "没有小窗",
+      "技能行": {
+        "属性原文": "skills/hpk-verify-tmp/SKILL.md",
+        "dataset": "skills/hpk-verify-tmp/SKILL.md",
+        "属性里反斜杠数": 0,
+        "dataset里反斜杠数": 0,
+        "逐字符": "s|k|i|l|l|s|/|h|p|k|-|v|e|r|i|f|y|-|t|m|p|/|S|K|I|L|L|.|m|d"
+      },
+      "列出的rel_来自hermes接口": {
+        "rel": "hpk-verify-tmp/SKILL.md",
+        "path": "skills/hpk-verify-tmp/SKILL.md",
+        "反斜杠数": 0
+      },
+      "直调": {
+        "干净路径": "@@SIZE 343\n@@SHA 56a0baf342c4770c7ac02dc9b4c43e7125971ccde7c99bcf6c77de32bc45caea\n@@B64\nLS0tCm5hbWU6IGhway12ZXJpZnktdG1wCmRlc2NyaXB0aW9uOiDorr7lpIflpI3pqozkuLTml7bmioDog73vvIjnlKjlrozljbPliKDvvIkKLS0t",
+        "带反斜杠": "抛错: 路径不允许：skills\\/hpk-verify-tmp\\/SKILL.md"
+      },
+      "下载": {
+        "小窗": {
+          "抬头": "hpk-verify-tmp",
+          "字段": [
+            {
+              "label": "远端路径",
+              "值": "~/.hermes/skills/hpk-verify-tmp/SKILL.md"
+            },
+            {
+              "label": "字节数 / sha256",
+              "值": "343 字节 · 56a0baf342c4"
+            }
+          ],
+          "有正文": true,
+          "有编辑框": false,
+          "按钮": [
+            "下载到手机",
+            "编辑并回写",
+            "关闭"
+          ]
+        },
+        "提示": "已存到 Download/hermes-skills/hpk-verify-tmp.md（343 字节 · sha 56a0baf342c4 · 与远端一致）",
+        "点了": true,
+        "小窗还剩": 0
+      },
+      "回写": {
+        "编辑小窗": {
+          "抬头": "编辑 hpk-verify-tmp",
+          "字段": [
+            {
+              "label": "正文",
+              "值": "---\nname: hpk-verify-tmp\ndescription: 设备复验临时技能（用完即删）\n---\n\n# 临时技能\n\n用来验证：下载到手机（字节数 / sha256 与远端一致）与编辑并回写（对账 + 备份 + 读回）。\n路径里带斜杠：skills/hpk-verify-tmp/SKILL.md\n带中文与 emoji：设备复验 ✅\n\n改动标记：原始内容\n"
+            }
+          ],
+          "有正文": true,
+          "有编辑框": true,
+          "按钮": [
+            "回写",
+            "关闭"
+          ]
+        },
+        "提示": "已回写（358 字节 · 新 sha 78eeed157c10 · 备份 SKILL.md.hpk-bak-20260921-181343）",
+        "点了编辑": true,
+        "点了回写": true
+      }
+    }
+  }
+}
+
+================ 宿主侧核对（手机文件 / 远端文件 / 备份 / 清理）================
+================ 宿主侧核对：手机上真落地的文件 ================
+$ adb -s emulator-5554 shell 'ls -l /sdcard/Download/hermes-skills/; sha256sum ...'
+-rwxrwx--- 1 u0_a173 media_rw 343 2026-09-21 10:13 hpk-verify-tmp.md
+56a0baf342c4770c7ac02dc9b4c43e7125971ccde7c99bcf6c77de32bc45caea  /sdcard/Download/hermes-skills/hpk-verify-tmp.md
+# ↑ 与远端那一版 sha256 完全一致（远端：56a0baf342c4770c7ac02dc9b4c43e7125971ccde7c99bcf6c77de32bc45caea，343 字节）
+#   即「下载到手机」在真设备上真的写进了 Download/hermes-skills/（Android 10+ MediaStore，未申请任何权限），字节与远端一致
+
+================ 宿主侧核对：远端被回写后的文件与备份 ================
+$ ls -l ~/.hermes/skills/hpk-verify-tmp/
+-rw-r--r-- 1 lwgat Users 358 2026-09-21 18:13 SKILL.md
+-rw-r--r-- 1 lwgat Users 343 2026-09-21 18:12 SKILL.md.hpk-bak-20260921-181343
+$ sha256sum ~/.hermes/skills/hpk-verify-tmp/SKILL.md
+78eeed157c10eb1e4f160490b9520c076cbc9cdef96f76e7afc56dc40123d9b2   （= App 提示里报的新 sha "78eeed157c10"）
+$ grep -c '设备复验改过这一行' SKILL.md
+1
+$ sha256sum ~/.hermes/skills/hpk-verify-tmp/SKILL.md.hpk-bak-20260921-181343
+56a0baf342c4770c7ac02dc9b4c43e7125971ccde7c99bcf6c77de32bc45caea   （= 改之前那一版的 sha，备份是原样的一份）
+$ grep -c '原始内容' SKILL.md.hpk-bak-20260921-181343
+1
+
+================ 清理与还原（不留痕）================
+- 远端一次性技能目录 ~/.hermes/skills/hpk-verify-tmp/ 已删
+- 一次性 tmux 会话 hpk-verify 已 kill；用户自己的 hermes 会话仍在（创建时间 Sep 16 23:18:43，未动）
+- 一次性公钥已从 ~/.ssh/authorized_keys 删除：
+    改之前 sha256 6b5bfc4e60746680eea5b3e8c7fc6af264fe2765d5b11130bf2ad833276abf17
+    还原后 sha256 6b5bfc4e60746680eea5b3e8c7fc6af264fe2765d5b11130bf2ad833276abf17   ✅ 完全一致（6 行）
+- 模拟器容器 notifbridge-emu 已删（镜像 / AVD hpk34 保留，下次秒起）；宿主可用内存回到 ~4.7GB
+
+================ 第一轮踩到的危险点（已纠正，值得记住）================
+设备第一次连接时，App 按启动流程 attach 了远端**已存在的** tmux 会话 —— 而那台机器上唯一的会话
+是用户自己正在用的 `hermes`（Hermes CLI 就跑在里面）。设备的终端于是显示/可能写入用户的实际会话。
+- 这是需求第 6 条规定的正确行为（「有 tmux 就不管它、attach 它」），但对本机这种"用户正在用的会话"，
+  设备端复验必须先把「进哪个会话」指到一次性会话（本轮改成 hpk-verify）再连。
+- 本轮只读了缓冲区、没有向该会话发送任何按键；恢复办法是 App 里断开（App 永不 kill tmux）。

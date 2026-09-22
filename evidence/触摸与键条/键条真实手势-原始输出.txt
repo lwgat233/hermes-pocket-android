@@ -1,0 +1,16 @@
+### 键条：真实手势点击  2026-09-17 10:18:04 CST
+
+=== 连接 ===
+    "value": "{\"状态\":\"connected\"}"
+
+=== 真实手势逐个点（用选择器，动作由 pointerup 触发）===
+  ok
+  warm
+  ① 起点（焦点终端）→ {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"发出":[]}
+  ② 点 Esc → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"发出":[]}
+  ③ 点 Ctrl → {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"发出":[]}
+  ④ 点「⌄更多」→ {"焦点":"TEXTAREA","锁定Ctrl":false,"更多行可见":false,"发出":[]}
+  warm2
+  ⑤ 焦点切到输入框 → {"焦点":"cinput","锁定Ctrl":false,"更多行可见":false,"发出":[]}
+  ⑥ 输入框里点 Ctrl → {"焦点":"cinput","锁定Ctrl":false,"更多行可见":false,"发出":[]}
+  ⑦ 敲字母 x（应带 Ctrl → 0x18，且焦点仍在输入框）→ {"焦点":"cinput","锁定Ctrl":false,"更多行可见":false,"发出":["x"]}

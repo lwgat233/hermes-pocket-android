@@ -1,0 +1,1762 @@
+### F-NET-8「历史上下行（采集区间 → 统计一处 → 柱/饼一处）」原始输出  2026-09-21 17:49:33 CST
+# 改动版本 HP.BUILD=net-20260921-B；构件 sha256 af22293f2a3eb67b90b8dd2a9fa898fca1e3ea618c281f4070bf13af23db36a6（干净构建，归档源码可复现）
+# 采集：每秒采样把**这一段的增量**落成一条 {t0,t1,up,down}（存区间不存总计），环形缓冲 120 条，跟累计值同一个 30s 节流口落盘
+# 老版本只存过 trafficCum（一个总数、没有时间窗）：不伪造巨柱，只当累计显示；图从这版开始记
+
+=== ① 历史上下行：17 条断言（采集 / 上限 / 落盘 / 柱数=组数 / 柱上数字之和=汇总 / 空历史不画空图 / 归零与清空各管各）===
+{
+  "name": "F-NET-8 历史上下行：采集区间 → 统计 → 柱/饼",
+  "result": {
+    "check": {
+      "采集": {
+        "初始条数": 0,
+        "空转后条数": 0,
+        "条数": 2,
+        "第一条": {
+          "t0": 1789984173104,
+          "t1": 1789984175104,
+          "up": 100,
+          "down": 300
+        },
+        "末条": {
+          "t0": 1789984173105,
+          "t1": 1789984175105,
+          "up": 200,
+          "down": 700
+        },
+        "上下行之和": {
+          "up": 300,
+          "down": 1000
+        },
+        "时间窗合理": true
+      },
+      "上限": {
+        "MAX": 120,
+        "条数": 120,
+        "最旧": 81,
+        "最新": 200
+      },
+      "落盘": {
+        "存了": true,
+        "条数一致": true,
+        "末条一致": true,
+        "累计也写了": true,
+        "坏数据当空": true
+      },
+      "小窗": {
+        "抬头": "流量统计",
+        "行": [
+          {
+            "id": "tf-down",
+            "标题": "下行（本次会话）",
+            "次行": "当前 106B/s · 峰值 213B/s",
+            "右列": "44.6K"
+          },
+          {
+            "id": "tf-up",
+            "标题": "上行（本次会话）",
+            "次行": "当前 31B/s",
+            "右列": "12.1K"
+          },
+          {
+            "id": "tf-avg",
+            "标题": "平均下行",
+            "次行": "会话 1 分 6 秒 · 收到数据块 42 次",
+            "右列": "696B/s"
+          },
+          {
+            "id": "tf-cum",
+            "标题": "累计下行（跨会话）",
+            "次行": "每 30 秒落一次盘",
+            "右列": "1000B"
+          }
+        ],
+        "状态行": [
+          "历史上下行：每 1 条合一组（12 条区间 → 12 组）"
+        ],
+        "柱": [
+          {
+            "up": 100,
+            "down": 200,
+            "高上": "4px",
+            "高下": "8px",
+            "提示": "200B ↓ / 100B ↑"
+          },
+          {
+            "up": 200,
+            "down": 400,
+            "高上": "8px",
+            "高下": "15px",
+            "提示": "400B ↓ / 200B ↑"
+          },
+          {
+            "up": 300,
+            "down": 600,
+            "高上": "11px",
+            "高下": "23px",
+            "提示": "600B ↓ / 300B ↑"
+          },
+          {
+            "up": 400,
+            "down": 800,
+            "高上": "15px",
+            "高下": "30px",
+            "提示": "800B ↓ / 400B ↑"
+          },
+          {
+            "up": 500,
+            "down": 1000,
+            "高上": "19px",
+            "高下": "38px",
+            "提示": "1000B ↓ / 500B ↑"
+          },
+          {
+            "up": 600,
+            "down": 1200,
+            "高上": "23px",
+            "高下": "45px",
+            "提示": "1.2KB ↓ / 600B ↑"
+          },
+          {
+            "up": 700,
+            "down": 1400,
+            "高上": "26px",
+            "高下": "53px",
+            "提示": "1.4KB ↓ / 700B ↑"
+          },
+          {
+            "up": 800,
+            "down": 1600,
+            "高上": "30px",
+            "高下": "60px",
+            "提示": "1.6KB ↓ / 800B ↑"
+          },
+          {
+            "up": 900,
+            "down": 1800,
+            "高上": "34px",
+            "高下": "68px",
+            "提示": "1.8KB ↓ / 900B ↑"
+          },
+          {
+            "up": 1000,
+            "down": 2000,
+            "高上": "38px",
+            "高下": "75px",
+            "提示": "2KB ↓ / 1000B ↑"
+          },
+          {
+            "up": 1100,
+            "down": 2200,
+            "高上": "41px",
+            "高下": "83px",
+            "提示": "2.1KB ↓ / 1.1KB ↑"
+          },
+          {
+            "up": 1200,
+            "down": 2400,
+            "高上": "45px",
+            "高下": "90px",
+            "提示": "2.3KB ↓ / 1.2KB ↑"
+          }
+        ],
+        "图例": [
+          {
+            "name": "下行",
+            "value": 15600,
+            "pct": 66.7,
+            "文案": "下行 15.2KB · 66.7%"
+          },
+          {
+            "name": "上行",
+            "value": 7800,
+            "pct": 33.3,
+            "文案": "上行 7.6KB · 33.3%"
+          }
+        ],
+        "合计文案": "合计 22.9KB（12 条区间 → 12 组）",
+        "有图": true,
+        "有饼": true,
+        "按钮": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "界面数字": {
+        "up": 7800,
+        "down": 15600,
+        "total": 23400,
+        "采集条数": 12,
+        "区间条数": 12
+      },
+      "分组后": {
+        "抬头": "流量统计",
+        "行": [
+          {
+            "id": "tf-down",
+            "标题": "下行（本次会话）",
+            "次行": "当前 22.3K/s · 峰值 22.3K/s",
+            "右列": "44.6K"
+          },
+          {
+            "id": "tf-up",
+            "标题": "上行（本次会话）",
+            "次行": "当前 6.0K/s",
+            "右列": "12.1K"
+          },
+          {
+            "id": "tf-avg",
+            "标题": "平均下行",
+            "次行": "会话 1 分 6 秒 · 收到数据块 42 次",
+            "右列": "689B/s"
+          },
+          {
+            "id": "tf-cum",
+            "标题": "累计下行（跨会话）",
+            "次行": "每 30 秒落一次盘",
+            "右列": "44.6K"
+          }
+        ],
+        "状态行": [
+          "历史上下行：每 10 条合一组（120 条区间 → 12 组）"
+        ],
+        "柱": [
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 500,
+            "down": 700,
+            "高上": "1px",
+            "高下": "1px",
+            "提示": "700B ↓ / 500B ↑"
+          },
+          {
+            "up": 12495,
+            "down": 45308,
+            "高上": "25px",
+            "高下": "90px",
+            "提示": "44.2KB ↓ / 12.2KB ↑"
+          }
+        ],
+        "图例": [
+          {
+            "name": "下行",
+            "value": 53008,
+            "pct": 74.7,
+            "文案": "下行 51.8KB · 74.7%"
+          },
+          {
+            "name": "上行",
+            "value": 17995,
+            "pct": 25.3,
+            "文案": "上行 17.6KB · 25.3%"
+          }
+        ],
+        "合计文案": "合计 69.3KB（120 条区间 → 12 组）",
+        "有图": true,
+        "有饼": true,
+        "按钮": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "空历史": {
+        "抬头": "流量统计",
+        "行": [
+          {
+            "id": "tf-down",
+            "标题": "下行（本次会话）",
+            "次行": "当前 11.2K/s · 峰值 22.3K/s",
+            "右列": "44.6K"
+          },
+          {
+            "id": "tf-up",
+            "标题": "上行（本次会话）",
+            "次行": "当前 3.0K/s",
+            "右列": "12.1K"
+          },
+          {
+            "id": "tf-avg",
+            "标题": "平均下行",
+            "次行": "会话 1 分 7 秒 · 收到数据块 42 次",
+            "右列": "681B/s"
+          },
+          {
+            "id": "tf-cum",
+            "标题": "累计下行（跨会话）",
+            "次行": "每 30 秒落一次盘",
+            "右列": "44.6K"
+          }
+        ],
+        "状态行": [
+          "还没有历史采样（老版本只存了一个累计总数，没有时间窗、折不成桶 —— 宁可不画，也不伪造一根巨柱）"
+        ],
+        "柱": [],
+        "图例": [],
+        "合计文案": "",
+        "有图": false,
+        "有饼": false,
+        "按钮": [
+          "计数归零",
+          "清空历史",
+          "关闭"
+        ]
+      },
+      "清空历史": {
+        "提示": "已清掉 2 条历史区间",
+        "内存条数": 0,
+        "落盘": "[]"
+      },
+      "计数归零": {
+        "提示": "本次会话计数已归零（历史不动）",
+        "会话下行": 0
+      },
+      "老数据": {
+        "条数": 0,
+        "累计": 5000000,
+        "legacy": 5000000
+      },
+      "自检": {
+        "总数": 11,
+        "已做": 11,
+        "没归属": [],
+        "空集合": [],
+        "界面空集合": [],
+        "没挂上": [],
+        "没测": [],
+        "未做": []
+      },
+      "结论": {
+        "有增量才记区间": true,
+        "区间带时间窗": true,
+        "区间之和等于增量之和": true,
+        "上限是环形": true,
+        "落盘与内存一致": true,
+        "落盘坏了当空不瞎画": true,
+        "小窗抬头与四个数字行": true,
+        "三条动作都在": true,
+        "柱数等于组数": true,
+        "柱上数字之和等于汇总": true,
+        "饼的占比与合计对得上": true,
+        "柱高按同一分母": true,
+        "一百二十条合成十二根柱": true,
+        "空历史不画空图": true,
+        "清空历史真清掉": true,
+        "归零只清本次会话": true,
+        "老累计值不伪造桶": true,
+        "登记表里流量统计挂上了": true
+      }
+    }
+  }
+}
+
+=== ② 回归：连通性与丢包（含真样本）===
+{
+  "name": "F-NET-2 连通性 / 丢包 / 延迟（真样本解析 + 界面流程）",
+  "result": {
+    "check": {
+      "回环": {
+        "ok": true,
+        "err": "",
+        "transmitted": 3,
+        "received": 3,
+        "loss": 0,
+        "min": 0.03,
+        "avg": 0.058,
+        "max": 0.076,
+        "times": [
+          0.03,
+          0.076,
+          0.069
+        ],
+        "text": "PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.030 ms\n64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.076 ms\n64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.069 ms\n\n--- 127.0.0.1 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 628ms\nrtt min/avg/max/mdev = 0.030/0.058/0.076/0.020 ms"
+      },
+      "全丢包": {
+        "ok": true,
+        "err": "",
+        "transmitted": 2,
+        "received": 0,
+        "loss": 100,
+        "min": null,
+        "avg": null,
+        "max": null,
+        "times": [],
+        "text": "PING 192.0.2.1 (192.0.2.1) 56(84) bytes of data.\n\n--- 192.0.2.1 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 305ms"
+      },
+      "解析失败": {
+        "ok": false,
+        "err": "ping: no-such-host.invalid: Name or service not known",
+        "transmitted": 0,
+        "received": 0,
+        "loss": null,
+        "min": null,
+        "avg": null,
+        "max": null,
+        "times": [],
+        "text": "ping: no-such-host.invalid: Name or service not known"
+      },
+      "端口通": {
+        "ok": true,
+        "err": "",
+        "ms": 4,
+        "text": "@@OK 1\n@@MS 4"
+      },
+      "端口不通": {
+        "ok": false,
+        "err": "[Errno 111] Connection refused",
+        "ms": 3,
+        "text": "@@OK 0\n@@ERR [Errno 111] Connection refused\n@@MS 3"
+      },
+      "栏目在": true,
+      "三行": [
+        "net-target",
+        "net-ping",
+        "net-tcp"
+      ],
+      "没测过": {
+        "标题": "延迟与丢包",
+        "次行": "没测过",
+        "右列": "",
+        "有右列": false
+      },
+      "ping后": {
+        "行": {
+          "标题": "延迟与丢包",
+          "次行": "3 个包 · 0% 丢包 · 平均 0.1 ms（0–0.1 ms）",
+          "右列": "0.1 ms",
+          "有右列": true
+        },
+        "桥收到的调用": {
+          "net.ping": 1
+        },
+        "桥收到的参数": {
+          "host": "192.168.1.10",
+          "count": 5
+        }
+      },
+      "tcp后": {
+        "行": {
+          "标题": "端口连通",
+          "次行": "通 · 4 ms",
+          "右列": "通",
+          "有右列": true
+        },
+        "桥收到的参数": {
+          "host": "192.168.1.10",
+          "port": 22
+        }
+      },
+      "目标小窗": {
+        "抬头": "测试目标",
+        "字段": [
+          {
+            "label": "地址（域名或 IP）",
+            "可编辑": true,
+            "值": "192.168.1.10"
+          },
+          {
+            "label": "ping 次数（1–20）",
+            "可编辑": true,
+            "值": "5"
+          },
+          {
+            "label": "端口（1–65535）",
+            "可编辑": true,
+            "值": "22"
+          }
+        ],
+        "正文": "",
+        "按钮": [
+          "保存",
+          "关闭"
+        ]
+      },
+      "改目标后": {
+        "提示": "已保存：example.local · ping 4 次 · 端口 2222",
+        "存的pref": "{\"host\":\"example.local\",\"count\":4,\"port\":2222}",
+        "目标行": {
+          "标题": "测试目标",
+          "次行": "点行改地址 / 次数 / 端口",
+          "右列": "example.local",
+          "有右列": true
+        },
+        "ping行": {
+          "标题": "延迟与丢包",
+          "次行": "没测过",
+          "右列": "",
+          "有右列": false
+        },
+        "小窗还剩": 0
+      },
+      "ping失败": {
+        "行": {
+          "标题": "延迟与丢包",
+          "次行": "测不了：ping: no-such-host.invalid: Name or service not known",
+          "右列": "",
+          "有右列": false
+        },
+        "提示": "ping 没跑成：ping: no-such-host.invalid: Name or service not known"
+      },
+      "tcp失败": {
+        "行": {
+          "标题": "端口连通",
+          "次行": "不通：[Errno 111] Connection refused",
+          "右列": "不通",
+          "有右列": true
+        },
+        "提示": "端口不通：[Errno 111] Connection refused"
+      },
+      "原文小窗": {
+        "抬头": "原始输出",
+        "字段": [
+          {
+            "label": "目标",
+            "可编辑": false,
+            "值": "example.local · 端口 2222"
+          }
+        ],
+        "正文": "$ ping -c 4 example.local（这一把远端跑了 620 ms）\nPING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.030 ms\n64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.076 ms\n64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.069 ms\n\n--- 127.0.0.1 ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 628ms\nrtt min/avg/max/mdev = 0.030/0.058/0.076/0.020 ms\n\n$ 连接 example.local:2222\n@@OK 1\n@@MS 4",
+        "按钮": [
+          "重测 ping",
+          "重测端口",
+          "关闭"
+        ]
+      },
+      "自检": {
+        "总数": 11,
+        "已做": 11,
+        "没归属": [],
+        "空集合": [],
+        "界面空集合": [],
+        "没挂上": [
+          "prompt(行)",
+          "model(行)",
+          "skills-dl(行)"
+        ],
+        "没测": [],
+        "未做": []
+      },
+      "统计": {
+        "采集条数": 10,
+        "区间条数": 2,
+        "up": 5500,
+        "down": 11000,
+        "total": 16500,
+        "占比": [
+          {
+            "name": "下行",
+            "value": 11000,
+            "pct": 66.7
+          },
+          {
+            "name": "上行",
+            "value": 5500,
+            "pct": 33.3
+          }
+        ],
+        "柱数": 2,
+        "柱上数字之和_up": 5500,
+        "柱上数字之和_down": 11000,
+        "饼数字": [
+          {
+            "name": "下行",
+            "value": 11000,
+            "pct": 66.7,
+            "文案": "下行 10.7KB · 66.7%"
+          },
+          {
+            "name": "上行",
+            "value": 5500,
+            "pct": 33.3,
+            "文案": "上行 5.4KB · 33.3%"
+          }
+        ],
+        "合计文案": "合计 16.1KB（10 条区间 → 2 组）",
+        "柱高像素": [
+          "34px",
+          "90px"
+        ],
+        "人话": [
+          "0B",
+          "999B",
+          "1KB",
+          "1.5KB",
+          "1MB"
+        ]
+      },
+      "结论": {
+        "回环样本解析对": true,
+        "全丢包样本解析对": true,
+        "解析不了时如实说": true,
+        "端口样本解析对": true,
+        "网络栏目能打开": true,
+        "没测过就说没测过": true,
+        "点行真去 ping": true,
+        "点行真去连端口": true,
+        "目标小窗是可编辑的三个字段": true,
+        "保存真的写进 pref": true,
+        "换目标后旧结果不算数": true,
+        "ping跑不成本事要说清": true,
+        "端口不通要写原因": true,
+        "原文小窗有两段原文与三个动作": true,
+        "登记表不再报网络没挂上": true,
+        "区间统计条数与数字对齐": true,
+        "占比与合计对得上": true,
+        "图上数字与人话一致": true
+      }
+    }
+  }
+}
+
+=== ③ 回归：其余 9 个驱动 ===
+{
+  "name": "F-HERM-3 skill：下载到手机 / 编辑并回写",
+  "result": {
+    "check": {
+      "往返": {
+        "同": true,
+        "空": true
+      },
+      "解析": {
+        "ok": true,
+        "size": 107,
+        "sha": "abc",
+        "正文一致": true,
+        "正文长度": 69
+      },
+      "解析_坏数据": {
+        "ok": false,
+        "err": "读不到: 文件不存在",
+        "size": 0,
+        "sha": "",
+        "text": ""
+      },
+      "小窗": {
+        "抬头": "demo-skill",
+        "字段": [
+          {
+            "label": "远端路径",
+            "值": "~/.hermes/test/demo-skill/SKILL.md"
+          },
+          {
+            "label": "字节数 / sha256",
+            "值": "107 字节 · 6306c021a533"
+          }
+        ],
+        "有正文": true,
+        "正文开头": "---\nname: tmp-x\ndescription: 试",
+        "有编辑框": false,
+        "编辑框开头": "",
+        "按钮": [
+          "下载到手机",
+          "编辑并回写",
+          "关闭"
+        ]
+      },
+      "小窗_字节数": 107,
+      "下载": {
+        "提示": "已存到 Download/hermes-skills/demo-skill.md（107 字节 · sha 6306c021a533 · 与远端一致）",
+        "桥收到的调用": {
+          "local.save": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "存下来的文件": {
+          "name": "demo-skill.md",
+          "size": 107,
+          "sha": "6306c021a533f902e941bdcf416ac37e6ef4a9dbdf325b7c76268048f312cc86",
+          "内容一致": true
+        },
+        "小窗还剩": 0
+      },
+      "存过之后再打开": {
+        "抬头": "demo-skill",
+        "字段": [
+          {
+            "label": "远端路径",
+            "值": "~/.hermes/test/demo-skill/SKILL.md"
+          },
+          {
+            "label": "字节数 / sha256",
+            "值": "107 字节 · 6306c021a533"
+          },
+          {
+            "label": "已存到手机",
+            "值": "Download/hermes-skills/demo-skill.md（sha 6306c021a533）"
+          }
+        ],
+        "有正文": true,
+        "正文开头": "---\nname: tmp-x\ndescription: 试",
+        "有编辑框": false,
+        "编辑框开头": "",
+        "按钮": [
+          "下载到手机",
+          "编辑并回写",
+          "关闭"
+        ]
+      },
+      "编辑小窗": {
+        "抬头": "编辑 demo-skill",
+        "字段": [
+          {
+            "label": "正文",
+            "值": "---\nname: tmp-x\ndescription: 试试下载 ✅\n---\n\n# 标题\n\n正文一行（中文）/ emoji ✅\n第二行\n"
+          }
+        ],
+        "有正文": true,
+        "正文开头": "打开时 sha256 6306c021a533 · 107 ",
+        "有编辑框": true,
+        "编辑框开头": "---\nname: tmp-x\ndesc",
+        "按钮": [
+          "回写",
+          "关闭"
+        ]
+      },
+      "回写": {
+        "提示": "已回写（123 字节 · 新 sha e4b9c6c2ffa8 · 备份 SKILL.md.hpk-bak-20260921-120000）",
+        "桥收到的调用": {
+          "skill.write": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "桥收到的东西": {
+          "path": "test/demo-skill/SKILL.md",
+          "sha": "e4b9c6c2ffa880198071f0d1ccad735cdc778688264374889b9bdcf8007ec948",
+          "size": 123,
+          "text": "---\nname: tmp-x\ndescription: 试试下载 ✅\n---\n\n# 标题\n\n正文一行（中文）/ emoji ✅\n第二行\n新加的一行\n"
+        },
+        "小窗还剩": 0
+      },
+      "没改就点": {
+        "提示": "和打开时一样，没改",
+        "桥收到的调用": {}
+      },
+      "远端变了": {
+        "提示": "回写失败：远端文件已变（现在是 ffffffffffff，你手上的是 e4b9c6c2ffa8），先重新打开再改",
+        "小窗还在": true
+      },
+      "读不到": {
+        "提示": "读技能失败：读不到: 文件不存在",
+        "小窗数": 0
+      },
+      "存不进": {
+        "提示": "存到手机失败：写不进手机：Permission denied",
+        "小窗还在": true
+      },
+      "存了但对不上": {
+        "提示": "存到手机失败：存完之后读回来对不上（sha256/字节数不一致）"
+      },
+      "结论": {
+        "base64往返不坏字节": true,
+        "解析出字节数与正文": true,
+        "坏数据如实报错": true,
+        "小窗是技能与原文": true,
+        "小窗写清字节数与sha": true,
+        "小窗三个动作": true,
+        "下载发了请求": true,
+        "下载的文件名与正文对": true,
+        "下载后与远端对账一致": true,
+        "下载提示写清存哪并说对账": true,
+        "下载后小窗关了": true,
+        "再打开显示已存到手机": true,
+        "编辑框带全文": true,
+        "回写发了请求": true,
+        "回写带的sha是打开那一版": true,
+        "回写内容确实是改后的": true,
+        "回写提示写清新sha与备份": true,
+        "回写后小窗关了": true,
+        "没改就不发请求": true,
+        "远端变了就拒绝覆盖": true,
+        "读不到不弹空窗": true,
+        "存不进如实报错": true,
+        "存了但对不上不算成功": true
+      }
+    }
+  }
+}
+{
+  "name": "F-HERM-5 远端模型：看 / 改 / 还原",
+  "result": {
+    "check": {
+      "解析": {
+        "ok": true,
+        "err": "",
+        "path": "/home/lwgat/.hermes/config.yaml",
+        "writable": true,
+        "model": "deepseek-v4-flash",
+        "provider": "deepseek",
+        "base": "https://api.deepseek.com/v1",
+        "candidates": [
+          "deepseek-v4-pro",
+          "deepseek-flash"
+        ],
+        "backups": [
+          "config.yaml.hpk-bak-20260921-120000"
+        ]
+      },
+      "解析_坏数据": {
+        "ok": false,
+        "err": "打不开 config.yaml",
+        "path": "",
+        "writable": false,
+        "model": "",
+        "provider": "",
+        "base": "",
+        "candidates": [],
+        "backups": []
+      },
+      "行": {
+        "标题": "模型",
+        "右列": "deepseek-v4-flash",
+        "次行": "deepseek · 可改（改前自动备份） · 有 1 份备份"
+      },
+      "小窗": {
+        "抬头": "远端模型（deepseek）",
+        "字段": [
+          {
+            "label": "模型名（改完点「写回并校验」）",
+            "可编辑": true,
+            "值": "deepseek-v4-flash"
+          },
+          {
+            "label": "配置文件",
+            "可编辑": false,
+            "值": "/home/lwgat/.hermes/config.yaml"
+          },
+          {
+            "label": "接口地址",
+            "可编辑": false,
+            "值": "https://api.deepseek.com/v1"
+          }
+        ],
+        "候选": [
+          "deepseek-v4-pro",
+          "deepseek-flash"
+        ],
+        "按钮": [
+          "写回并校验",
+          "还原上次",
+          "关闭"
+        ]
+      },
+      "点候选后输入框值": "deepseek-v4-pro",
+      "写回": {
+        "桥收到的调用": {
+          "hermes.model.set": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "小窗还剩": 0,
+        "提示": "模型已改为 deepseek-v4-pro（读回校验通过 · yaml ok）",
+        "行": {
+          "标题": "模型",
+          "右列": "deepseek-v4-pro",
+          "次行": "deepseek · 可改（改前自动备份） · 有 1 份备份"
+        }
+      },
+      "还原": {
+        "桥收到的调用": {
+          "hermes.model.undo": 1,
+          "hermes.info": 1,
+          "hermes.memory": 1,
+          "hermes.prompt": 1,
+          "hermes.model": 1
+        },
+        "提示": "已还原到 deepseek-v4-flash（来自 config.yaml.hpk-bak-20260921-120000）",
+        "行": {
+          "标题": "模型",
+          "右列": "deepseek-v4-flash",
+          "次行": "deepseek · 可改（改前自动备份） · 有 1 份备份"
+        }
+      },
+      "写不进去": {
+        "提示": "写回失败：写不进去（config.yaml 只读）",
+        "小窗还在": true,
+        "输入框值": "some-other-model"
+      },
+      "没改就点": {
+        "桥收到的调用": {},
+        "提示": "和现在一样，没改"
+      },
+      "结论": {
+        "解析出模型与候选": true,
+        "坏数据如实报错": true,
+        "行上是当前模型": true,
+        "小窗有可编辑字段": true,
+        "小窗有候选与三个动作": true,
+        "点候选只填不发": true,
+        "写回发了正确的参数": true,
+        "写回后小窗关闭": true,
+        "写回后有校验提示": true,
+        "写回后行上是新模型": true,
+        "还原发了请求": true,
+        "还原后行上是原模型": true,
+        "写不进去如实报错": true,
+        "没改就不发请求": true
+      }
+    }
+  }
+}
+{
+  "name": "F-HERM-4 系统提示词可见（来源 state.db）",
+  "result": {
+    "check": {
+      "解析": {
+        "ok": true,
+        "err": "",
+        "files": 20,
+        "maxChars": 21891,
+        "minChars": 17658,
+        "hash": "84bab0584d4b",
+        "total": 21732,
+        "head": "You are Hermes Agent, built by Nous Research. Be direct: match the length of your reply",
+        "text": "You are Hermes Agent, built by Nous Research. 这是正文开头。"
+      },
+      "解析_坏数据": {
+        "ok": false,
+        "err": "打不开 state.db: no such file or directory",
+        "files": 0,
+        "maxChars": 0,
+        "minChars": 0,
+        "hash": "",
+        "total": 0,
+        "head": "",
+        "text": ""
+      },
+      "行": {
+        "标题": "系统提示词",
+        "次行": "20 份 · 当前会话 5135 字符 · 最长 21891 字符",
+        "右列": "5135 字符",
+        "标题字号": "14px",
+        "行高": 55
+      },
+      "小窗": {
+        "抬头": "系统提示词（1–1200 / 5135 字符）",
+        "字段": [
+          "来源=远端 state.db · system_prompts · 20 份 · hash 84bab0584d4b",
+          "开头一行=You are Hermes Agent, built by Nous Research."
+        ],
+        "正文长度": 1199,
+        "正文开头": "You are Hermes Agent, built by Nous Rese",
+        "按钮": [
+          "看更多",
+          "复制",
+          "关闭"
+        ]
+      },
+      "看更多": {
+        "抬头": "系统提示词（1201–2400 / 5135 字符）",
+        "正文开头": "第 97 行提示词内容\n第 98 行提示",
+        "正文长度": 1200
+      },
+      "底部": {
+        "抬头": "系统提示词（5125–5135 / 5135 字符）",
+        "按钮": [
+          "已到底",
+          "复制",
+          "关闭"
+        ]
+      },
+      "取不到": {
+        "次行": "取不到：打不开 state.db: no such file or directory",
+        "小窗数没增加": true,
+        "提示": "取不到系统提示词：打不开 state.db: no such file or directory"
+      },
+      "结论": {
+        "解析出份数与长度": true,
+        "解析出hash与开头": true,
+        "坏数据如实报错": true,
+        "行渲染合规": true,
+        "行上写清份数与长度": true,
+        "小窗抬头写清范围": true,
+        "小窗来源写清在哪": true,
+        "正文是那一段": true,
+        "看更多真的取下一段": true,
+        "到底了就说到底": true,
+        "取不到时如实说": true
+      }
+    }
+  }
+}
+{
+  "name": "F-SESS-10 主机指纹提示 / 是否每次上传公钥",
+  "result": {
+    "check": {
+      "已信任主机": {
+        "计数": {},
+        "弹框": 0
+      },
+      "首次连接": {
+        "计数": {
+          "app.notify": 1
+        },
+        "弹框文案": " 127.0.0.1:22 算法 ssh-ed25519 指纹 SHA256:AbCdEf1234567890 首次连接，是否信任并记住？ 信任并保存 取消 "
+      },
+      "指纹变了": {
+        "计数": {
+          "app.notify": 1
+        },
+        "弹框文案": " 127.0.0.1:22 密钥类型 ssh-ed25519 已保存的指纹： SHA256:AbCdEf1234567890 本次收到的指纹： SHA256:NEW999 同一类型"
+      },
+      "新密钥类型": {
+        "计数": {
+          "app.notify": 1
+        },
+        "弹框": 1
+      },
+      "第一次连接": {
+        "key_install次数": 1,
+        "装完后主机登录方式": "key"
+      },
+      "第二次连接": {
+        "key_install次数": 0
+      },
+      "结论": {
+        "已信任主机静默": true,
+        "首次连接会问": true,
+        "指纹变了会问": true,
+        "新密钥类型会问": true,
+        "第一次会装公钥": true,
+        "装完切成密钥登录": true,
+        "第二次不再装": true
+      }
+    }
+  }
+}
+{
+  "name": "F-SESS-12 聊天输出状态机",
+  "result": {
+    "check": {
+      "规则表": [
+        {
+          "id": "compacting",
+          "state": "压缩中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"compacting\""
+        },
+        {
+          "id": "compacted",
+          "state": "压缩中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"compacted\"（刚压完，仍算压缩态，下一次输出会转回运行）"
+        },
+        {
+          "id": "compressions",
+          "state": "压缩中",
+          "有依据": true,
+          "依据": "ui-tui/dist: `Compressions: ${n}` / `cmp ${n}`"
+        },
+        {
+          "id": "interrupted",
+          "state": "已结束",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"[interrupted]\" —— 这一轮被中断"
+        },
+        {
+          "id": "interrupt_hint",
+          "state": "运行中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"Ctrl+C to interrupt…\" —— 只有在跑的时候才显示"
+        },
+        {
+          "id": "thinking",
+          "state": "运行中",
+          "有依据": true,
+          "依据": "ui-tui/dist: \"Thinking\" / \"~N tokens\" / \"N tok\" —— 流式输出还在动"
+        }
+      ],
+      "逐条": [
+        {
+          "喂的": "思考",
+          "文本": "✻ Thinking…  ~1.2k tokens",
+          "判成": "运行中",
+          "命中规则": "thinking",
+          "命中片段": " Thinking…"
+        },
+        {
+          "喂的": "可中断",
+          "文本": "Ctrl+C to interrupt…",
+          "判成": "运行中",
+          "命中规则": "interrupt_hint",
+          "命中片段": "Ctrl+C to interrupt"
+        },
+        {
+          "喂的": "压缩中",
+          "文本": "compacting",
+          "判成": "压缩中",
+          "命中规则": "compacting",
+          "命中片段": "compacting"
+        },
+        {
+          "喂的": "压缩计数",
+          "文本": "Compressions: 3",
+          "判成": "压缩中",
+          "命中规则": "compressions",
+          "命中片段": "Compressions: 3"
+        },
+        {
+          "喂的": "压缩完",
+          "文本": "compacted",
+          "判成": "压缩中",
+          "命中规则": "compacted",
+          "命中片段": "compacted"
+        },
+        {
+          "喂的": "被打断",
+          "文本": "  [interrupted]",
+          "判成": "已结束",
+          "命中规则": "interrupted",
+          "命中片段": "[interrupted]"
+        },
+        {
+          "喂的": "普通输出",
+          "文本": "assistant: 好了，做完了。",
+          "判成": "未知",
+          "命中规则": "",
+          "命中片段": ""
+        }
+      ],
+      "迁移": {
+        "中途": "运行中",
+        "序列": [
+          "运行中",
+          "压缩中",
+          "运行中",
+          "已结束"
+        ],
+        "规则": [
+          "interrupt_hint",
+          "compacting",
+          "thinking",
+          "quiet"
+        ],
+        "终态": "已结束"
+      },
+      "说明": "压缩中 ← 规则 compacting｜依据：ui-tui/dist: \"compacting\"｜命中：\"compacting\"｜静默 0s",
+      "真实链路": {
+        "状态": "运行中",
+        "命中规则": "interrupt_hint",
+        "顶栏文字": "shell · 运行中",
+        "顶栏悬停说明": "运行中 ← 规则 interrupt_hint｜依据：ui-tui/dist: \"Ctrl+C to interrupt…\" —— 只有在跑的时候才显示｜命中：\"Ctrl+C to interrupt\"｜静默 0s"
+      },
+      "静默转结束": {
+        "状态": "已结束",
+        "命中规则": "quiet",
+        "顶栏文字": "shell · 已结束"
+      },
+      "覆盖": {
+        "覆盖到": [
+          "thinking",
+          "interrupt_hint",
+          "compacting",
+          "compressions",
+          "compacted",
+          "interrupted",
+          "quiet"
+        ],
+        "没覆盖到": []
+      },
+      "结论": {
+        "每条规则都有依据": true,
+        "思考算运行中": true,
+        "可中断提示算运行中": true,
+        "compacting算压缩中": true,
+        "压缩计数算压缩中": true,
+        "压缩完算压缩中": true,
+        "被打断算已结束": true,
+        "普通输出不改状态": true,
+        "迁移序列对": true,
+        "静默阈值前不算结束": true,
+        "说明里有依据与命中片段": true,
+        "真实链路生效": true,
+        "顶栏带悬停说明": true,
+        "静默后顶栏显示已结束": true,
+        "规则全被覆盖": true
+      }
+    }
+  }
+}
+{
+  "name": "F-SESS-6 会话（tmux）流程：能看 / 能选 / 有就不动 / 永不终止",
+  "result": {
+    "check": {
+      "解析_两条": {
+        "list": [
+          {
+            "name": "hermes",
+            "windows": 3,
+            "attached": 1,
+            "activityMs": 1789980000000,
+            "createdMs": 1789900000000,
+            "ageSec": 84246,
+            "idleSec": 4246
+          },
+          {
+            "name": "work",
+            "windows": 1,
+            "attached": 0,
+            "activityMs": 1789979000000,
+            "createdMs": 1789800000000,
+            "ageSec": 184246,
+            "idleSec": 5246
+          }
+        ],
+        "err": ""
+      },
+      "解析_没有": {
+        "list": [],
+        "err": "no server running on /tmp/tmux-1000/default"
+      },
+      "启动_有会话": {
+        "action": "attach",
+        "name": "hermes",
+        "count": 2
+      },
+      "启动_有会话_发出去的字": "tmux attach -t 'hermes'\r",
+      "启动_没会话_用主机命令": {
+        "action": "startCmd",
+        "cmd": "tmux new -As hermes 'hermes --tui' \\; set -g mouse on",
+        "count": 0
+      },
+      "启动_没会话_发出去的字": "tmux new -As hermes 'hermes --tui' \\; set -g mouse on\r",
+      "启动_没会话_自建": {
+        "action": "create",
+        "name": "hermes",
+        "count": 0
+      },
+      "启动_没会话_自建_发出去的字": "tmux new -As 'hermes' 'hermes --tui' \\; set -g mouse on\r",
+      "界面": {
+        "状态行": [
+          "在线：已连接 · 远端 tmux：2 个会话",
+          "当前选中：hermes"
+        ],
+        "行数": 2,
+        "行": [
+          {
+            "id": "session-hermes",
+            "t": "hermes",
+            "s": "窗口 3 · 建了 23 小时 · 最后活动 1 小时前",
+            "r": "attach 中",
+            "on": true
+          },
+          {
+            "id": "session-work",
+            "t": "work",
+            "s": "窗口 1 · 建了 2 天 · 最后活动 1 小时前",
+            "r": "空闲",
+            "on": false
+          }
+        ]
+      },
+      "点第二行": {
+        "选中": "work",
+        "状态行": [
+          "在线：已连接 · 远端 tmux：2 个会话",
+          "当前选中：work"
+        ],
+        "选中记号在第二行": "row-item row-on"
+      },
+      "点第二行_发出去的字": "tmux attach -t 'work'\r",
+      "永不终止": {
+        "发过的负载条数": 1,
+        "含kill": false,
+        "含newAs": false
+      },
+      "结论": {
+        "解析出两个会话": true,
+        "解析没tmux不抛错": true,
+        "有会话时是attach": true,
+        "有会话时没有新建": true,
+        "没会话时按主机命令建": true,
+        "没会话也没命令时自建": true,
+        "界面两行": true,
+        "状态行有在线与会话数": true,
+        "右列是状态": true,
+        "点行就切过去": true,
+        "切换后界面跟着变": true,
+        "全程没有杀会话": true
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-7 左侧隐藏栏 + 功能登记表",
+  "result": {
+    "check": {
+      "自检": {
+        "总数": 11,
+        "已做": 11,
+        "没归属": [],
+        "空集合": [],
+        "界面空集合": [],
+        "没挂上": [
+          "prompt(行)",
+          "model(行)",
+          "skills-dl(行)"
+        ],
+        "没测": [],
+        "未做": []
+      },
+      "抽屉": {
+        "条目数": 6,
+        "登记可用数": 6,
+        "集合": [
+          "连接",
+          "Hermes",
+          "诊断"
+        ],
+        "条目": [
+          {
+            "id": "hosts",
+            "t": "主机",
+            "s": "地址 / 用户 / 启动命令",
+            "h": 55
+          },
+          {
+            "id": "keys",
+            "t": "密钥",
+            "s": "生成 / 导入 / 装到服务器",
+            "h": 55
+          },
+          {
+            "id": "settings",
+            "t": "设置",
+            "s": "字号 / 回滚 / 省电 / 通知",
+            "h": 55
+          },
+          {
+            "id": "sessions",
+            "t": "会话",
+            "s": "远端 tmux 会话 · 点一下就切过去（永不终止）",
+            "h": 55
+          },
+          {
+            "id": "hermes",
+            "t": "技能与记忆",
+            "s": "远端 SKILL.md / USER.md / MEMORY.md",
+            "h": 55
+          },
+          {
+            "id": "net",
+            "t": "网络与流量",
+            "s": "连通性 / 丢包 / 上下行",
+            "h": 55
+          }
+        ],
+        "未做的没摆出来": true
+      },
+      "行样式": {
+        "标题字号": "14px",
+        "标题字重": "600",
+        "次行字号": "12px",
+        "行高": 55,
+        "达标": true
+      },
+      "右列规范": {
+        "flexBasis": "auto",
+        "whiteSpace": "nowrap",
+        "textOverflow": "clip",
+        "scrollWidth": 54,
+        "clientWidth": 54,
+        "数值没被截断": true,
+        "达标": true
+      },
+      "选栏目": [
+        {
+          "id": "settings",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "设置"
+        },
+        {
+          "id": "keys",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "密钥"
+        },
+        {
+          "id": "hermes",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "技能与记忆"
+        },
+        {
+          "id": "hosts",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "主机"
+        },
+        {
+          "id": "sessions",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "会话"
+        },
+        {
+          "id": "net",
+          "抽屉收起": true,
+          "面板打开": true,
+          "切到了": true,
+          "抬头": "网络与流量"
+        },
+        {
+          "点空白收起": true
+        }
+      ],
+      "未做的点不动": {
+        "拿谁试的": "__tmp__",
+        "抬头没变": true,
+        "提示": "这个栏目还没做",
+        "计划项不进抽屉": true
+      },
+      "结论": {
+        "抽屉条目数等于真栏目数": true,
+        "抽屉里有三个集合": true,
+        "没做的没摆出来": true,
+        "行样式合规": true,
+        "右列不截断": true,
+        "每个栏目都点得开": true,
+        "抬头跟着栏目走": true,
+        "点空白能收起": true,
+        "没做的点不动且有提示": true,
+        "自检四类缺口为空": true
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-9 设置生效 / 回读 / 持久化（字号 + 回滚上限 + 开关）",
+  "result": {
+    "boot": {
+      "optFont": 13,
+      "cssFont": "13px",
+      "cols": 50,
+      "rows": 34,
+      "scrollback": 5000,
+      "keybarHidden": false,
+      "composerHidden": false,
+      "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+      "inpFont": "13",
+      "inpScroll": "5000",
+      "inpKeybar": true
+    },
+    "set": {
+      "before": {
+        "optFont": 13,
+        "cssFont": "13px",
+        "cols": 50,
+        "rows": 34,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 13px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "13",
+        "inpScroll": "5000",
+        "inpKeybar": true
+      },
+      "font": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 5000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 50×34 · 回滚 5000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "5000",
+        "inpKeybar": true,
+        "prefFont": "20"
+      },
+      "scroll": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 22,
+        "scrollback": 1000,
+        "keybarHidden": false,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": true,
+        "prefFont": "20",
+        "prefScroll": "1000"
+      },
+      "kb": {
+        "optFont": 20,
+        "cssFont": "20px",
+        "cols": 32,
+        "rows": 25,
+        "scrollback": 1000,
+        "keybarHidden": true,
+        "composerHidden": false,
+        "stEff": "生效中：字号 20px · 终端 32×22 · 回滚 1000 行 · 已保存",
+        "inpFont": "20",
+        "inpScroll": "1000",
+        "inpKeybar": false,
+        "prefFont": "20",
+        "prefScroll": "1000",
+        "prefKeybar": "false"
+      },
+      "字号当场生效": true,
+      "回滚上限当场生效": true,
+      "开关当场生效": true,
+      "界面回读生效值": true,
+      "控件显示与生效一致": true
+    },
+    "afterReload": {
+      "optFont": 20,
+      "cssFont": "20px",
+      "cols": 32,
+      "rows": 25,
+      "scrollback": 1000,
+      "keybarHidden": true,
+      "composerHidden": false,
+      "stEff": "生效中：字号 20px · 终端 32×25 · 回滚 1000 行 · 已保存",
+      "inpFont": "20",
+      "inpScroll": "1000",
+      "inpKeybar": false,
+      "prefFont": "20",
+      "prefScroll": "1000",
+      "prefKeybar": "false",
+      "重载后字号仍是20": true,
+      "重载后回滚上限仍是1000": true,
+      "重载后键条仍是关的": true,
+      "重载后控件显示一致": true
+    }
+  }
+}
+{
+  "name": "F-UI-1 长文本滚动 / 一键到底 / 缓存上限",
+  "result": {
+    "check": {
+      "普通_初始": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 274,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": null,
+        "alt": false,
+        "mouseMode": 0,
+        "发给远端字节数": 0
+      },
+      "普通_下滑后": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 257,
+        "落后行数": 17,
+        "chipVisible": true,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": false,
+        "mouseMode": 0,
+        "发给远端字节数": 0
+      },
+      "普通_点chip后": {
+        "bufType": "normal",
+        "baseY": 274,
+        "viewportY": 274,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": false,
+        "mouseMode": 0,
+        "发给远端字节数": 0
+      },
+      "普通_结论": {
+        "能往上翻": true,
+        "出现回到底部入口": true,
+        "一键到底后回到最新": true,
+        "入口消失": true
+      },
+      "备用屏_初始": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 1,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": "⇣ 回到底部（上面还有 17 行）",
+        "alt": true,
+        "mouseMode": 1000,
+        "发给远端字节数": 0
+      },
+      "备用屏_下滑后": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 1,
+        "落后行数": 0,
+        "chipVisible": true,
+        "chipText": "⇣ 回到最新（TUI 里已往上翻 17 格）",
+        "alt": true,
+        "mouseMode": 1000,
+        "发给远端字节数": 17
+      },
+      "备用屏_点回到最新后": {
+        "bufType": "alternate",
+        "baseY": 1,
+        "viewportY": 1,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": "⇣ 回到最新（TUI 里已往上翻 17 格）",
+        "alt": true,
+        "mouseMode": 1000,
+        "发给远端字节数": 34
+      },
+      "备用屏_结论": {
+        "认出是备用屏": true,
+        "认出远端鼠标": true,
+        "手势变成了发给远端的滚轮": true,
+        "出现回到最新的入口": true,
+        "入口文字对得上": true,
+        "一键回到最新又发了滚轮": true,
+        "回程后入口消失": true,
+        "入口文案不再是上面还有N行": true,
+        "进TUI时旧的入口先藏起来": true
+      },
+      "无鼠标_下滑后": {
+        "bufType": "alternate",
+        "baseY": 0,
+        "viewportY": 0,
+        "落后行数": 0,
+        "chipVisible": false,
+        "chipText": null,
+        "alt": true,
+        "mouseMode": 0,
+        "发给远端字节数": 34
+      },
+      "无鼠标_结论": {
+        "mouseMode": 0,
+        "dialog": true,
+        "按钮": [
+          "打开系统通知设置",
+          "发一条测试通知",
+          "开启 tmux 鼠标",
+          "取消"
+        ]
+      }
+    }
+  }
+}
+{
+  "name": "F-UI-11 启动时间线 + Hermes 页读取策略",
+  "result": {
+    "check": {
+      "启动打点": {
+        "点": {
+          "开始": 79,
+          "通道就绪": 81,
+          "偏好就绪": 81,
+          "字体就绪": 87,
+          "终端可显示": 113,
+          "面板就绪": 140
+        },
+        "阶段数": 6,
+        "终端可显示": 113,
+        "面板就绪": 140
+      },
+      "启动时读远端次数": 0,
+      "第一次进": {
+        "读取次数": 1,
+        "耗时ms": 7,
+        "有读数行": true,
+        "还在读取中": false
+      },
+      "再切回来": {
+        "读取次数": 1,
+        "还在读取中": false,
+        "技能条目数": 1
+      },
+      "结论": {
+        "六个阶段都有读数": true,
+        "终端不等面板": true,
+        "启动时不读远端": true,
+        "第一次进读一次": true,
+        "有耗时读数": true,
+        "切回来命中缓存": true,
+        "技能列表真的渲染了": true
+      }
+    }
+  }
+}

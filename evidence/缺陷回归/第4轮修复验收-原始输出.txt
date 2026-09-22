@@ -1,0 +1,65 @@
+
+=== A. 键条在空间不够时是否还在屏幕内 ===
+  composer on
+  filled
+  大视口778: {"可视高":778,"键条高":97,"键条完整可见":true,"键条底":778,"终端区高":497,"输入框高":145,"输入框显示":true}
+  视口377: {"可视高":377,"键条高":97,"键条完整可见":true,"键条底":377,"终端区高":97,"输入框高":143,"输入框显示":true}
+  视口300: {"可视高":300,"键条高":97,"键条完整可见":true,"键条底":300,"终端区高":97,"输入框高":66,"输入框显示":true}
+  视口240（键盘弹起后很小的小屏）: {"可视高":240,"键条高":97,"键条完整可见":true,"键条底":240,"终端区高":103,"输入框高":0,"输入框显示":false}
+  视口200: {"可视高":200,"键条高":97,"键条完整可见":true,"键条底":200,"终端区高":63,"输入框高":0,"输入框显示":false}
+  恢复778: {"可视高":778,"键条高":97,"键条完整可见":true,"键条底":778,"终端区高":641,"输入框高":0,"输入框显示":false}
+
+=== B. 视口变化不发事件时看门狗的表现 ===
+  hooked
+  初始: {"可视高":778,"innerHeight":778,"cssVh":"778.1818237304688px","app高":778,"键条底":778,"键条完整可见":true,"事件计数":{"vvResize":0,"vvScroll":0,"winResize":0},"sync计数":0}
+  设成 377 之后: {"可视高":377,"innerHeight":377,"cssVh":"377.0909118652344px","app高":377,"键条底":377,"键条完整可见":true,"事件计数":{"vvResize":1,"vvScroll":0,"winResize":1},"sync计数":4}
+  清除覆盖之后: {"可视高":778,"innerHeight":778,"cssVh":"778.1818237304688px","app高":778,"键条底":778,"键条完整可见":true,"事件计数":{"vvResize":2,"vvScroll":0,"winResize":2},"sync计数":8}
+
+=== C. 补输出 + 公钥自动装到服务器 ===
+A. session.since 补输出（切后台被冻结时漏掉的那段）
+  ✓ 已连上 2222   state=connected
+   rxSeq: 发送前 3 → 现在 6（原生侧每条输出一个 seq）
+  ✓ data 事件带上了 seq   3 → 6
+   把 rxSeq 退回 3 后调用 resyncOutput()，补回 127 字节，rxSeq 现为 6
+  ✓ 确实补回了漏掉的输出   127 字节
+  ✓ 补完后 rxSeq 追平原生侧   6 vs 6
+  ✓ 追平后再补为 0（不会重复刷屏）   0 字节
+
+B. 把公钥装到服务器（对着 Node ssh2 假服务器，支持密码登录）
+   新生成密钥: 9f3941f206f54fd4 Ed25519
+   公钥: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIObdy9Slx5ttvECEAqmA57u6Dp+ySKVV7Q…
+  ✓ 主机已建好（auth=password）   {"auth":"password","keyId":"9f3941f206f54fd4"}
+   密码登录结果: error
+  ✗ 密码登录成功   error
+   key.install 返回: {"ok":true,"added":true,"already":false,"count":2,"verified":false,"out":"HPK_ADDED\nHPK_COUNT=2","exit":0,"msg":"公钥已写入服务器，但密钥登录验证没通过（可能是 sshd 禁止该算法或权限问题）"}
+  ✓ 安装成功
+  ✓ 公钥是新增的（不是本来就有）   added=true
+  ✗ ★ 装完用密钥真连一次验证通过   verified=false
+  ✓ authorized_keys 里现在有几把   count=2
+
+   → 现在把主机切成密钥登录，再用**密钥**连一次（不再用密码）
+  ✗ ★ 改用密钥登录也连得上   error
+   主机现在的 auth = key  keyId = 9f3941f206f54fd4
+  ✓ 主机已切为密钥登录   key
+
+失败 3 项: 密码登录成功 | ★ 装完用密钥真连一次验证通过 | ★ 改用密钥登录也连得上
+
+=== D. 连接失败的真实报错 ===
+看门狗诊断:
+  _watchRaf = 1272   _lastVh = 778.1818237304688   实际 vv.height = 778.1818237304688
+  600ms 内 rAF 跑了 37 帧  → rAF 正常
+  typeof fitChrome = function   typeof growComposer = function
+  initViewport 是否存在 = function
+
+交互式连接诊断（主机 copyid-2223 auth=key keyId=9f3941f206f54fd4）
+  connect() 没抛异常
+  最终 state = error
+  state 事件里的错误信息: ["error: failed to send channel request"]
+  有没有弹主机密钥确认框: false
+
+JS 错误: []
+
+=== 服务器侧 authorized_keys ===
+  非空行数: 2
+
+=== C（修正假服务器后重跑）：补输出 + 公钥自动装到服务器  2026-09-17 09:31:02 CST ===

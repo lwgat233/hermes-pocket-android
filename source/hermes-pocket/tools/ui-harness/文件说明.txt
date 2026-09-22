@@ -1,0 +1,36 @@
+tools/ui-harness 里的文件说明（纯文本清单，给人看的）
+==================================================================
+这些 .mjs 是「本地测试台」与「设备端复验」：
+  · harness.mjs 起 Playwright 的 Chromium，注入一个假的原生桥（window.HermesPocket），
+    把 App 的界面（app/src/main/assets/ui/）加载起来；t-*.mjs 是断言驱动，读界面里的真实数值做判断。
+  · dev-probe.mjs 直连真机/模拟器上 WebView 的 devtools socket（页面级 CDP），device-check.mjs 用它做设备复验。
+.mjs = JavaScript 的 ES 模块文件，Node 能直接跑；之所以是 JS，是因为要驱动浏览器/读 DOM。
+
+文件名                        大小  干什么用的
+------------------------------------------------------------------
+t-net.mjs                 13K  F-NET-2 连通性 / 丢包 / 延迟（真样本解析 + 界面流程）
+harness.mjs               12K  测试主机
+t-traffic.mjs             12K  F-NET-8 历史上下行：采集区间 → 统计 → 柱/饼
+t-skill.mjs               11K  F-HERM-3 skill：下载到手机 / 编辑并回写
+t-model.mjs                9K  F-HERM-5 远端模型：看 / 改 / 还原
+t-keyboard.mjs             9K  点上面那块屏幕不弹键盘（真实鼠标点 + 焦点判据）
+device-check.mjs           8K  设备端复验（版本 / 键盘 / 沉浸 / ☰ / 滚动）
+t-drawer.mjs               7K  F-UI-7 左侧隐藏栏 + 功能登记表
+t-composer.mjs             7K  输入框：实时就实时 · 不存储在框里（真实按键）
+t-keep.mjs                 7K  对话框一直攒着（切栏目 / 断线重连 / 后台补发 / 输入框草稿）
+t-prompt.mjs               6K  F-HERM-4 系统提示词可见（来源 state.db）
+t-sessions.mjs             6K  F-SESS-6 会话（tmux）流程：能看 / 能选 / 有就不动 / 永不终止
+t-hostkey.mjs              6K  F-SESS-10 主机指纹提示 / 是否每次上传公钥
+t-chatstate.mjs            5K  F-SESS-12 聊天输出状态机
+dev-probe.mjs              5K  (工具文件)
+t-scroll.mjs               5K  F-UI-1 长文本滚动 / 一键到底 / 缓存上限
+t-immersive.mjs            4K  沉浸（全屏）模式：保留输入框 · 退出后 ☰ 与上下滑照旧
+t-noconn.mjs               3K  没连接时开抽屉：不报错 · 照样能用 · 自检分清「未渲染」
+t-boot.mjs                 3K  F-UI-11 启动时间线 + Hermes 页读取策略
+t-registry.mjs             2K  功能覆盖自检：登记表 11 项全挂上、没归属/没测/未做 全空
+t-settings.mjs             2K  F-UI-9 设置生效 / 回读 / 持久化（字号 + 回滚上限 + 开关）
+t-pack.mjs                 2K  打包信息：界面版本串与包内 build-info.json 对账
+t-fontsize.mjs             2K  F-UI-9 字号生效与持久化
+------------------------------------------------------------------
+共 23 个文件，合计 158 KB
+一次性排查脚本（28 个 d-*.mjs）已移到 evidence/临时排查脚本-存档/，不在这个目录里。

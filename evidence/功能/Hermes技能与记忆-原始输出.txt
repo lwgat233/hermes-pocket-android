@@ -1,0 +1,23 @@
+### 「Hermes 技能 / 记忆」页验收  2026-09-17 11:36:56 CST
+
+=== 连接 ===
+  connected
+
+=== ① hermes.info：技能清单（原生取数）===
+  {"目录": "/home/lwgat/.hermes", "技能数": 62, "分类数": 12, "分类": ["apple", "autonomous-ai-agents", "creative", "devops", "email", "media", "note-taking", "productivity", "research", "social-media", "software-development", "web"], "记忆上限": 2200, "用户画像上限": 1375, "样例": {"rel": "software-development/github/SKILL.md", "path": "skills/software-development/github/SKILL.md", "category": "software-development", "name": "github", "size": 2446, "mtime": 1789379201851, "desc": "GitHub via gh CLI: PRs, issues, reviews, repos, auth."}}
+
+=== ② hermes.memory：记忆内容（和本地文件核对首行）===
+  {"内存字符数": 1583, "用户字符数": 152, "条目数": 8, "MEMORY首行": "Env: this host is the user's 飞牛 fnOS NAS (hostname galaxy-fn", "USER首行": "沟通风格：中文表述常高度省略/口语化（如「bd」、「不不发送的是不实时的」），反复猜错方向会明显消耗"}
+  本地核对 MEMORY.md 首行: Env: this host is the user's 飞牛 fnOS NAS (hostname galax
+  本地 MEMORY.md 字符数: 1569  USER.md: 152
+
+=== ③ 打开面板 → 切到 Hermes 页 → 渲染结果 ===
+  {"技能行数": 62, "含分类标题": true, "片段": " 远端 Hermes 目录 /home/lwgat/.hermes · 技能 62 个 刷新 记忆（§ 分隔的条目，就是\"我记住的东西\"） USER.md（关于你） · 11%（152/1375 字符） 沟通风格：中文表述常高度省略/口语化（如「bd」、「不不发送的是不实时的」），反复猜错方向会明显消耗他的耐心 —— "}
+
+=== ④ 点开一个技能（github）看内容 ===
+  {"弹窗": true, "内容前120字": "--- name: github description: \"GitHub via gh CLI: PRs, issues, reviews, repos, auth.\" version: 2.0.0 author: Ben Barclay"}
+
+=== ⑤ 「在终端打开」→ 终端里应出现该技能内容 ===
+  {"终端命中行": 4, "样例": ["name: github", "description: \"GitHub via gh CLI: PRs, issues, re", "tags: [github, gh, git, pull-requests, issue"]}
+  （在终端里按 q 退出 less）
+  sent q

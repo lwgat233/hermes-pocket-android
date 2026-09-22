@@ -1,0 +1,59 @@
+### 通知权限链路验收  2026-09-17 10:42:39 CST
+
+=== ① 撤销通知权限并冷启动（模拟用户第一次点了不允许）===
+  启动后权限状态：
+          android.permission.POST_NOTIFICATIONS
+          android.permission.WAKE_LOCK
+        install permissions:
+  系统弹窗（启动时自动申请，应看到权限弹窗）：
+      Window #9 Window{dc9db78 u0 com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity}:
+        mOwnerUid=10181 showForAllUsers=false package=com.google.android.permissioncontroller appop=NONE
+        mBaseLayer=21000 mSubLayer=0    mToken=ActivityRecord{ebe6eef u0 com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity t193}
+  用返回键取消这个系统弹窗（= 用户点了不允许/忽略了）：
+  现在权限状态：
+          android.permission.POST_NOTIFICATIONS
+          android.permission.WAKE_LOCK
+        install permissions:
+
+=== ② 连上后应主动提示没有通知权限（这就是不知道在哪授权的修法）===
+  {"已授权": false, "提示框": false, "提示文字": null, "按钮": null}
+
+=== ③ 点提示框里的「去授权」→ 应拉起系统权限弹窗 ===
+    "value": "没有提示框"
+  系统弹窗：
+      Window #9 Window{1f30ed6 u0 com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity}:
+        mOwnerUid=10181 showForAllUsers=false package=com.google.android.permissioncontroller appop=NONE
+        mBaseLayer=21000 mSubLayer=0    mToken=ActivityRecord{6e945b9 u0 com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity t193}
+
+=== ④ 在系统弹窗上点「允许」（用 uiautomator 找按钮坐标，真点）===
+  找到按钮: 540 1061 Allow Hermes Pocket to send you notifications?
+  授权后权限状态：
+          android.permission.POST_NOTIFICATIONS
+          android.permission.WAKE_LOCK
+        install permissions:
+
+=== ⑤ 授权成功应触发原生回调 → 自动发一条测试通知 ===
+
+=== ⑥ 设置面板里的权限状态显示 ===
+    "value": "未授权 ← 点下面「申请通知权限」，或去系统设置里打开"
+
+=== ⑦ 真点系统弹窗的「Allow」(540,1279) ===
+  权限状态：android.permission.POST_NOTIFICATIONS: granted=true, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+
+=== ⑧ 授权成功后 app 侧状态 + 自动自测通知 ===
+    "value": "{\"已授权\":true,\"设置面板显示\":\"已授权 · 现在是「App 前台」（前台时普通通知不打扰）\"}"
+
+=== ⑨ 通知栏（应有「通知已就绪」这条自动自测）===
+    android.title=String (通知已就绪)
+    android.text=String (以后远端有事，我就这样叫你)
+
+=== ⑩ 从服务端事件文件再发一条（端到端：我写 → 你手机弹）===
+    done: 权限已打通 | 现在通知真的能到你手机了
+    android.title=String (通知已就绪)
+    android.text=String (以后远端有事，我就这样叫你)
+
+=== ⑪ 前台收到普通事件：应改成应用内提示（而不是什么都不发生）===
+    "value": "connected"
+  （App 在前台）
+    info: 前台提示测试 | App 开着的时候应该浮出这条
+    "value": "{\"应用内提示\":\"事件通道已连接：~/hermes-pocket-events.log\",\"显示中\":true}"

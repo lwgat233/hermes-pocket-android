@@ -1,0 +1,16 @@
+== 频道面板 · 模拟器验证 2026-09-22 20:17:44 ==
+构件：apk/测试版/hermes-pocket-频道面板-测试-20260922.apk
+sha256：39e151000aa31687af704e038840af18b16299aaaa90f77f46d912de7399bfec
+构建：BUILD SUCCESSFUL（清编译，见 tools/rebuild.sh 那套配方）
+
+—— 读回来的 DOM 事实（不改他的 cdp.mjs，用 mark-readnotes 项目的探针）——
+1) 页签与栏目：tab-talk 存在；pages 里多出 tab-talk；boards 里 talk:talk:ready
+2) 切换：HP.App.showBoard('talk') 返回 1，.tabpage.on 切到 tab-talk
+3) 频道页渲染：children=7，[data-testid=talk-shout]=true，[data-testid=talk-solo]=true，
+   开关 chips=[实时, 含私信 🔒]，页面文字= 实时/含私信/跟谁说/🗣 全体喊话/＋ 新对话（只对我）/上次聊过/频道
+
+—— 没能验到的（说清楚）——
+· 角色按钮列表、[跟他说一句]、[看他要回什么]、历史条目：需要 app 先 SSH 连上这台 NAS；
+  模拟器里的 pocket 没配这台主机，所以那些 RPC 失败 → 页面按设计降级（角色区空、历史提示读不到），
+  面板本身照常渲染、不崩。接上主机后按 docs/频道面板验收.txt 那 12 条逐条点。
+· 他的 tools/cdp.mjs 有语法错（'x': : box.x），我没动它。

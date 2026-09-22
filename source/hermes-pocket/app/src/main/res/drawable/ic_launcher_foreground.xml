@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 终端窗口 -->
+    <path
+        android:fillColor="#1de9b6"
+        android:pathData="M28,34h52a4,4 0 0 1 4,4v32a4,4 0 0 1 -4,4h-52a4,4 0 0 1 -4,-4v-32a4,4 0 0 1 4,-4zM28,38v32h52v-32z" />
+    <!-- 提示符 > -->
+    <path
+        android:fillColor="#ffd166"
+        android:pathData="M35,47l9,7l-9,7v-4.4l4.5,-2.6l-4.5,-2.6z" />
+    <!-- 光标块 -->
+    <path
+        android:fillColor="#8ab4f8"
+        android:pathData="M50,55h14v6h-14z" />
+</vector>

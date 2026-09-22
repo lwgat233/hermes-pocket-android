@@ -1,0 +1,16 @@
+### 第 3 轮修复验收  2026-09-17 08:48:13 CST
+
+=== 缺陷8 键盘跟随顺滑（CDP 注入视口变化，778→460 共12步）===
+  "value": "ready"
+  "value": "sampling NEW at h=778"
+  "value": "{\"phase\":\"修复后\",\"frames\":28,\"vvFrom\":778,\"vvTo\":460,\"moved\":true,\"divVh\":0,\"divKb\":0,\"bad\":0,\"lag\":0}"
+  "value": "patched 250ms"
+  "value": "sampling OLD at h=778"
+  "value": "{\"phase\":\"修复前\",\"frames\":34,\"vvFrom\":778,\"vvTo\":460,\"moved\":true,\"divVh\":132,\"divKb\":132,\"bad\":22,\"lag\":273}"
+  "value": "restored h=499"
+
+=== 缺陷9 窗口大小可调（远端 stty size 回读）===
+  "value": "  ✓ 已连上   state=connected\n\n① 手动 140 列 × 40 行 × 字号 12\n  ✓ 本地 term = 140×40   140×40\n  ✓ 字号 = 12px   12px\n  ✓ 顶栏显示 140×40   140×40\n   远端 `stty size` = {\"rows\":40,\"cols\":140}\n  ✓ 远端 PTY 真的变成 40 行 × 140 列   {\"rows\":40,\"cols\":140}\n\n② 手动 200 列 × 0 行（行数交给屏幕）× 字号 9\n   本地 term = 200×26 font=9\n   远端 = {\"rows\":26,\"cols\":200}\n  ✓ 远端列数 = 200   {\"rows\":26,\"cols\":200}\n  ✓ 行数与本地一致（跟随屏幕，不是 40）   远端26 / 本地26\n  ✓ 字号 9px 生效\n\n③ 恢复自适应\n   本地 term = 69×26  geomMode=auto\n   远端 = {\"rows\":26,\"cols\":69}\n  ✓ geomMode=auto 已落盘\n  ✓ 远端不再停在 200 列   {\"rows\":26,\"cols\":69}\n  ✓ 远端与本地自适应尺寸一致   远端{\"rows\":26,\"cols\":69} 本地69×26\n\n全部通过"
+
+=== 缺陷10 主机指纹（ecdsa→ed25519 迁移与静默）===
+（详见下方：第一轮复现 + 第二轮修复后验证）

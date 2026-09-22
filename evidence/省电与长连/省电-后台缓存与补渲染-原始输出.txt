@@ -1,0 +1,31 @@
+### 省电细化：后台不渲染→落盘→回前台补渲染  2026-09-17 11:50:44 CST
+
+=== 连接 ===
+  connected
+
+=== ① 基线 ===
+  {"省电中": false, "渲染水位": 6, "终端总行数": 32, "终端底行": 0, "通道": {"save": false, "keepAwake": true, "wakeHeld": true, "keepalive": 0, "interactive": true}, "页面隐藏": false}
+  服务端连接数: 2
+
+=== ② 切后台（应进入省电：不渲染、心跳拉长到 120s、唤醒锁释放）===
+  {"省电中": true, "渲染水位": 6, "终端总行数": 32, "终端底行": 0, "通道": {"save": true, "keepAwake": true, "wakeHeld": false, "keepalive": 120, "interactive": true}, "页面隐藏": true}
+      (没有 spill 文件)
+  服务端连接数（应仍是 2：**没断**）: 2
+
+=== ③ 后台期间让远端产生 2000 行输出（应只落盘、不渲染）===
+  (没拿到)
+  {"省电中": true, "渲染水位": 6, "终端总行数": 32, "终端底行": 0, "通道": {"save": true, "keepAwake": true, "wakeHeld": false, "keepalive": 120, "interactive": true}, "页面隐藏": true}
+  落盘缓存：
+      (没有 spill 文件)
+  服务端连接数: 2
+
+=== ④ 回前台：应把落盘的那段补渲染出来 ===
+  {"省电中": false, "渲染水位": 6, "终端总行数": 32, "终端底行": 0, "通道": {"save": false, "keepAwake": true, "wakeHeld": true, "keepalive": 10, "interactive": true}, "页面隐藏": false}
+  落盘缓存（应已被取走并清掉）：
+      (没有 spill 文件)
+  (没拿到)
+  服务端连接数: 2
+
+=== ⑤ 心跳没有被关掉（省电时 120s，恢复后 30s）===
+  {"正常时心跳": 10, "省电中心跳": 120, "恢复后心跳": 10}
+  复位 screenOff

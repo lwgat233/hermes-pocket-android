@@ -1,0 +1,17 @@
+### 输入框：中文输入法上屏  2026-09-17 10:07:26 CST
+
+=== 连接 ===
+    "value": "{\"状态\":\"connected\",\"实时\":true,\"模式按钮\":\"实时\"}"
+
+=== 还原真机输入法顺序：组合中 → 上屏 ===
+  ok
+  初始 → {"发送的字节":[],"输入框内容":"","事件":[]}
+  组合中 value=zhongwen
+  组合中（此时不该发任何东西）→ {"发送的字节":[],"输入框内容":"zhongwen","事件":["compositionstart","input(comb)"]}
+  上屏 value=
+  上屏后（应该发一次「中文」）→ {"发送的字节":["中文"],"输入框内容":"","事件":["compositionstart","input(comb)","compositionend"]}
+  1s 后 → {"发送的字节":["中文"],"输入框内容":"","事件":["compositionstart","input(comb)","compositionend"]}
+  再 insertText 一段 → {"发送的字节":["中文","粘贴或英文"],"输入框内容":"","事件":["compositionstart","input(comb)","compositionend","input"]}
+
+=== 终端里核对：远端是否真的收到了「中文」 ===
+    "value": "[\"lwgat@galaxy-fnos:~$ \"]"
