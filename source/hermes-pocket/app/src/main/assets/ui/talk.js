@@ -711,7 +711,51 @@
       }
 
       /* 输入行：聊天和终端两种形式都在，敲一句按发送 */
-
+      const line = document.createElement('div');
+      line.className = 'tk-askline';
+      const kc = document.createElement('button');
+      kc.className = 'tk-chip' + (this.kind === 'default' ? ' on' : '');
+      kc.id = 'tk-kindchip';
+      kc.setAttribute('data-testid', 'talk-kindchip');
+      kc.textContent = this.kind === 'default' ? '他人可见' : '只给他';
+      kc.addEventListener('click', () => {
+        this.kind = (this.kind === 'default' ? 'private' : 'default');
+        this.render();
+      });
+      line.appendChild(kc);
+      const wc = document.createElement('button');
+      wc.className = 'tk-chip' + (this.asWho === 'owner.me' ? ' on' : '');
+      wc.id = 'tk-whosay';
+      wc.setAttribute('data-testid', 'talk-whosay');
+      wc.textContent = this.asWho === 'owner.me' ? '经理说' : '本人说';
+      wc.addEventListener('click', () => {
+        this.asWho = (this.asWho === 'owner.me' ? 'me' : 'owner.me');
+        this.render();
+      });
+      line.appendChild(wc);
+      const inp = document.createElement('input');
+      inp.className = 'tk-askin';
+      inp.id = 'tk-sayin';
+      inp.setAttribute('data-testid', 'talk-sayin');
+      inp.placeholder = this.style === 'chat' ? '说点什么…' : '说点什么（会送进他的会话）…';
+      const ok = document.createElement('button');
+      ok.className = 'tk-act';
+      ok.id = 'tk-sayok';
+      ok.setAttribute('data-testid', 'talk-sayok');
+      ok.textContent = '发送';
+      const fire = async () => {
+        const text = (inp.value || '').trim();
+        if (!text) { HP.App.toast('先说点什么'); return; }
+        inp.value = '';
+        await this.send(r.full_name, this.kind || 'private', text);
+        setTimeout(() => this.pullRoleOutput(r), 2500);
+        setTimeout(() => this.pullRoleOutput(r), 6000);
+      };
+      ok.addEventListener('click', fire);
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') fire(); });
+      line.appendChild(inp);
+      line.appendChild(ok);
+      el.appendChild(line);
     },
 
     /* Hermes 的界面是整屏重画的，"行数变多"取不到新行 —— 直接抠他最近一次回答的框
@@ -836,15 +880,8 @@
         this.render();
       } catch (e) { HP.App.toast('开不了新对话：' + e.message, 5000); }
     },
-    async openSession(s) {
-      if (s.role) {
-        try {
-          const r = await rpc('talk.switch', { role: s.role });
-          if (r && r.switched) HP.App.toast('已切到 ' + s.role, 2500);
-        } catch (e) { /* 切不过去也照样能看记录 */ }
-        return this.openRole(s.role);
-      }
-      if (false) return this.openRole(s.role);
+    openSession(s) {
+      if (s.role) return this.openRole(s.role);
       HP.App.toast('这是单独对话（' + s.name + '）：在终端里 tmux attach -t ' + s.tmux, 5000);
     },
     when(ts) {
