@@ -619,7 +619,10 @@
         const th = await rpcCache('talk.thread', { role: r.full_name, limit: 100 }, 'thread.' + r.full_name);
         const items = (th && th.items) || [];
         box.textContent = '';
-        if (!items.length) { box.textContent = '（还没聊过）'; return; }
+        if (!items.length && !((this.live || {})[r.full_name] || []).length) {
+          box.textContent = '（还没聊过）';
+          return;
+        }
         items.forEach((m) => {
           const b = document.createElement('div');
           b.className = 'tk-bub ' + (m.who === 'me' ? 'me' : 'him');
