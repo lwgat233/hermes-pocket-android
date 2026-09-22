@@ -834,6 +834,44 @@
         this.render();
       } catch (e) { HP.App.toast('开不了新对话：' + e.message, 5000); }
     },
+    /* 点会话 = 弹一个选择窗（不直接切） */
+    openSessionSheet(s) {
+      const el = document.getElementById('tk-page');
+      el.textContent = '';
+      const head = document.createElement('div');
+      head.className = 'tk-title';
+      head.textContent = s.name + (s.role ? '（角色会话）' : '（普通会话）');
+      el.appendChild(head);
+      const mk = (label, tid, fn, danger) => {
+        const b2 = document.createElement('button');
+        b2.className = 'tk-act' + (danger ? ' danger' : '');
+        b2.id = tid;
+        b2.setAttribute('data-testid', tid);
+        b2.textContent = label;
+        b2.style.display = 'block';
+        b2.style.width = '100%';
+        b2.style.margin = '6px 0';
+        b2.addEventListener('click', fn);
+        el.appendChild(b2);
+        return b2;
+      };
+      mk('切过去（就在当前 tmux 里）', 'tk-sess-switch', async () => {
+        if (s.role) { try { await rpc('talk.switch', { role: s.role }); HP.App.toast('已切到 ' + s.role, 2500); } catch (e) { HP.App.toast('切不过去：' + e.message, 4000); } }
+        else { await rpc('talk.run', { line: 'tmux switch-client -t ' + s.name + ' 2>/dev/null || tmux attach -t ' + s.name }); }
+        this.view = 'channel'; this.render();
+      });
+      if (s.role) mk('跟他说话（聊天界面）', 'tk-sess-talk', () => { this.openRole(s.role); });
+      mk('删除这个会话', 'tk-sess-del', async () => {
+        if (!confirm('删掉「' + s.name + '」这个会话？' + (s.role ? '（只是结束这次会话，角色还在，可以再拉起）' : ''))) return;
+        try {
+          const r = await rpc('talk.sessionDel', { name: s.role || s.name });
+          HP.App.toast(r && r.deleted ? ('已删除：' + (r.role || r.name)) : ('没删掉：' + ((r && r.why) || '未知原因')), 4000);
+          this.view = 'channel'; this.render();
+        } catch (e) { HP.App.toast('删失败：' + e.message, 5000); }
+      }, true);
+      mk('取消', 'tk-sess-cancel', () => { this.view = 'channel'; this.render(); });
+    },
+
     async openSession(s) {
       if (s.role) {
         try {

@@ -712,6 +712,7 @@ print('@@OK', '1')
             "talk.switch" -> if (hasId) ok(id, talkJson(listOf("switch", "--role", talkText(m.optString("role", "")))))
             "talk.doctor" -> if (hasId) ok(id, talkJson(listOf("doctor")))
             "talk.setup" -> if (hasId) ok(id, talkJson(listOf("setup")))
+            "talk.sessionDel" -> if (hasId) ok(id, talkJson(listOf("session-del", "--name", talkText(m.optString("name", "")))))
             "talk.deliveries" -> if (hasId) ok(id, talkJson(listOf("deliveries", "--lines",
                     m.optString("limit", "20"))))
             "talk.thread" -> if (hasId) ok(id, talkJson(listOf("thread", "--role", talkText(m.optString("role", "")),
