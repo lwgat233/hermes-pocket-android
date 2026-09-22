@@ -747,10 +747,11 @@ print('@@OK', '1')
                 val to = talkRole(m.optString("role"))
                 val body = talkText(m.optString("body", ""))
                 if (body.isBlank()) throw IllegalArgumentException("说要说什么")
-                // 记录 + 投递一步到位：带【私聊】标签（哪儿发的 + 谁发的 + 编号 + 怎么回我）
-                val r = runCatching { talkJson(listOf("say", "--by", "me", "--role", to,
+                // kind: private=只给他本人看；default=发给他但**他人可见**
+                val kind = if (m.optString("kind", "private") == "default") "default" else "private"
+                val r = runCatching { talkJson(listOf("say", "--by", "me", "--role", to, "--kind", kind,
                         "--body", body, "--topic", talkText(m.optString("topic", "私信")))) }
-                ok(id, JSONObject().put("to", to).put("delivered", r.isSuccess)
+                ok(id, JSONObject().put("to", to).put("kind", kind).put("delivered", r.isSuccess)
                     .put("raw", r.getOrNull() ?: JSONObject()))
             }
             "talk.capture" -> if (hasId) ok(id, JSONObject().put("raw",

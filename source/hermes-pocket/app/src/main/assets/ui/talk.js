@@ -629,6 +629,16 @@
       /* 输入行：聊天和终端两种形式都在，敲一句按发送 */
       const line = document.createElement('div');
       line.className = 'tk-askline';
+      const kc = document.createElement('button');
+      kc.className = 'tk-chip' + (this.kind === 'default' ? ' on' : '');
+      kc.id = 'tk-kindchip';
+      kc.setAttribute('data-testid', 'talk-kindchip');
+      kc.textContent = this.kind === 'default' ? '他人可见' : '只给他';
+      kc.addEventListener('click', () => {
+        this.kind = (this.kind === 'default' ? 'private' : 'default');
+        this.render();
+      });
+      line.appendChild(kc);
       const inp = document.createElement('input');
       inp.className = 'tk-askin';
       inp.id = 'tk-sayin';
@@ -643,7 +653,7 @@
         const text = (inp.value || '').trim();
         if (!text) { HP.App.toast('先说点什么'); return; }
         inp.value = '';
-        await this.send(r.full_name, 'private', text);
+        await this.send(r.full_name, this.kind || 'private', text);
         setTimeout(() => this.pullRoleOutput(r), 2500);
         setTimeout(() => this.pullRoleOutput(r), 6000);
       };
@@ -762,7 +772,7 @@
       this.busy = true;
       try {
         if (kind === 'broadcast') await rpc('talk.shout', { body: body });
-        else await rpc('talk.say', { role: target, body: body });
+        else await rpc('talk.say', { role: target, body: body, kind: kind || 'private' });
         HP.App.toast('已发出');
         await this.tick().catch(() => { });
         this.render();
