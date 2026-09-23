@@ -1,0 +1,45 @@
+### R29-4「满 80 裁旧后钉底失效」修复原始输出 —— 2026-09-23 · 角色 pipeline.author
+# 改的文件：source/hermes-pocket/app/src/main/assets/ui/talk.js（修后 sha256 d9a7c8ff6c7bb5160ee598859310743ed65c43c5ab8428d836d8e5200cd90333；修前 39c79f7e7bd1…，备份 /tmp/talk.js.r294.bak）
+# 探针：source/hermes-pocket/tools/ui-harness/d-r29-4-trim.mjs（跑真 paintStream，读真 DOM）
+# 命令：cd source/hermes-pocket/tools/ui-harness && node harness.mjs d-r29-4-trim.mjs
+
+=== ① 对照表（修前 → 修后，单位 px / 布尔）===
+场景                 修前                                             修后
+A_未满80_追加1条        离底 0px · pinned=True · 入口=False(0)             离底 0px · pinned=True · 入口=False(0)
+B_满80_追加1条         离底 97px · pinned=False · 入口=True(1)            离底 0px · pinned=True · 入口=False(0)
+B_满80_再追加3条        离底 655px · pinned=False · 入口=True(4)           离底 0px · pinned=True · 入口=False(0)
+B_满80_再追加5条        离底 1585px · pinned=False · 入口=True(9)          离底 0px · pinned=True · 入口=False(0)
+C_上翻后追加3条          离底 4191px · pinned=False · 锚点Δ267px · 入口计数=3   离底 3924px · pinned=False · 锚点Δ0px · 入口计数=3
+B 老节点同一批           （未测）                                           {"同一对象还在容器里": true, "仍在文档里": true, "id": "3076", "容器节点数": 80}
+
+=== ② 修前原始读数（d-r29-4-trim.mjs，完整 JSON 见同目录）===
+A_未满80_追加1条: {"离底px": 0, "scrollTop": 573, "scrollHeight": 1067, "可视高": 494, "pinned": true, "气泡数": 11, "第一条id": "1000", "入口": {"显示": false, "文案": "", "计数": "0"}}
+B_满80_追加1条: {"离底px": 97, "scrollTop": 7169, "scrollHeight": 7760, "可视高": 494, "pinned": false, "气泡数": 80, "第一条id": "3001", "入口": {"显示": true, "文案": "⇣ 回到底部（新 1 条）", "计数": "1"}}
+B_满80_再追加3条: {"离底px": 655, "scrollTop": 6611, "scrollHeight": 7760, "可视高": 494, "pinned": false, "气泡数": 80, "第一条id": "3004", "入口": {"显示": true, "文案": "⇣ 回到底部（新 4 条）", "计数": "4"}}
+B_满80_再追加5条: {"离底px": 1585, "scrollTop": 5681, "scrollHeight": 7760, "可视高": 494, "pinned": false, "气泡数": 80, "第一条id": "3009", "入口": {"显示": true, "文案": "⇣ 回到底部（新 9 条）", "计数": "9"}}
+C_上翻后追加3条: {"离底px": 4191, "锚点id": "5038", "锚点top": 458, "锚点位移px": 267, "pinned": false, "入口计数": "3", "气泡数": 80}
+
+=== ③ 修后原始读数 ===
+A_未满80_追加1条: {"离底px": 0, "scrollTop": 573, "scrollHeight": 1067, "可视高": 494, "pinned": true, "气泡数": 11, "第一条id": "1000", "入口": {"显示": false, "文案": "", "计数": "0"}}
+B_满80_追加1条: {"离底px": 0, "scrollTop": 7266, "scrollHeight": 7760, "可视高": 494, "pinned": true, "气泡数": 80, "第一条id": "3001", "入口": {"显示": false, "文案": "", "计数": "0"}}
+B_满80_再追加3条: {"离底px": 0, "scrollTop": 7266, "scrollHeight": 7760, "可视高": 494, "pinned": true, "气泡数": 80, "第一条id": "3004", "入口": {"显示": false, "文案": "", "计数": "0"}}
+B_满80_再追加5条: {"离底px": 0, "scrollTop": 7266, "scrollHeight": 7760, "可视高": 494, "pinned": true, "气泡数": 80, "第一条id": "3009", "入口": {"显示": false, "文案": "", "计数": "0"}}
+C_上翻后追加3条: {"离底px": 3924, "锚点id": "5038", "锚点top": 191, "锚点位移px": 0, "pinned": false, "入口计数": "3", "气泡数": 80}
+A_未满80_基线: {"离底px": 0, "scrollTop": 476, "scrollHeight": 970, "可视高": 494, "pinned": true, "气泡数": 10, "第一条id": "1000", "入口": {"显示": false, "文案": "", "计数": "0"}}
+B_满80_基线: {"离底px": 0, "scrollTop": 7266, "scrollHeight": 7760, "可视高": 494, "pinned": true, "气泡数": 80, "第一条id": "3000", "入口": {"显示": false, "文案": "", "计数": "0"}}
+C_上翻前: {"离底px": 3633, "锚点id": "5038", "锚点top": 191, "pinned": false}
+B_老节点是否同一批: {"同一对象还在容器里": true, "仍在文档里": true, "id": "3076", "容器节点数": 80}
+
+=== ④ 改了什么（三处，都在 assets/ui/talk.js）===
+1) paintStream 进门**先取状态**：`const wasAtBottom = s._pinned === undefined ? true : s._pinned;`（动 DOM 之前）
+2) 裁旧补偿：只有「本来不在底部」才补偿，且补偿量按 `scrollHeight` 的真实缩减（含 margin）算，不再用 `offsetHeight`（它不含 margin，一条少算 8px → 上翻锚点漂 24px/3 条）；收尾 `pinBottom(s, {added, force: wasAtBottom})`
+3) 两个滚动容器加 `overflow-anchor: none`（#tk-stream / #tk-chat）：位置只由我们自己的钉底/补偿决定，桌面 Chromium 与 Android WebView 行为一致
+
+=== ⑤ 为什么真因是「判底用错了读数」===
+旧代码：append（高度 +97）→ 裁旧（高度 −97，浏览器把 scrollTop 夹低）→ pinBottom 里 wasAtBottom 拿 `_lastHeight`(旧高度) − clientHeight − scrollTop 算差 = 97 > NEAR_BOTTOM(24) → 判「不在底部」→ 不钉底、只计数。
+满 80 之前不裁旧，所以一直是绿的（复测也是这样观察到的）。
+
+=== ⑥ 边界（未验）===
+· 本地台是桌面 Chromium；设备真触摸复测归 tester（本口径：不接主机、未验 ≠ 通过）。
+· 出包归 renderer（配方 bash tools/build.sh --name "R29-4-裁旧钉底" --feature-id "R-29"）。
+· 单聊 #tk-chat 只是加了 overflow-anchor:none（它不裁旧）；单聊既有绿判据未重测（本轮范围是群聊裁旧）。

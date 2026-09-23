@@ -99,9 +99,27 @@
   }
   function swSave() { try { localStorage.setItem('HP_SWITCH_CFG', JSON.stringify(SW_CFG)); } catch (e) { /* 存不了也不崩 */ } }
   function swBuild(v) { return String(SW_CFG.cmd || '').replace(/\{v\}/g, v); }   /* 见过的角色：做「历史」分组用 */
+  /* 落盘统一走 HP.Cache（R-26：节流 + 上限 + 满配额护栏都收在那一处）
+   * 分层：小而常用的（roles/asks/sessions/deliveries）全量留；thread.<角色> 只留最近 N 条（设置 cacheMaxItems，默认 50）；
+   *       draft.<角色> 按键合并写（500ms），不再一个字母一次 setItem。 */
+  const threadMax = () => {
+    try { const v = parseInt(HP.App.pref('cacheMaxItems', 50), 10); return (v > 0 ? v : 50); } catch (e) { return 50; }
+  };
+  const CACHE_OPT = {
+    roles: { throttle: 1000, maxBytes: 64 * 1024 },
+    asks: { throttle: 1000, maxBytes: 32 * 1024 },
+    sessions: { throttle: 1000, maxBytes: 64 * 1024 },
+    deliveries: { throttle: 1000, maxItems: 20, maxBytes: 64 * 1024 },
+    draft: { throttle: 500 },
+    thread: {
+      throttle: 1000, maxBytes: 96 * 1024,
+      trim: (v) => (v && Array.isArray(v.items) ? Object.assign({}, v, { items: v.items.slice(-threadMax()) }) : v)
+    }
+  };
+  const cacheOpt = (k) => Object.assign({}, CACHE_OPT[String(k).split('.')[0]] || { throttle: 1000 });
   const CACHE = {
-    get(k, d) { try { const v = localStorage.getItem('HP_TALK_CACHE.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem('HP_TALK_CACHE.' + k, JSON.stringify(v)); } catch (e) { } }
+    get(k, d) { return HP.Cache.get(k, d); },
+    set(k, v) { return HP.Cache.set(k, v, cacheOpt(k)); }
   };
   const rpcCache = async (op, args, key) => {
     try {
@@ -124,6 +142,8 @@
     chOpen: false,                 /* 「频道」折叠状态 */
     cache: {},                     /* role -> 上次读到的会话输出（切回来秒显，充当"多窗口"） */
     asks: [],
+    sends: [],                     /* R-31：最近几条发送的状态（发送中 / 已送达◯◯ms / 没送达:原因） */
+    sendSeq: 0,
 
     onShow(tab) { this.tab = tab || 'talk'; this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
     onHide() { this.stopPoll(); },
@@ -202,7 +222,7 @@
       const el = document.getElementById(group ? 'tab-group' : 'tab-talk');
       if (!el) return;
       el.textContent = '';
-      if (group) { this.paintGroup(el); return; }
+      if (group) { this.paintGroup(el); this.paintSends(el); return; }
       try {
         await this.refreshRoles();
         await this.refreshAsks();
@@ -210,6 +230,7 @@
       } catch (e) { HP.App.toast('连不上频道：' + e.message); }
       try { (this.view === 'role' && this.sel) ? this.paintRole(el) : this.paintChannel(el); }
       catch (e) { el.textContent = '频道画不出来：' + e.message; }
+      this.paintSends(el);
     },
 
     /* ---------------- 频道页 ---------------- */
@@ -373,6 +394,10 @@
       stream.style.flexDirection = 'column';
       stream.style.maxHeight = '54vh';
       stream.style.overflowY = 'auto';
+      /* 我们自己按「被删节点高度」补偿 scrollTop（见 paintStream 的裁旧），
+       * 所以关掉浏览器的滚动锚定（overflow-anchor）：不然两个机制叠加，
+       * 同样的代码在桌面 Chromium 与 Android WebView 上会跑出不同的可见位置。 */
+      stream.style.overflowAnchor = 'none';
       el.appendChild(stream);
       this.paintStream();
 
@@ -507,13 +532,106 @@
     title(t) { const d = document.createElement('div'); d.className = 'tk-title'; d.textContent = t; return d; },
     hint(t) { const d = document.createElement('div'); d.className = 'tk-hint'; d.textContent = t; return d; },
 
+    /* ---- 钉底（R-29）：群聊/单聊共用一个入口 ------------------------------
+     * 群聊原先是漏的：paintStream 与 paintGroup 都不设 scrollTop，也没有「在不在底部」的状态。
+     * 现在状态挂在容器上：box._pinned = 用户此刻在不在底部（一条 scroll 监听维护）。
+     * 规矩：只有「本来就在底部」或 force（切栏目/首次渲染）才往下钉；
+     * 用户手动上翻后**不抢回**，改用「⇣ 回到底部（新 N 条）」给一条路回去。
+     */
+    NEAR_BOTTOM: 24,
+    isNearBottom(box) {
+      if (!box) return true;
+      return (box.scrollHeight - box.clientHeight - box.scrollTop) <= this.NEAR_BOTTOM;
+    },
+    /* 「用户刚才在不在底部」要用**上一次渲染结束时的高度**算（box._lastHeight）：
+     * 只靠 scroll 监听会漏 —— 有人用代码改 scrollTop（或事件还没派发）时，缓存的状态是旧的，
+     * 下一次重画就会把用户抢回底部。用旧高度量差距，即时改也不抢回。 */
+    wasAtBottom(box) {
+      if (!box) return true;
+      if (box._lastHeight === undefined) return true;                     /* 首次渲染：就当在底部 */
+      return (box._lastHeight - box.clientHeight - box.scrollTop) <= this.NEAR_BOTTOM;
+    },
+    bindScroll(box) {
+      if (!box || box._pinBound) return;
+      box._pinBound = true;
+      this._scrollBound = true;                 /* 有人（探针/自检）拿这个看「挂了滚动监听没有」 */
+      box.addEventListener('scroll', () => {
+        const near = this.isNearBottom(box);
+        box._pinned = near;
+        if (near) box._newCount = 0;
+        this.paintBackChip(box);
+      });
+    },
+    backChip(box) {
+      if (box._chip && box._chip.isConnected) return box._chip;
+      const b = document.createElement('button');
+      b.className = 'tk-chip tk-backchip';
+      b.id = 'tk-backchip-' + (box.id || 'x');
+      b.setAttribute('data-testid', 'talk-backchip');
+      b.style.display = 'none';
+      b.style.alignSelf = 'center';
+      b.addEventListener('click', () => {
+        box.scrollTop = box.scrollHeight;
+        box._pinned = true;
+        box._newCount = 0;
+        this.paintBackChip(box);
+      });
+      if (box.parentNode) box.parentNode.insertBefore(b, box.nextSibling);
+      box._chip = b;
+      return b;
+    },
+    paintBackChip(box) {
+      if (!box) return;
+      const b = this.backChip(box);
+      const n = box._newCount || 0;
+      if (box._pinned) {
+        b.style.display = 'none';
+        b.textContent = '';
+        b.setAttribute('data-count', '0');
+        return;
+      }
+      b.style.display = '';
+      b.textContent = n > 0 ? ('⇣ 回到底部（新 ' + n + ' 条）') : '⇣ 回到底部';
+      b.setAttribute('data-count', String(n));
+    },
+    pinBottom(box, opts) {
+      if (!box) return;
+      const o = opts || {};
+      this.bindScroll(box);
+      if (o.force || this.wasAtBottom(box)) {
+        box.scrollTop = box.scrollHeight;
+        box._pinned = true;
+        box._newCount = 0;
+      } else if (o.added) {
+        box._newCount = (box._newCount || 0) + o.added;
+      }
+      box._lastHeight = box.scrollHeight;      /* 记下这次渲染完的高度，下次拿它判「刚才在不在底部」 */
+      this.paintBackChip(box);
+    },
+
+    /* 群聊流：**只追加不整块重建**（上翻时 DOM 不重排、位置天然稳；长列表也不卡） */
     paintStream() {
       const s = document.getElementById('tk-stream');
       if (!s) return;
-      s.textContent = '';
+      this.bindScroll(s);
+      /* 「用户此刻在不在底部」必须**在动 DOM 之前**取好（R29-4 的红就在这里）：
+       * 收满 80 之后，append 会把高度抬上去、裁旧又把它拉回来并把 scrollTop 夹小，
+       * 拿变动后的 scrollHeight/scrollTop 去判底必然误判（实测差 97px > 24 → 判成「不在底部」）。 */
+      const wasAtBottom = s._pinned === undefined ? true : s._pinned;
       const rows = this.msgs.filter((m) => this.withPrivate || m.kind !== 'private').slice(-80);
-      if (!rows.length) { s.textContent = '（还没有消息）'; return; }
+      /* 过滤器变了 → 整块重建（否则只追加新行） */
+      const sig = 'w' + (this.withPrivate ? 1 : 0);
+      if (s._sig !== sig) { s.textContent = ''; s._ids = new Set(); s._sig = sig; s._lastHeight = undefined; }
+      if (!s._ids) s._ids = new Set();
+      if (!rows.length) {
+        if (!s.textContent) s.textContent = '（还没有消息）';
+        this.pinBottom(s, { force: true });
+        return;
+      }
+      if (s.children.length === 1 && s.children[0].nodeType === 3) s.textContent = '';   /* 清掉空态那句 */
+      let added = 0;
       rows.forEach((m) => {
+        if (s._ids.has(m.id)) return;
         const me = m.from === 'owner.me';
         const arrow = m.kind === 'private' ? (' → ' + (m.to || '?')) : (m.kind === 'broadcast' ? ' → 全体' : '');
         const head = (KIND[m.kind] || '') + ' ' + m.from + arrow + (m.topic ? ('　' + m.topic) : '');
@@ -525,8 +643,27 @@
           d.setAttribute('data-from', m.from);
           d.addEventListener('click', () => this.openRoleSheet(m.from));
         }
+        d.setAttribute('data-tk-id', String(m.id));
         s.appendChild(d);
+        s._ids.add(m.id);
+        added++;
       });
+      /* 上限裁旧：超过 80 条从头顶去掉；**只有用户上翻时**才补偿 scrollTop（在底部的人最后会被强制钉底）。
+       * 补偿量按 scrollHeight 的真实缩减算 —— 不用 offsetHeight：它不含 margin，
+       * 一条气泡会少算 8px（实测 3 条差 24px，上翻的锚点就会漂）。 */
+      const baseTop = s.scrollTop;
+      const baseH = s.scrollHeight;
+      while (s.children.length > 80) {
+        const first = s.children[0];
+        const id = Number(first.getAttribute('data-tk-id'));
+        if (!isNaN(id)) s._ids.delete(id);
+        s.removeChild(first);
+      }
+      if (s.scrollHeight !== baseH && !wasAtBottom) {
+        s.scrollTop = Math.max(0, baseTop - (baseH - s.scrollHeight));
+      }
+      /* 收尾判底用**进门时**的状态（不是被裁旧夹过的 scrollTop）：在底部就继续跟着，上翻就只计数 */
+      this.pinBottom(s, { added: added, force: wasAtBottom });
     },
 
     /* 会话列表：分成 在线 / 没在线 / 历史 三组（点一下弹选择窗，不直接切） */
@@ -773,6 +910,7 @@
         box.style.flexDirection = 'column';
         box.style.maxHeight = '48vh';
         box.style.overflowY = 'auto';
+        box.style.overflowAnchor = 'none';   /* 同 #tk-stream：位置只由我们自己的钉底/还原决定 */
         el.appendChild(box);
         this.paintChat(r);
       } else {
@@ -861,6 +999,9 @@
     async paintChat(r) {
       const box = document.getElementById('tk-chat');
       if (!box) return;
+      this.bindScroll(box);
+      const wasNear = box._pinned === undefined ? true : this.isNearBottom(box);
+      const prevTop = box.scrollTop;
       box.textContent = '';
       let items = [];
       try {
@@ -868,7 +1009,7 @@
         items = (th && th.items) || [];
       } catch (e) { /* 拉不到记录也要能看他的话 */ }
       const live = ((this.live || {})[r.full_name] || []);
-      if (!items.length && !live.length) { box.textContent = '（还没聊过）'; return; }
+      if (!items.length && !live.length) { box.textContent = '（还没聊过）'; this.pinBottom(box, { force: true }); return; }
       items.forEach((m) => {
         const me = m.who === 'me';
         const head = me ? ('我 → ' + (r.title || r.full_name)) : ((r.title || r.full_name) + ' → 我');
@@ -881,8 +1022,89 @@
         bu.className = 'tk-bub him';
         box.appendChild(bu);
       });
-      box.scrollTop = box.scrollHeight;
+      if (wasNear) this.pinBottom(box, { force: true });
+      else { box.scrollTop = prevTop; box._pinned = false; box._lastHeight = box.scrollHeight; this.paintBackChip(box); }
       this.pullRoleOutput(r);
+    },
+
+    /* ---- 发送状态（R-31）：每条消息给状态，不再只闪一行 toast -------------------
+     * 三态：发送中 → 已送达 ◯◯ms / 没送达：原因。
+     * 桥不回执：3s 转「还在发…」（带重试），8s 转「没送达：超时」；回执后到也照样覆盖终态。
+     * 耗时优先用**回执里的 ms**（就是平台 delivery 台账那个数）；回执没给才退回界面往返毫秒，那种情况前面加 ≈。
+     * 省电/省流量：设置 sendTiming 关掉后只留终态 —— 不显示毫秒、也不做每秒刷新。
+     */
+    timing() {
+      try { return HP.App.bool('sendTiming', true); } catch (e) { return true; }
+    },
+    secs(t0) { return ((performance.now() - (t0 || 0)) / 1000).toFixed(1); },
+    sendWho(s) {
+      const name = s.target === '全体' ? '全体' : ((this.roles.find((x) => x.full_name === s.target) || {}).title || s.target);
+      return '我 → ' + name;
+    },
+    sendStateText(s) {
+      const who = this.sendWho(s) + (s.kind === 'broadcast' ? '（广播）' : '');
+      if (s.state === 'sending') return who + ' · 发送中…' + (this.timing() ? ' ' + this.secs(s.t0) + 's' : '');
+      if (s.state === 'waiting') return who + ' · 还在发…' + (this.timing() ? ' ' + this.secs(s.t0) + 's' : '');
+      if (s.state === 'sent' || s.state === 'partial') {
+        const head = s.parts && s.parts.length
+          ? (s.parts.filter((p) => p.ok).length + '/' + s.parts.length + ' 已送达')
+          : '已送达';
+        const ms = (this.timing() && s.ms != null) ? (' ' + (s.msApprox ? '≈' : '') + Math.round(s.ms) + 'ms') : '';
+        return who + ' · ' + head + ms;
+      }
+      return who + ' · 没送达：' + (s.note || '原因不明');
+    },
+    fillSends(box) {
+      if (!box) return;
+      box.textContent = '';
+      this.sends.slice(-4).forEach((s) => {
+        const row = document.createElement('div');
+        const cls = (s.state === 'sent') ? 'ok' : ((s.state === 'sending' || s.state === 'waiting') ? 'wait' : 'bad');
+        row.className = 'tk-sendrow ' + cls;
+        row.setAttribute('data-testid', 'talk-sendrow');
+        row.setAttribute('data-state', s.state);
+        const line = document.createElement('div');
+        line.className = 'tk-sendtext';
+        line.textContent = this.sendStateText(s);
+        row.appendChild(line);
+        (s.parts || []).forEach((p) => {
+          const d = document.createElement('div');
+          d.className = 'tk-sendsub';
+          d.textContent = '· ' + p.role + (p.ok ? ' ✓' : ' ✗') +
+            ((this.timing() && p.ok && p.ms != null) ? ' ' + Math.round(p.ms) + 'ms' : '') +
+            (p.ok ? '' : ' ' + (p.note || '没投成'));
+          row.appendChild(d);
+        });
+        if (s.state === 'waiting' || s.state === 'timeout' || s.state === 'failed' || s.state === 'partial') {
+          const rt = document.createElement('button');
+          rt.className = 'tk-chip';
+          rt.setAttribute('data-testid', 'talk-retry');
+          rt.textContent = '重试';
+          rt.addEventListener('click', () => { this.send(s.target, s.kind, s.body, { force: true }); });
+          row.appendChild(rt);
+        }
+        box.appendChild(row);
+      });
+    },
+    paintSends(el) {
+      if (!el || !this.sends.length) return;
+      const box = document.createElement('div');
+      box.className = 'tk-sends';
+      box.id = 'tk-sends';
+      el.appendChild(box);
+      this.fillSends(box);
+    },
+    repaintSends() {
+      const box = document.getElementById('tk-sends');
+      if (box) this.fillSends(box);
+    },
+    startSendTicker() {
+      if (this._sendTick) return;
+      this._sendTick = setInterval(() => {
+        const busy = this.sends.some((s) => s.state === 'sending' || s.state === 'waiting');
+        if (!busy) { clearInterval(this._sendTick); this._sendTick = null; return; }
+        if (this.timing()) this.repaintSends();
+      }, 500);
     },
 
     /* 输入：只让他敲"要说的话"，别的都不用选 */
@@ -892,17 +1114,63 @@
       if (text == null || !text.trim()) return;
       this.send(target, kind, text.trim());
     },
-    async send(target, kind, body) {
-      if (this.busy) return;
+    async send(target, kind, body, opts) {
+      const o = opts || {};
+      /* 防连点：只在「上一条还没落定」（发送中/还在发）时挡；已经出终态的（含 8s 超时）不该继续挡 ——
+       * 否则一次卡住会把后面 20s 的发送全吞掉。*/
+      const pending = this.sends.some((x) => x.state === 'sending' || x.state === 'waiting');
+      if (pending && !o.force) return;
       this.busy = true;
+      const s = {
+        n: ++this.sendSeq, target: target, kind: kind || 'private', body: body,
+        t0: performance.now(), state: 'sending', ms: null, msApprox: false, note: '', parts: null
+      };
+      this.sends.push(s);
+      if (this.sends.length > 4) this.sends.shift();
+      this.repaintSends();
+      this.startSendTicker();
+      const t3 = setTimeout(() => { s.state = 'waiting'; this.repaintSends(); }, 3000);
+      const t8 = setTimeout(() => { s.state = 'timeout'; s.note = '超时（8 秒没回执）'; this.repaintSends(); }, 8000);
       try {
-        if (kind === 'broadcast') await rpc('talk.shout', { body: body, by: this.asWho || 'me' });
-        else await rpc('talk.say', { role: target, body: body, kind: kind || 'private', by: this.asWho || 'me' });
-        HP.App.toast('已发出');
-        await this.tick().catch(() => { });
-        this.render();
-      } catch (e) { HP.App.toast('发不出去：' + e.message, 5000); }
-      finally { this.busy = false; }
+        const r = (kind === 'broadcast')
+          ? await rpc('talk.shout', { body: body, by: this.asWho || 'me' })
+          : await rpc('talk.say', { role: target, body: body, kind: kind || 'private', by: this.asWho || 'me' });
+        clearTimeout(t3); clearTimeout(t8);
+        const raw = (r && r.raw) || {};
+        const results = (raw && raw.results) || (r && r.results);
+        const bridged = (r && r.delivered !== undefined) ? r.delivered
+          : (raw.delivered !== undefined ? raw.delivered : null);
+        if (results && results.length) {
+          /* 广播：逐个角色各自的结果（判据⑥） */
+          s.parts = results.map((x) => ({
+            role: x.role, ok: !!x.delivered, ms: (x.ms != null ? x.ms : null), note: x.error || x.note || ''
+          }));
+          const okN = s.parts.filter((p) => p.ok).length;
+          const msList = s.parts.filter((p) => p.ms != null).map((p) => p.ms);
+          s.ms = msList.length ? Math.max.apply(null, msList) : null;
+          s.msApprox = false;
+          s.state = (okN === s.parts.length) ? 'sent' : (okN ? 'partial' : 'failed');
+          if (okN !== s.parts.length) {
+            s.note = s.parts.filter((p) => !p.ok).map((p) => p.role + '：' + (p.note || '没投成')).join('；');
+          }
+        } else {
+          const ok = (bridged === null) ? true : !!bridged;
+          const ms = (r && r.ms != null) ? r.ms : (raw.ms != null ? raw.ms : null);
+          s.ms = (ms != null) ? ms : Math.round(performance.now() - s.t0);
+          s.msApprox = (ms == null);                       /* 回执没给耗时：退回界面往返毫秒，前面加 ≈ */
+          s.state = ok ? 'sent' : 'failed';
+          if (!ok) s.note = raw.error || (r && r.error) || '桥说这条没投成';
+        }
+      } catch (e) {
+        clearTimeout(t3); clearTimeout(t8);
+        s.state = 'failed';
+        s.note = String((e && e.message) || e);
+      } finally {
+        this.busy = false;
+        this.repaintSends();
+      }
+      try { await this.tick(); } catch (e) { /* 拉不到新消息不影响刚才那条的状态 */ }
+      this.render();
     },
     async newSolo() {
       try {
