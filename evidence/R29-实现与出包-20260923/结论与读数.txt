@@ -1,0 +1,41 @@
+R-29「群聊不自动到最下面」—— 实现与出包 结论与读数
+角色 pipeline.renderer · 2026-09-23 · 构件 hermes-pocket-R29-群聊钉底-20260923.apk
+
+== 改了什么（只动界面层，未改功能逻辑；一行未动原生/后端）==
+source/hermes-pocket/app/src/main/assets/ui/talk.js
+  · 516-586  新增钉底统一入口：NEAR_BOTTOM=24 / isNearBottom / wasAtBottom / bindScroll（一条 scroll 监听）
+             / backChip + paintBackChip（「⇣ 回到底部（新 N 条）」）/ pinBottom（force | 本来在底部才钉）
+  · 588-632  paintStream 改成**只追加不整块重建**：按 m.id 去重追加（data-tk-id），超过 80 条从头顶裁旧，
+             上翻时按被删高度补偿 scrollTop；过滤器变化才整块重建
+  · 989-990  paintChat（单聊）改走同一入口：原先写死 box.scrollTop = box.scrollHeight（旧 884 行），
+             现在「本来在底部才钉」，上翻后恢复原位并给回程入口
+source/hermes-pocket/app/src/main/assets/ui/talk.css
+  · 5       .tk-backchip 样式（居中胶囊）
+tools/ui-harness/t-r29-pinbottom.mjs（新增验收探针，跑真渲染代码读真 DOM）
+
+关键设计：判「用户刚才在不在底部」用**上一次渲染结束时的高度** box._lastHeight 量差距，
+不只看 scroll 监听的缓存 —— 本地探针 ③（改 scrollTop 后立刻重画）第一版会被抢回，用旧高度量之后不抢回。
+
+== 判据对照（本地测试台读数，原始 JSON 见同目录两个文件）==
+① 切到群聊栏目：离底部 0px（改前 3386px）· 最后一条在可视区 ✓
+② 新消息到达后：离底部 0px（改前 3462px）· 老节点还在=true（只追加，没整块重建）✓
+③ 手动上翻后再来 1 条：位置 1731 → 1731（改动 false）· 入口「⇣ 回到底部（新 1 条）」显示 ✓
+④ 点该入口：离底部 0px · 入口隐藏 · 计数 0 ✓
+⑤ 单聊：初次渲染在底部 ✓ · 上翻后不被抢回（改动 false）· 回程入口出现 ✓
+⑥ 消息不足一屏（3 条）：不可滚动、scrollTop 0、无报错 ✓
+⑦ 上限裁旧：120 条只留 80 条，仍在底部 ✓
+⑧ 频道页（talk 栏目，无 #tk-stream）：正常渲染 ✓ ⑨ 全程 pageerror/console.error = 0 条 ✓
+（作者定位探针 d-r29-scroll.mjs 复跑：进群聊 0px、新消息 0px、上翻“位置被改动”false、有滚动监听 true）
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R29-群聊钉底-20260923.apk（5062540 字节，08:14 出包）
+整包 sha256：0f02746ce5c592cc5f36234457f9ff5bc0d578f5b6b3aa34df6a68fedda0058e
+包内 assets/build-info.json：testVersion=unified-20260923-081430 · builtAt=2026-09-23 08:14 CST · featureId=R-29
+包内 assets/ui/talk.js sha256：03200fe9bf61ec07d7cb57cddf045564fa407c6a1b181559317ac72611638499（与源树逐字节相同）
+包内 assets/ui/app.js 的 HP.BUILD = "unified-20260923-081430"（与 JSON 版本串一致）
+复核：python3 source/hermes-pocket/tools/stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账
+
+== 本轮没验的（未验 ≠ 通过）==
+· 设备上的**真触摸**上滑/点入口：本地测试台没有触摸输入，「上翻」是设 scrollTop + 派发 scroll 事件替代的
+  （真代码就是靠这个 scroll 监听），真触摸读数由 tester 在第 3 步做；
+· 不接主机口径未变（不动 NAS 的 authorized_keys），所以那 5 条联网项与本轮无关。

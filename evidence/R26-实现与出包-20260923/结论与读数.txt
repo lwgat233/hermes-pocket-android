@@ -1,0 +1,51 @@
+R-26「自动本地存储优化」—— 实现与出包 结论与读数
+角色 pipeline.renderer · 2026-09-23 · 构件 hermes-pocket-R26-本地存储-20260923.apk
+
+== 改了什么（界面层；原生侧未碰）==
+新增 source/hermes-pocket/app/src/main/assets/ui/cache.js —— `HP.Cache`：本地落盘的**唯一入口**
+  · set(k, v, {throttle, maxItems, maxBytes, trim})：节流合并写 + 条数/字节上限（超了丢最旧）+ 满配额护栏
+  · report()：每个键的字节/条数/最后用过 + 合计 + 降级标记（读数，不估算）
+  · cleanup({days, budgetBytes})：删掉 N 天没用过的 + 超预算按「最老先走」清
+  · del / clearAll / flush / setPrefFallback / getPrefFallback
+  · 全程**没有定时器**：读数与清理只在被调用时算一次（省电档不吃亏）
+talk.js（本次改的部分 = 缓存入口；另有别人在改的 18 行见下）
+  · 102-121  CACHE 改成走 HP.Cache，并给每个键定策略：roles/asks/sessions/deliveries 全量留（64/32/64KB 上限、1s 节流）；
+             draft.<角色> 500ms 合并；thread.<角色> 只留最近 cacheMaxItems 条（默认 50）+ 96KB 上限
+index.html  · 引入 cache.js（放在 talk.js 之前）
+app.js      · 166 行：设置兜底写改走 HP.Cache.setPrefFallback（配额满不再把异常冒给 setPref 调用方）；178 行读取同源
+panels.js   · 设置项 `cacheMaxItems`（默认 50，hint 写清代价）、`storageReport`（默认关＝只算合计）；
+             回滚缓冲 hint 补上「约 0.75KB/行：5000 行≈3.6MB、100000 行≈72MB（外推）」；
+             新增「本地占用」卡：合计 + 「看明细」+「清理」两个键；原生侧读数按实情写「暂不可用（等原生加只读口 app.storage）」
+tools/ui-harness/t-r26-storage.mjs（新增验收探针：真页面 / 真写入路径 / 平台真回包当夹具）
+
+== 8 条判据（本地测试台读数，原始 JSON 见同目录 t-r26-storage-原始输出.json）==
+① 能读回占用：写一次 roles 后再进设置页 → 那行显示「1 个键 · 2.1KB」（真读数）✓；原生侧如实写暂不可用 ✓
+② 容量上限：thread 回包撑到 200 条 → 落盘只留 50 条（= cacheMaxItems）、55264B；再重画 3 次仍 50 条、字节不涨 ✓
+③ 落盘节流：连续 10 次重画 → 真落盘 **0 次**（合并计数 17），收尾 flush 后 1 次；输入框敲 6 下草稿 → 真落盘 0 次 ✓
+④ 自动清理：造 2 个「30 天没用过」的键 → 清掉 2 个、释放 962B，读数 56414B → 55452B（跟着降）✓
+⑤ 满了不静默：写时**没抛**异常、给一次可读提示「本地存储满了：不再往手机存缓存（界面照常用）」、
+   降级标记 true、降级后不再撞墙（返回 false）、设置兜底写也没抛（{ok:false, degraded:true}）、报告里标降级 ✓
+⑥ 省电不冲突：Cache 里没有定时器字段；静置 1.2s 后挂着的节流定时器 0 个；静置期间自发落盘 0 次 ✓
+⑦ 不回归：设置读写仍生效（scrollback 写 1000 读回 1000）、群聊容器在 ✓
+⑧ 报错：pageerror / console.error 全程 0 条 ✓
+另：R-29 钉底回归（含别人那 18 行改动）离底 0px、上翻不被抢回、裁到 80 条仍钉底、报错 0 —— t-r29-回归-原始输出.json
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R26-本地存储-20260923.apk（5062672 字节，08:25 出包）
+整包 sha256：407a23270b93bafc087412990bb04bac5ffda8dee8fe97fac0588cb2570d231e
+包内 assets/build-info.json：testVersion=unified-20260923-082501 · builtAt=2026-09-23 08:25 CST · featureId=R-26
+包内 assets/ui/talk.js sha256：d9a7c8ff6c7bb5160ee598859310743ed65c43c5ab8428d836d8e5200cd90333（与当前源树逐字节相同）
+包内 assets/ui/cache.js sha256：182045b4fc4a4ea4b531e6581f32785476ccdb276292e5266a0a200c01173241（与当前源树相同）
+复核：python3 source/hermes-pocket/tools/stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账
+
+== 并行期说明（口径见经理 #1006）==
+· 本次是我改的：cache.js（新）、talk.js 的缓存入口那一段、index.html、app.js 兜底、panels.js（设置项 + 占用卡）。
+· 不是我的出手：talk.js 里 R-29 裁旧补偿那 18 行（08:24:15 被别人改：offsetHeight → 按 scrollHeight 真实缩减，
+  注释写「实测 3 条差 24px」）。第一版包（08:23，talk.js 428b80e2…）没含它；按「以源树为准」重出后本包已含，
+  并复跑了 R-29 探针确认钉底行为没坏。
+· 整树 --verify 只有在树静的那一刻才可能全绿（本包 08:25 出的时候正好全绿）；并行期以「包内被改文件 sha == 源树该文件 sha」为准。
+
+== 没验的（未验 ≠ 通过）==
+· 真机配额与 spill 实况：桌面 Chromium 实测配额 ≈5.23M 字符、真机由 tester 量；本轮不接主机。
+· 原生侧占用（filesDir 里 hosts/keys/prefs 与 spill 清单）：只读 op `app.storage` 还没有 → 界面如实写「暂不可用」，
+  没有编数字；加了那个口，这张卡自动就有读数。

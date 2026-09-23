@@ -1,0 +1,60 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-触发边界与单聊-A5": {
+    "check": {
+      "A_under80_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 10,
+        "chipDisplay": "none"
+      },
+      "A_under80_append": {
+        "gap": 0,
+        "pinned": true,
+        "newCount": 0,
+        "children": 11,
+        "chipDisplay": "none",
+        "chipText": ""
+      },
+      "B_at80_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none"
+      },
+      "B_at80_append": {
+        "gap": 101,
+        "pinned": false,
+        "newCount": 1,
+        "children": 80,
+        "chipDisplay": "block",
+        "chipText": "⇣ 回到底部（新 1 条）"
+      },
+      "C_openRole": {
+        "exists": true,
+        "children": 0,
+        "gap": 0,
+        "pinned": true,
+        "scrollable": false
+      },
+      "C_anchor": {
+        "found": false,
+        "scrollTop": 0,
+        "gap": 0
+      },
+      "C_afterNew": {
+        "found": false,
+        "error": "Cannot read properties of undefined (reading 'push')"
+      },
+      "verdict": {
+        "未满80追加后钉底(不裁旧)": true,
+        "满80追加后掉底(裁旧)": true,
+        "单聊首屏钉底": true,
+        "单聊上翻后不被抢回(±2px)": false
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:135:77"
+  ]
+}

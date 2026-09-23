@@ -1,0 +1,12 @@
+  Next max deadline: 2026-09-23-03-00-00
+    Package changes:
+      Update dev.hermes.pocket vers=1
+      Update dev.hermes.pocket vers=1
+
+Statistics since last charge:
+--
+    Wake lock Icing realtime
+    Wake lock WindowManager/displayId:0 realtime
+    Apk dev.hermes.pocket:
+      Service org.chromium.content.app.SandboxedProcessService0:0:
+        Created for: 0ms uptime

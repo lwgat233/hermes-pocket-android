@@ -147,15 +147,50 @@
 
     onShow(tab) { this.tab = tab || 'talk'; this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
     onHide() { this.stopPoll(); },
+    /* 轮询周期：前台一律 2.5s（实时）；省电档按设置（R-25，与「聊天要实时」的冲突交本人定，这里只给档位）——
+     *   slow30（默认，作者推荐）：省电时降到 30s —— 牺牲：新消息最多晚 30s 才亮，亮屏立刻补一次
+     *   pause：省电时完全停轮询 —— 牺牲：后台期间完全不刷（省得最干净）
+     *   realtime：省电时也 2.5s —— 牺牲：省电基本白省（30 分钟 ≈720 次 talk.since，每次还走 SSH 起 python） */
+    POLL_MS: 2500,
+    POLL_SAVE_MS: 30000,
+    pollDelay() {
+      if (!this._powerSave) return this.POLL_MS;
+      let mode = 'slow30';
+      try { mode = HP.App.pref('talkPollSave', 'slow30'); } catch (e) { /* 读不到设置就用推荐档 */ }
+      if (mode === 'realtime') return this.POLL_MS;
+      if (mode === 'pause') return 0;
+      return this.POLL_SAVE_MS;
+    },
     startPoll() {
       this.stopPoll();
       if (!this.live) return;
+      const ms = this.pollDelay();
+      this._pollOff = false;
+      if (!ms) { this._pollOff = true; return; }        /* pause 档：省电时不开表，回前台由 onPowerSave(false) 补一次 */
       this.timer = setInterval(() => {
+        if (this._powerSave) this._pollInSave = (this._pollInSave || 0) + 1;
         this.tick().catch(() => { });
         if (this.view === 'role' && this.style === 'chat' && this.sel) this.pullRoleOutput(this.sel);
-      }, 2500);
+      }, ms);
     },
     stopPoll() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
+    /* 省电进出（app.js 的 pauseWork/resumeWork 会调）：轮询按档位重排 + 把「只在看得见时才有意义」的表一起收掉 */
+    onPowerSave(on) {
+      this._powerSave = !!on;
+      if (on) {
+        this._pollInSave = 0;
+        this.stopSendTicker();                        /* R-31 的 500ms 发送状态表：省电期间不刷 */
+        try { HP.Cache.flush(); } catch (e) { /* 缓存节流表先落盘，别留着定时器空转 */ }
+        this.startPoll();                             /* 按档位重排（pause 档会直接关表） */
+      } else {
+        this.startPoll();                             /* 回前台：按档位开表 */
+        if (this.live) this.tick().catch(() => { });  /* 亮屏/回前台立刻补一次，不等下一个周期 */
+      }
+    },
+    pollStats() {
+      const ms = this.pollDelay();
+      return { 省电: !!this._powerSave, 间隔秒: ms ? Math.round(ms / 100) / 10 : 0, 省电期间轮询次数: this._pollInSave || 0 };
+    },
 
     async refreshRoles() {
       const r = await rpcCache('talk.roles', {}, 'roles');
@@ -1098,8 +1133,9 @@
       const box = document.getElementById('tk-sends');
       if (box) this.fillSends(box);
     },
+    stopSendTicker() { if (this._sendTick) { clearInterval(this._sendTick); this._sendTick = null; } },
     startSendTicker() {
-      if (this._sendTick) return;
+      if (this._sendTick || this._powerSave) return;    /* 省电期间不刷发送状态（R-25） */
       this._sendTick = setInterval(() => {
         const busy = this.sends.some((s) => s.state === 'sending' || s.state === 'waiting');
         if (!busy) { clearInterval(this._sendTick); this._sendTick = null; return; }

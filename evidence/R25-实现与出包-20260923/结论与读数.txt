@@ -1,0 +1,51 @@
+R-25 第 2 步「实现与出包」—— 省电模式：把聊天轮询纳入省电 结论与读数
+角色 pipeline.renderer · 2026-09-23 · 构件 hermes-pocket-R25-省电-20260923.apk
+
+== 本次我改了什么（3 个界面文件 + 1 个探针）==
+talk.js（1a0cdd942d88…）
+  · 148-190 新增轮询档位：POLL_MS=2500 / POLL_SAVE_MS=30000；pollDelay() 按设置 talkPollSave 取
+            （slow30 / pause=0 / realtime）；startPoll 按当前档位开表；pollStats() 给读数
+  · onPowerSave(on)：省电进 → 停 R-31 的 500ms 发送状态表 + HP.Cache.flush() 把缓存节流表落盘 + 轮询按档重排；
+            省电出 → 按档开表并**立刻 tick() 补一次**（不等下一个周期）
+  · startSendTicker 加省电守卫；新增 stopSendTicker()
+app.js（1c8382dd9179…）
+  · pauseWork() 末尾调 HP.Talk.onPowerSave(true)，resumeWork() 调 onPowerSave(false)（跟切后台/亮屏同一条路）
+  · renderPowerState() 多一行读数：#pw-poll 显示「聊天轮询：每 Ns · 本次省电期间已轮询 M 次」
+panels.js（35f628d12364…）
+  · 新增设置项 talkPollSave（三档 + hint 写清各自牺牲什么）；省电卡加一行 #pw-poll；powerSave 那条 hint 补「三档＝前台/熄屏/后台+熄屏」
+tools/ui-harness/t-r25-power.mjs（新增验收探针）
+说明：心跳（30s→120s，不关）、唤醒锁、spill 补渲染**按定位的建议保持不动** —— 实测本来是对的。
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r25-power-原始输出.json）==
+① 前台 6s：talk.since **2 次**（2.5s 实时档不变）✓
+② 省电档（slow30，默认）6s：talk.since **0 次**（改前 2 次）；tick/流量/ping 定时器全无、rAF 已取消、
+   发送状态表也停了；app.power 请求带 {save:true, keepalive:30, keepaliveSave:120}（心跳只拉长不关）✓
+③ 实时档 6s：talk.since **2 次**（省电时也 2.5s，代价在 hint 里写清：30 分钟 ≈720 次 SSH 调用）✓
+④ 最省档 6s：talk.since **0 次**、间隔 0（表都没开）✓
+⑤ 回前台：轮询立刻补一次（true）、间隔回 2.5s、tick/流量/rAF 都回来；
+   回前台那条 app.power 请求 {save:false, keepalive:30} ✓（心跳参数两半都抓到了）
+⑥ 设置页读数：「聊天轮询：每 2.5s · 本次省电期间已轮询 2 次」；档位选择器 3 个选项 ✓
+⑦ 不回归：R-29 钉底（离底 0/0px、上翻不被抢回、报错 0）、R-31 发送状态（已送达 1370ms、8s 转超时、报错 0）、
+   R-26 本地存储（200→50 条、10 次重画真落盘 0 次、满配额提示在、报错 0）✓
+⑧ 报错：pageerror / console.error 全程 **0** 条 ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R25-省电-20260923.apk（5062948 字节，08:32 出包）
+整包 sha256：decf88e9b890f6994dd74f1655c2dec8410af205f006086b0dd93cc509cced33
+包内 assets/build-info.json：testVersion=unified-20260923-083149 · builtAt=2026-09-23 08:31 CST · featureId=R-25
+本次改动文件的 sha256（包内 == 源树，逐字节）：
+  ui/talk.js   1a0cdd942d884a1b2487da60316a771ad26242506ccadb0b1e6cf5fa30d9a0c6
+  ui/app.js    1c8382dd9179bc8ce110cbb51626d18f14f31e6b4f51b46ccc0a0c604530ca94
+  ui/panels.js 35f628d12364a5466b75bf2aed4653483562245bc35f4a2750736318b259f238
+复核：stamp-build.py --verify <apk> → PASS（这一版整树也对得上）
+
+== 别人同期在改什么 ==
+· author：talk.js 的 R-29-4（9f5abf0，判底用裁旧前读数 + 按 scrollHeight 真实缩减补偿 + overflow-anchor）——
+  已在本包里，也是我这轮改 talk.js 时的基线；另有 R-27/R-28 两轮「只定位」的提交（docs/evidence，不动界面）。
+· 包里还带我之前两轮在树里未提交的 R-26/R-31 改动（cache.js 新文件、talk.js 缓存/发送状态、index.html、talk.css）。
+· 提交与否由经理/作者定，我没动 git。
+
+== 没验的（未验 ≠ 通过）==
+· 真机耗电（batterystats mAh）与「省电 30 分钟内 talk.py 被调用次数」：由 tester 在第 3 步量（本机不接主机）。
+· 唤醒锁那行（dumpsys power 查不到持有）也要真机。
+· 后台 WebView 是否被系统冻结因机型而异，本地台只能证明我们自己的定时器停了。

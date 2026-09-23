@@ -1,0 +1,120 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R25-复测-板块B-群聊轮询": {
+    "check": {
+      "open": {
+        "on": "tab-group",
+        "live": true,
+        "timerOn": true,
+        "delay": 2500
+      },
+      "foreground": {
+        "label": "前台实时(非省电)",
+        "sinceCalls": 2,
+        "stats": {
+          "省电": false,
+          "间隔秒": 2.5,
+          "省电期间轮询次数": 0
+        },
+        "prefNow": "slow30",
+        "powerSaveFlag": false,
+        "pollOff": false,
+        "timerOn": true
+      },
+      "saveSlow30": {
+        "label": "省电档slow30",
+        "sinceCalls": 0,
+        "stats": {
+          "省电": true,
+          "间隔秒": 30,
+          "省电期间轮询次数": 0
+        },
+        "prefNow": "slow30",
+        "powerSaveFlag": true,
+        "pollOff": false,
+        "timerOn": true
+      },
+      "backForeground": {
+        "sinceCallsWithin1_5s": 1,
+        "stats": {
+          "省电": false,
+          "间隔秒": 2.5,
+          "省电期间轮询次数": 0
+        },
+        "delay": 2500
+      },
+      "savePause": {
+        "label": "最省档pause",
+        "sinceCalls": 0,
+        "stats": {
+          "省电": true,
+          "间隔秒": 0,
+          "省电期间轮询次数": 0
+        },
+        "prefNow": "pause",
+        "powerSaveFlag": true,
+        "pollOff": true,
+        "timerOn": false
+      },
+      "pauseBack": {
+        "sinceCallsWithin1_5s": 1,
+        "stats": {
+          "省电": false,
+          "间隔秒": 2.5,
+          "省电期间轮询次数": 0
+        },
+        "delay": 2500
+      },
+      "saveRealtime": {
+        "label": "实时档realtime(省电中)",
+        "sinceCalls": 2,
+        "stats": {
+          "省电": true,
+          "间隔秒": 2.5,
+          "省电期间轮询次数": 2
+        },
+        "prefNow": "realtime",
+        "powerSaveFlag": true,
+        "pollOff": false,
+        "timerOn": true
+      },
+      "powerArgs": [
+        {
+          "save": false,
+          "keepalive": 30,
+          "at": 149231
+        },
+        {
+          "save": true,
+          "keepalive": 30,
+          "at": 150737
+        },
+        {
+          "save": false,
+          "keepalive": 30,
+          "at": 156748
+        },
+        {
+          "save": true,
+          "keepalive": 30,
+          "at": 158261
+        }
+      ],
+      "restore": {
+        "prefNow": "slow30",
+        "powerSave": false,
+        "delay": 2500
+      },
+      "verdict": {
+        "①省电档(30s)6s内0次": true,
+        "①前台6s内2~3次": true,
+        "②回前台立刻补一次": true,
+        "②最省档回前台也立刻补一次": true,
+        "①最省档6s内0次": true,
+        "①实时档省电中仍2~3次": true,
+        "③心跳省电120/回前台30": false,
+        "档位读数(间隔秒)": "30/2.5/0"
+      }
+    }
+  }
+}

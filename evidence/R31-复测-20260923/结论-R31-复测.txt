@@ -1,0 +1,33 @@
+# R-31 复测结论（pipeline.tester · 设备真计时 · 2026-09-23）
+
+对象：apk/测试版/hermes-pocket-R31-发送反馈-20260923.apk（5062554 字节）
+整包 sha256 = d84f26c93d0a8e67adac98d04e7756db701e3dbc4e6d9f18f54dadf18720ba32（与派活单一致）
+包内 build-info.json：testVersion=unified-20260923-081934 / builtAt=2026-09-23 08:19 CST / featureId=R-31
+包内 assets/ui/talk.js sha256 = d206683fa9a83238bfc6f241c6e95024789ce88afa07ce1a890c785608128c5f（与派活单一致）
+设备：emulator-5554 / Android 14 / AVD hpk34（容器 hp-emu）· adb install -r Success
+
+## 判据结果（8/8 通过，全部是设备上的真读数 + 真 setTimeout 时间点）
+
+① 正常回执 2s 内出终态 —— **通过**：发起后 **127ms** 行状态变 sent，文案「我 → pipeline.tester · 已送达 1411ms」
+② 桥回失败 5s 内报原因 —— **通过**：**105ms** 变 failed，文案「没送达：阶段没放行，不投递：pipeline.author（他名下全部阶段都还没放行）」，并出现「重试」键
+③ 无回执 3s 转「还在发」—— **通过**：**3025ms** 变 waiting，文案「… · 还在发… 3.0s」（带秒数跳动）
+④ 8s 超时 + 能重试 —— **通过**：**8079ms** 变 timeout，文案「没送达：超时（8 秒没回执）」，有「重试」键
+⑤ 迟到回执覆盖终态 —— **通过**：对已超时那条补回执 {delivered:true,ms:1500} 后 **106ms** 变成 sent，「已送达 1500ms」（覆盖了 timeout）
+⑥ 界面耗时 vs 平台台账 delivery.ms —— **通过**：桩把台账**真值** 1411ms（`talk.py deliveries` 最新一条 msg 985 → pipeline.author，ms=1411）当回执给回来，界面显示 **1411ms，差 0ms（≤100ms）**；对照组（回执不带 ms）显示「已送达 ≈1ms」= 界面往返值，说明界面不是抄台账、而是如实区分两种来源。
+⑦ 广播逐条状态 —— **通过**：state=partial，抬头「我 → 全体（广播） · 1/2 已送达 120ms」，两行明细：
+   「· pipeline.author ✓ 120ms」「· home.maid ✗ 已暂停（role），不投递」
+⑧ 省电档（sendTiming=false）只留终态 —— **通过**：`HP.App.setPref('sendTiming', false)` 后 `HP.Talk.timing()`=false，同一条发送只显示「已送达」（无 ms、无每秒刷新）；恢复 true 后再验一次仍正常
+
+全程 pageerror / console.error = **0 条**。
+
+## 测法边界（说清楚）
+- **只打桩传输层**（`HP.App.rpc`）：发送状态机、3s/8s 计时器、DOM 渲染、重试键全是产品自己的代码，在真设备上真跑；调的是 `HP.Talk.send()`（界面按钮点下去走的同一条路）。
+- ⑥ 的「app 自己从平台收到的 ms 与台账同源」这半条要接主机才能验 —— 本轮不接主机，**这半条未验**（桩用的是台账真值，验到的是"界面如实显示回执 ms 且与台账一致"）。
+- 不接主机照旧未验：点角色→信息窗 / 气泡 / 删会话 / 切会话 / 开左栏（未验 ≠ 通过）。
+
+## 附带读数（不在本轮判据里，如实记录）
+`stamp-build.py --verify` 对本包返回 **FAIL 包内↔源树 对账**：源树（08:21 改过）比包（08:19 出）新 ——
+talk.js / app.js / index.html / panels.js 四个文件哈希不同，且源树多了 assets/ui/cache.js（包内没有、包内 index.html 也未引用它）。
+包内 talk.js 的 sha256 与派活单给的完全一致，所以被测构件本身与派活单吻合；这条只是"源树比包新"，判断权归经理/渲染者。
+
+原始读数：设备读数-原始输出.txt（驱动 JSON 原样）· 驱动：tools/验收脚本/r31-reprobe-20260923.mjs

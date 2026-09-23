@@ -1,0 +1,151 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R25-复测-板块A-设置页省电": {
+    "check": {
+      "env": {
+        "cssW": 393,
+        "cssH": 778,
+        "dpr": 2.75
+      },
+      "block": {
+        "coords": {
+          "省电模式(select)": {
+            "label": "省电模式",
+            "px": {
+              "x": 25,
+              "y": 16,
+              "w": 344,
+              "h": 40
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 37
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": false,
+            "hitWhat": "HEADER.",
+            "coveredByChrome": true,
+            "clipped": false,
+            "text": "关（最稳、最费电）息屏时省电（推荐）后台 + 息屏省电"
+          },
+          "聊天轮询档位(select)": {
+            "label": "轮询档位",
+            "px": {
+              "x": 25,
+              "y": 140,
+              "w": 344,
+              "h": 40
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 160
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "SELECT.",
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "省电档：省电时降到 30s（推荐）最省：省电时完全停轮询实时档：省电时也保持 2.5s"
+          },
+          "省电读数行": {
+            "label": "读数行",
+            "px": {
+              "x": 25,
+              "y": 898,
+              "w": 344,
+              "h": 35
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 916
+            },
+            "inViewport": false,
+            "ge44": false,
+            "hitIsSelf": false,
+            "hitWhat": null,
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "当前：正常 · 模式=息屏时 · 唤醒锁=已释放 · 心跳=关 · 屏幕=亮 · App=前台"
+          },
+          "聊天轮询读数行": {
+            "label": "轮询读数行",
+            "px": {
+              "x": 25,
+              "y": 939,
+              "w": 344,
+              "h": 17
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 948
+            },
+            "inViewport": false,
+            "ge44": false,
+            "hitIsSelf": false,
+            "hitWhat": null,
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "聊天轮询：每 2.5s · 本次省电期间已轮询 0 次"
+          }
+        },
+        "selTap": {
+          "x": 197,
+          "y": 160,
+          "tag": "SELECT",
+          "hitSelf": true
+        },
+        "selects": 6,
+        "statusText": "省电 当前：正常 · 模式=息屏时 · 唤醒锁=已释放 · 心跳=关 · 屏幕=亮 · App=前台 聊天轮询：每 2.5s · 本次省电期间已轮询 0 次 省电 ≠ 断连。息屏/后台时只停掉\"自己花 CPU 的活\"：放",
+        "scrollTop": 2367
+      },
+      "modes": {
+        "rows": [
+          {
+            "mode": "slow30",
+            "prefNow": "slow30",
+            "delayMsInSave": 30000,
+            "stats": {
+              "省电": true,
+              "间隔秒": 30,
+              "省电期间轮询次数": 0
+            }
+          },
+          {
+            "mode": "pause",
+            "prefNow": "pause",
+            "delayMsInSave": 0,
+            "stats": {
+              "省电": true,
+              "间隔秒": 0,
+              "省电期间轮询次数": 0
+            }
+          },
+          {
+            "mode": "realtime",
+            "prefNow": "realtime",
+            "delayMsInSave": 2500,
+            "stats": {
+              "省电": true,
+              "间隔秒": 2.5,
+              "省电期间轮询次数": 0
+            }
+          }
+        ],
+        "restored": "slow30"
+      },
+      "storageRegression": {
+        "totalKB": 20.6,
+        "keys": 8,
+        "degraded": false
+      },
+      "verdict": {
+        "坐标:4项全命中且不遮挡": false,
+        "三档生效(省电时 30s/停/2.5s)": true,
+        "读数行可读": true,
+        "选择器命中自己(真触摸预备)": true
+      }
+    }
+  }
+}

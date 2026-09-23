@@ -2,6 +2,14 @@
 .tk-row { display: flex; gap: 8px; padding: 8px 2px; flex-wrap: wrap; }
 .tk-chip { background: #1b1f27; color: #cfd3dd; border: 1px solid #2a2f3a; border-radius: 999px; padding: 6px 12px; font-size: 13px; }
 .tk-chip.on { background: #2b6cff; color: #fff; border-color: #2b6cff; }
+.tk-backchip { align-self: center; display: block; margin: 6px auto 0; font-size: 12px; }
+.tk-sends { display: flex; flex-direction: column; gap: 4px; margin: 6px 0 2px; }
+.tk-sendrow { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; font-size: 12px;
+  padding: 6px 10px; border-radius: 10px; border: 1px solid #2a2f3a; background: #161a21; color: #cfd3dd; }
+.tk-sendrow.ok { border-color: #1f6f43; color: #b7f0cd; }
+.tk-sendrow.wait { border-color: #6f5b1f; color: #f0e0b7; }
+.tk-sendrow.bad { border-color: #6f2b2b; color: #f3c2c2; }
+.tk-sendsub { font-size: 11px; opacity: .85; }
 .tk-title { color: #8b93a5; font-size: 12px; margin: 12px 2px 6px; }
 .tk-hint { color: #5f6779; font-size: 13px; padding: 6px 2px; }
 .tk-scene { color: #5f6779; font-size: 12px; margin: 10px 2px 6px; }

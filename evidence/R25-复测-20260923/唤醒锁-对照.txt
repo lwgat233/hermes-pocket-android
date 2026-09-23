@@ -1,0 +1,4 @@
+省电档slow30 45s:
+  mWakefulness=Awake · mHoldingWakeLockSuspendBlocker=true · Wake Locks: size=2
+实时档realtime(省电中) 45s:
+  mWakefulness=Awake · mHoldingWakeLockSuspendBlocker=false · Wake Locks: size=0

@@ -253,7 +253,12 @@
         hint: '关（默认）：终端宽度不超过屏幕，不需要左右滑动。开：为了 TUI 框线不错位而凑够 80 列，字会更小且要左右滑动看全' },
       { k: 'fixedCols', label: '固定列数', type: 'sel', def: '100', opts: [['80', '80 列'], ['100', '100 列'], ['120', '120 列'], ['160', '160 列'], ['200', '200 列'], ['240', '240 列']] },
       { k: 'fixedRows', label: '固定行数（0 = 跟随屏幕高度）', type: 'num', min: 0, max: 200, def: 0, hint: '想随手改大小：长按终端 →「⇔ 窗口大小 / 字号」可以直接填任意列数/行数/字号' },
-      { k: 'scrollback', label: '回滚缓冲（行）', type: 'sel', def: '5000', opts: [['1000', '1000'], ['5000', '5000'], ['20000', '20000'], ['100000', '100000']] },
+      { k: 'scrollback', label: '回滚缓冲（行）', type: 'sel', def: '5000', opts: [['1000', '1000'], ['5000', '5000'], ['20000', '20000'], ['100000', '100000']],
+        hint: '吃内存的大头：实测约 0.75KB/行 —— 5000 行 ≈3.6MB，20000 行 ≈15MB，100000 行 ≈72MB（后两个是按行数外推）。老旧机型建议 1000~5000' },
+      { k: 'cacheMaxItems', label: '单聊记录缓存留多少条（本地落盘）', type: 'num', min: 10, max: 200, def: 50,
+        hint: '每个角色只留最近 N 条记录在手机上（切回来秒显用）。留得多＝回来看着更全，代价是每次落盘更大、占的本地空间更多；省电/省流量想更省就调到 10~20' },
+      { k: 'storageReport', label: '进设置页时顺带算「本地占用」明细', type: 'bool', def: false,
+        hint: '关（默认）：只显示一行合计数；开：进设置页时多算一遍各键字节（要多花一点 CPU，省电档建议关着，按「看明细」随时手动算）' },
       { k: 'touchMouse', label: '触摸转鼠标（TUI 里点按钮）', type: 'bool', def: true },
       { k: 'tapKeyboard', label: '点击终端弹出键盘', type: 'bool', def: false,
         hint: '默认关闭：手机上随手一点就被键盘盖住半屏。要打字请用功能键条的「⌨ 键盘」' },
@@ -262,6 +267,8 @@
       { k: 'showComposer', label: '显示输入框（手机打字更顺手）', type: 'bool', def: true },
       { k: 'liveComposer', label: '输入框实时上屏（关掉＝攒着点「发送」整行送）', type: 'bool', def: true },
       { k: 'showTraffic', label: '顶栏显示下行流量（点击看详情）', type: 'bool', def: true },
+      { k: 'sendTiming', label: '发送耗时读数（关掉＝省电/省流量，只留终态）', type: 'bool', def: true,
+        hint: '开着：频道里每条消息显示「已送达 ◯◯ms」并刷新「还在发…」；关掉：只留「已送达 / 没送达：原因」，不显示毫秒、也不做每秒刷新' },
       { k: 'eventChannel', label: '文件事件通道（另开一条 SSH 盯事件文件）', type: 'bool', def: true,
         hint: '服务端 home 下放一个只追加文件，我往里写一行，手机就弹系统通知' },
       { k: 'notifyAgent', label: '远端事件通知（文件通道，非授权类）', type: 'bool', def: true },
@@ -283,7 +290,15 @@
         hint: '开着链接最稳（能扛住整夜 Doze），代价是一直占着 CPU。省电模式会在息屏时**临时**放开它，亮屏立刻收回' },
       { k: 'powerSave', label: '省电模式', type: 'sel', def: 'screenOff',
         opts: [['off', '关（最稳、最费电）'], ['screenOff', '息屏时省电（推荐）'], ['background', '后台 + 息屏省电']],
-        hint: '省电 ≠ 断连：后台**不渲染**（输出先落盘缓存，回前台再补渲染）、放开 CPU 唤醒锁、拉长心跳（不关，关了连接可能被中间设备掐掉）、暂停每秒统计；TCP 连接一直保留' },
+        hint: '省电 ≠ 断连：后台**不渲染**（输出先落盘缓存，回前台再补渲染）、放开 CPU 唤醒锁、拉长心跳（不关，关了连接可能被中间设备掐掉）、暂停每秒统计；TCP 连接一直保留。三档＝前台/熄屏/后台+熄屏' },
+      { k: 'talkPollSave', label: '聊天实时性 vs 省电（省电时聊天轮询怎么走）', type: 'sel', def: 'slow30',
+        opts: [['slow30', '省电档：省电时降到 30s（推荐）'], ['pause', '最省：省电时完全停轮询'], ['realtime', '实时档：省电时也保持 2.5s']],
+        hint: '前台一律 2.5s 实时（现状不变）。<b>省电档</b>：后台/熄屏时降到 30s —— 代价＝新消息最多晚 30s 才亮（亮屏/回前台立刻补一次）；<b>最省</b>：后台完全不刷，省得最干净但期间一点新消息都看不到；<b>实时档</b>：省电时也 2.5s，代价＝省电基本白省（30 分钟约 720 次 SSH 调用，每次都起一次 python）' },
+      { k: 'netProbe', label: '定时自动探测网络（默认关）', type: 'bool', def: false,
+        hint: '开着才会按下面的间隔自动跑一次 ping（5 包）。代价：每次 ≈1.7s（一次 SSH 往返 0.37s + 远端命令 1.28s）＋远端 ICMP 5 个包；5 分钟一次 ≈288 次/天、30 分钟一次 ≈48 次/天。<b>省电档一律不跑</b>（进省电就停表，回前台按设置再开）' },
+      { k: 'netProbeInterval', label: '探测间隔', type: 'sel', def: '900',
+        opts: [['300', '5 分钟（≈288 次/天，最费）'], ['900', '15 分钟（≈96 次/天）'], ['1800', '30 分钟（≈48 次/天，推荐）'], ['3600', '1 小时（≈24 次/天，最省）']],
+        hint: '只在「定时自动探测」开着时生效；间隔越短越费电费流量，换来的只是历史更密' },
       { k: 'powerSaveDelay', label: '息屏后延迟多久进入省电', type: 'sel', def: '0',
         opts: [['0', '立即'], ['60', '1 分钟'], ['300', '5 分钟'], ['900', '15 分钟']] },
       { k: 'rerunStartCmd', label: '重连后自动回到原会话（重跑启动命令）', type: 'bool', def: true,
@@ -632,6 +647,7 @@
         <div class="card">
           <div class="sub" style="color:var(--fg)">省电</div>
           <div class="sub" style="margin-top:6px">当前：<b id="pw-state">…</b></div>
+          <div class="sub" style="margin-top:6px" id="pw-poll">…</div>
           <div class="hint">
             <b>省电 ≠ 断连</b>。息屏/后台时只停掉"自己花 CPU 的活"：放开 CPU 唤醒锁、
             静音 SSH 心跳、暂停终端渲染看门狗（每帧）与每秒统计；
@@ -660,6 +676,18 @@
           <div class="sub" style="margin-top:6px">事件通道：<b id="ev-state">未启动</b></div>
           <div class="hint">文件<b>只追加 + 限额</b>：用服务端的 <b>~/hpk-notify.sh</b> 写（协议见 <b>~/HERMES-POCKET-EVENTS.md</b>）。<br>
           一行一条，<code>kind: 标题 | 正文</code>，kind ∈ {auth, done, info}；<b>auth</b> 会当"需要授权"打扰你。</div>
+        </div>
+        <div class="card">
+          <div class="sub">本地占用：<b id="st-store">…</b></div>
+          <div class="sub" style="margin-top:6px" id="st-store-native"></div>
+          <div class="sub" style="margin-top:6px" id="st-store-detail"></div>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button class="btn" data-store="detail">看明细</button>
+            <button class="btn" data-store="clean">清理</button>
+          </div>
+          <div class="hint">数字是<b>真读数</b>（进这一页算一次，没有定时扫描）：合计按 UTF-16 折半算，桌面实测配额 ≈5.2M 字符。<br>
+          「清理」= 删掉 7 天没用过的缓存 + 把总量压到 2MB 以内（最老的先走）；清完上面那行会跟着降。<br>
+          原生侧（filesDir 里 hosts/keys/prefs 与 spill 落盘）要等原生加一个只读口才能列出来，现在只算界面这份。</div>
         </div>`;
 
       el.querySelectorAll('[data-pref]').forEach((c) => {
@@ -696,6 +724,37 @@
       }));
       this.refreshNotifyState();
       this.syncPrefInputs();      // 「生效中」那一行要有数（设置页刚重建过）
+      // 本地占用：进这一页算一次合计（storageReport 开着连明细一起）；按钮手动算一次/清理
+      const storeLine = el.querySelector('#st-store');
+      const storeDetail = el.querySelector('#st-store-detail');
+      const storeNative = el.querySelector('#st-store-native');
+      const kb = (b) => (b / 1024).toFixed(b > 10240 ? 0 : 1) + 'KB';
+      const paintStore = (detail) => {
+        const r = HP.Cache.report();
+        storeLine.textContent = r.count + ' 个键 · ' + kb(r.total) +
+          (r.degraded ? ' · 已降级（配额满，不再往下存）' : '');
+        storeDetail.textContent = detail
+          ? r.items.slice(0, 6).map((it) => it.k + ' ' + kb(it.bytes) + (it.items ? '（' + it.items + ' 条）' : '')).join('　·　') +
+            (r.items.length > 6 ? '　… 共 ' + r.items.length + ' 个键' : '')
+          : '';
+      };
+      paintStore(A().bool('storageReport', false));
+      el.querySelectorAll('[data-store]').forEach((b) => b.addEventListener('click', () => {
+        if (b.dataset.store === 'detail') paintStore(true);
+        else {
+          const c = HP.Cache.cleanup({ days: 7, budgetBytes: 2 * 1024 * 1024 });
+          paintStore(true);
+          A().toast('清掉 ' + c.removed + ' 个键，释放 ' + kb(c.freed));
+        }
+      }));
+      /* 原生侧（filesDir 里的文件 / spill 清单）：只读 op `app.storage` 还没有 → 如实写「暂不可用」，
+       * 不编数字。原生加了这个口，这里自动就有读数。 */
+      A().rpc('app.storage', {}).then((s) => {
+        const files = (s && s.files) || [];
+        if (!files.length) { storeNative.textContent = '原生侧：暂不可用（等原生加只读口 app.storage）'; return; }
+        storeNative.textContent = '原生侧：' + files.map((f) => f.name + ' ' + kb(f.bytes || 0)).join('　·　') +
+          ((s.spill || []).length ? '　·　spill ' + s.spill.length + ' 份' : '');
+      }).catch(() => { storeNative.textContent = '原生侧：暂不可用（等原生加只读口 app.storage）'; });
       // 事件文件路径：改完立刻重启事件通道，省得用户不知道要重连
       el.querySelector('#st-evfile')?.addEventListener('change', async (e) => {
         const v = e.target.value.trim() || '~/hermes-pocket-events.log';
@@ -849,6 +908,28 @@
           onTap: () => this.openNetRawSheet()
         }));
       }
+      /* R-27：留存与聚合（零新增采集；数字都来自已经在采的那三样） */
+      const st = HP.NetStats ? HP.NetStats.report() : null;
+      if (st) {
+        const n1 = (x) => (x == null ? '—' : x);
+        rows.push(HP.UI.row({
+          title: '丢包/延迟历史', sub: st.ping.n ? ('最近 ' + st.ping.n + ' 把 · 平均丢包 ' + n1(st.ping.lossAvg) + '% · 平均 ' + n1(st.ping.avgAvg) + ' ms · 最差 ' + n1(st.ping.maxMax) + ' ms') : '还没测过',
+          right: st.ping.n ? String(st.ping.n) + ' 把' : '', testid: 'net-hist', onTap: () => this.openNetStatsSheet('ping')
+        }));
+        rows.push(HP.UI.row({
+          title: '端到端 RTT', sub: st.rtt.n ? ('最近 ' + st.rtt.n + ' 次（20s 心跳）· 平均 ' + n1(st.rtt.avg) + ' ms · 最差 ' + n1(st.rtt.max) + ' ms') : '还没心跳读数',
+          right: st.rtt.last == null ? '' : st.rtt.last + ' ms', testid: 'net-rtt-hist', onTap: () => this.openNetStatsSheet('rtt')
+        }));
+        const td = st.today || { up: 0, down: 0, conn: 0, fail: 0, reconnects: 0 };
+        rows.push(HP.UI.row({
+          title: '按天上下行', sub: '今天 ↑' + HP.Net.bytes(td.up) + ' ↓' + HP.Net.bytes(td.down) + ' · 留最近 ' + st.days.length + ' 天',
+          right: HP.Net.bytes(td.down), testid: 'net-days', onTap: () => this.openNetStatsSheet('days')
+        }));
+        rows.push(HP.UI.row({
+          title: '连接统计', sub: (st.conn.count + ' 次连接 · ' + st.conn.fail + ' 次失败 · 重连 ' + st.conn.reconnects + ' 次' + (st.conn.lastReason ? (' · 最近断开：' + st.conn.lastReason) : '')),
+          right: st.conn.rate == null ? '—' : (st.conn.rate + '% 失败'), testid: 'net-conn', onTap: () => this.openNetStatsSheet('conn')
+        }));
+      }
       el.appendChild(HP.UI.list(rows, '还没测过 —— 点「延迟与丢包」或「端口连通」跑一次'));
     },
 
@@ -861,6 +942,7 @@
       const p = await HP.Net.ping(t.host, t.count);
       this._ping = p;
       this._pingAt = Date.now();
+      if (HP.NetStats) HP.NetStats.addPing(Object.assign({ host: t.host, count: t.count }, p));   // R-27：这把进历史
       this._netBusy = '';
       this.renderNet(true);
       if (p.err) A().toast('ping 没跑成：' + p.err, 5000);
@@ -875,6 +957,7 @@
       const r = await HP.Net.tcp(t.host, t.port);
       this._tcp = r;
       this._tcpAt = Date.now();
+      if (HP.NetStats) HP.NetStats.addTcp(Object.assign({ host: t.host, port: t.port }, r));       // R-27：这把进历史
       this._netBusy = '';
       this.renderNet(true);
       if (!r.ok) A().toast('端口不通：' + (r.err || '未知原因'), 5000);
@@ -915,6 +998,36 @@
     },
 
     /** 看这一把的原始输出（ping / 端口两段都在，带来源与耗时） */
+    openNetStatsSheet(kind) {
+      if (!HP.NetStats) return;
+      const st = HP.NetStats.report();
+      const hhmmss = (ts) => { const d = new Date(ts || 0); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0'); };
+      const day = (k) => (k === new Date().toISOString().slice(0, 10) ? k : k);
+      let title = '网络统计';
+      let text = '';
+      if (kind === 'ping') {
+        title = '丢包/延迟历史';
+        text = HP.NetStats.recent('ping', 12).map((p) => hhmmss(p.at) + '  ' + (p.err ? ('测不了：' + p.err) : ((p.loss == null ? '?' : p.loss) + '% 丢包 · 平均 ' + (p.avg == null ? '?' : p.avg) + ' ms · 最差 ' + (p.max == null ? '?' : p.max) + ' ms · 远端跑了 ' + (p.took == null ? '?' : p.took) + ' ms'))) .join('\n') || '还没有历史 —— 点「延迟与丢包」跑一把';
+      } else if (kind === 'rtt') {
+        title = '端到端 RTT 历史';
+        text = HP.NetStats.recent('rtt', 12).map((r) => hhmmss(r.at) + '  ' + r.ms + ' ms').join('\n') || '还没有 RTT 读数（连上主机后 20s 心跳会给）';
+      } else if (kind === 'days') {
+        title = '按天上下行（本地聚合）';
+        text = st.days.map((d) => d.day + '  ↑' + HP.Net.bytes(d.up) + '  ↓' + HP.Net.bytes(d.down) + '  连接 ' + d.conn + ' 次 · 失败 ' + d.fail).join('\n') || '还没有按天数据';
+      } else {
+        title = '连接统计';
+        text = '连接 ' + st.conn.count + ' 次 · 失败 ' + st.conn.fail + ' 次' + (st.conn.rate == null ? '' : ('（失败率 ' + st.conn.rate + '%）')) +
+          ' · 重连 ' + st.conn.reconnects + ' 次' + (st.conn.lastReason ? ('\n最近断开：' + st.conn.lastReason + ' @ ' + hhmmss(st.conn.lastAt)) : '') +
+          '\n\n数据源：原生 state 事件与 20s 心跳（零新增网络请求）';
+      }
+      HP.UI.sheet({
+        title: title,
+        fields: [{ label: '取数', value: '数据源都是已在采的那三样 · 落盘走 HP.Cache' }],
+        text: text,
+        actions: [{ label: '清空历史', fn: (box) => { HP.NetStats.clear(); box.remove(); this.renderNet(true); } }, { label: '关闭' }]
+      });
+    },
+
     openNetRawSheet() {
       const t = HP.Net.target();
       const parts = [];

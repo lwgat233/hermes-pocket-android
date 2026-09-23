@@ -1,0 +1,57 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-追加与锚点-A2": {
+    "check": {
+      "T1_before": {
+        "gap": 0,
+        "scrollTop": 7660,
+        "scrollHeight": 8080,
+        "clientHeight": 420,
+        "children": 80,
+        "pinned": true,
+        "newCount": 0,
+        "chipDisplay": "none",
+        "chipText": ""
+      },
+      "T1_after": {
+        "newBubbleHeight": 93
+      },
+      "T2_after": {
+        "gapBefore": 0,
+        "chipText": "⇣ 回到底部（新 5 条）",
+        "chipDisplay": "block"
+      },
+      "T3_anchorBefore": {
+        "id": 2072,
+        "top": 252,
+        "scrollTop": 7160
+      },
+      "T3_after": {
+        "anchorStillAlive": true,
+        "anchorTopBefore": 531,
+        "anchorTopAfter": 531,
+        "scrollTopAfter": 6578,
+        "chipText": "⇣ 回到底部（新 3 条）",
+        "newCount": 3
+      },
+      "T1_state": {
+        "gap": 1082,
+        "scrollTop": 6578,
+        "scrollHeight": 8080,
+        "clientHeight": 420,
+        "children": 80,
+        "pinned": false,
+        "newCount": 3,
+        "chipDisplay": "block",
+        "chipText": "⇣ 回到底部（新 3 条）"
+      },
+      "verdict": {
+        "A2-1等高追加仍钉底": false,
+        "A2-2变矮追加后仍在底部": false,
+        "A2-3老气泡还在": true,
+        "A2-3可见锚点不动(±2px)": true,
+        "A2-3入口文案": true
+      }
+    }
+  }
+}

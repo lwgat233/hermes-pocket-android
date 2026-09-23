@@ -1,0 +1,78 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-最小步-A3": {
+    "check": {
+      "T1_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none",
+        "chipText": "",
+        "bubbleH": 93
+      },
+      "T1_appendEqual": {
+        "gap": 505,
+        "scrollTop": 7155,
+        "scrollHeight": 8080,
+        "pinned": false,
+        "newCount": 5,
+        "chipDisplay": "block",
+        "chipText": "⇣ 回到底部（新 5 条）",
+        "firstId": 3005
+      },
+      "T2_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none",
+        "chipText": "",
+        "bubbleH": 93
+      },
+      "T2_appendShorter": {
+        "gap": 400,
+        "scrollTop": 7155,
+        "scrollHeight": 7975,
+        "pinned": false,
+        "newCount": 5,
+        "chipDisplay": "block",
+        "chipText": "⇣ 回到底部（新 5 条）",
+        "firstId": 4005
+      },
+      "T3_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none",
+        "chipText": "",
+        "bubbleH": 93
+      },
+      "T3_appendOneShorter": {
+        "gap": 80,
+        "scrollTop": 7559,
+        "scrollHeight": 8059,
+        "pinned": false,
+        "newCount": 1,
+        "chipDisplay": "block",
+        "chipText": "⇣ 回到底部（新 1 条）",
+        "firstId": 5001
+      },
+      "T3_appendOneShorterAgain": {
+        "gap": 253,
+        "scrollTop": 7365,
+        "scrollHeight": 8038,
+        "pinned": false,
+        "newCount": 2,
+        "chipDisplay": "block",
+        "chipText": "⇣ 回到底部（新 2 条）",
+        "firstId": 5002
+      },
+      "verdict": {
+        "T1起点在底部": true,
+        "T1等高追加后仍钉底": false,
+        "T2变矮追加后仍钉底": false,
+        "T3单条变矮追加后仍钉底": false,
+        "T3再来一条仍钉底": false
+      }
+    }
+  }
+}

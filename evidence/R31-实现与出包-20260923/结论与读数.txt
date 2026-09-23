@@ -1,0 +1,46 @@
+R-31「发送消息的迟滞与反馈」—— 实现与出包 结论与读数
+角色 pipeline.renderer · 2026-09-23 · 构件 hermes-pocket-R31-发送反馈-20260923.apk
+
+== 改了什么（界面层；平台侧未碰）==
+source/hermes-pocket/app/src/main/assets/ui/talk.js
+  · 127-128   状态表：Talk.sends / sendSeq
+  · 207 / 215 render 的群聊分支与频道/单聊分支都补 paintSends（切页/重画后状态不丢）
+  · 1003-1082 发送状态机：timing()（读设置 sendTiming）/ sendStateText()（三态文案）/
+              fillSends()（≤4 条状态行 + 失败给「重试」）/ paintSends() / startSendTicker()（500ms 刷「还在发… 3.0s」）
+  · 1084-1140 send()：记 t0 → 读回执 → 终态「已送达 ◯◯ms」或「没送达：原因」；
+              3s 无回执转「还在发…」（带重试）、8s 转「没送达：超时」；迟到回执照样覆盖终态；
+              广播读 results[] 逐条渲染（n/N 已送达 + 每行 ✓/✗ 与原因）；
+              耗时优先用**回执里的 ms**，回执没给才退回界面往返毫秒并加 ≈（避免与 delivery.ms 对不上还看不出来）；
+              防连点改成「上一条还没落定才挡」——原先 busy 一次卡住会把后面 20s 的发送全吞掉（本次顺带修掉）
+source/hermes-pocket/app/src/main/assets/ui/panels.js
+  · 265      新增设置项 sendTiming（默认开；关掉＝省电/省流量，只留终态，不显示 ms 也不做每秒刷新）
+source/hermes-pocket/app/src/main/assets/ui/talk.css
+  · 6-12     .tk-sends / .tk-sendrow（ok/wait/bad 三色）/ .tk-sendsub
+tools/ui-harness/t-r31-sendstate.mjs（新增验收探针，真按键 / 真 send()，拦桥回执按剧本走）
+说明：探针里把 pullRoleOutput 补了空壳 —— 那是既有缺陷 R-32（4 处调用 0 处定义），单独登记，否则报错会算到本轮头上。
+
+== 8 条判据（本地测试台读数，原始 JSON 见同目录 t-r31-sendstate-原始输出.json）==
+① 点「发送」（真按键 #tk-sayok）→ 条上出现「我 → 测试者 · 已送达 1370ms」，state=sent ✓
+② 桥回 delivered:false + error「阶段没放行」→「没送达：阶段没放行」+ 重试键，这条保留 ✓
+③ 桥不回执 → 3.0s 时「还在发… 3.0s」+ 重试键（state=waiting）✓
+④ 8s 仍未回执 → 「没送达：超时（8 秒没回执）」；点重试真重发（talk.say 计数 +1）并转「已送达 1410ms」；
+   超时那条还卡着 rpc 时，再发新消息也发得出去（state=sent）✓
+⑤ 迟到 9s 的回执：4s 时是「还在发…」，回执到达后覆盖为「已送达 1370ms」✓
+⑥ 耗时对齐：界面 1420ms == 回执 ms 1420，差 0ms（界面用的就是平台 delivery 台账那个 ms）✓
+⑦ 广播 3 角色：「2/3 已送达 1410ms」+ 3 行逐条（author ✓ 1410ms / tester ✓ 1380ms / renderer ✗ 没会话）✓
+⑧ 省电档（sendTiming=false）：仍显示「已送达」，不带 ms ✓
+⑨ 报错：pageerror / console.error 全程 0 条 ✓
+⑩ 不回归（R-29 钉底）：切群聊离底部 0px、新消息后 0px、上翻位置不被抢回、单聊仍钉底、报错 0
+   —— 原始输出见 t-r29-回归-原始输出.json
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R31-发送反馈-20260923.apk（5062554 字节，08:19 出包）
+整包 sha256：d84f26c93d0a8e67adac98d04e7756db701e3dbc4e6d9f18f54dadf18720ba32
+包内 assets/build-info.json：testVersion=unified-20260923-081934 · builtAt=2026-09-23 08:19 CST · featureId=R-31
+包内 assets/ui/talk.js sha256：d206683fa9a83238bfc6f241c6e95024789ce88afa07ce1a890c785608128c5f（与源树逐字节相同）
+复核：python3 source/hermes-pocket/tools/stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账
+
+== 没验的（未验 ≠ 通过）==
+· 设备上的真触摸发送、以及界面耗时与**真 delivery.ms** 的对照：本地是拦桥按剧本回回执（形状同 Bridge.kt/talk.py），
+  真 SSH 往返由 tester 在第 3 步做；本轮不接主机口径未变。
+· 平台侧 ok 语义（命令成功 vs 读回确认）与 delivery.ms 是否随 say() 回给桥，属平台侧（经理）。

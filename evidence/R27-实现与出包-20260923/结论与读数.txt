@@ -1,0 +1,53 @@
+R-27 第 2 步「实现与出包」—— 网络统计（A 零新增采集 + B 定时探测默认关） 结论与读数
+角色 pipeline.renderer · 2026-09-23 · 构件 hermes-pocket-R27-网络统计-20260923.apk
+
+== 本次我改了什么（动了 3 个界面文件 + index.html + 1 支探针；板块：**网络页**）==
+新增 assets/ui/netstats.js（HP.NetStats）—— 统计留存与聚合的**唯一权威源**：
+  · 环形历史：ping/端口/RTT 各留最近 60 条（超了丢最旧）；按天留最近 7 天
+  · 采集入口全都是"顺手记一笔"：addPing/addTcp（runPing/runTcp 的结果）、addRtt（20s 心跳那个数）、
+    trafficTick（每秒流量采样的增量 → 归到「今天」的桶）、connState（原生 state 事件 → 连接次数/失败/重连/断开原因）
+  · report()/recent() 给界面读数；clear() 清历史
+  · B：probeTick() 是**唯一**会真发 net.ping 的路；startProbe() 只在设置开着且不在省电档时开表
+  · 落盘走 HP.Cache（R-26 的入口）：重要事件（ping/端口/连接状态）立刻写；流量每秒那种 5s 合并
+app.js（61d115ae…）
+  · onState → connState（零网络）；20s 心跳 → addRtt；sampleTraffic → trafficTick；
+  · pauseWork/resumeWork → NetStats.onPowerSave（进省电停探测，回前台按设置再开）；applySettings → startProbe
+panels.js（95aebca3…）
+  · 网络页新增 4 行：丢包/延迟历史、端到端 RTT、按天上下行、连接统计（点行开小窗看明细，可清空历史）
+  · runPing/runTcp 的结果顺手进历史；新增 openNetStatsSheet()
+  · 新增设置项 netProbe（默认关）+ netProbeInterval（5/15/30/60 分钟，默认 15），hint 写清代价与「省电档一律不跑」
+index.html（514902d1…）引入 netstats.js
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r27-netstats-原始输出.json）==
+① 跑 3 次 ping + 1 次端口（真路径 runPing/runTcp）：历史 3 把 / 1 把、时间递增、平均丢包 0%、平均 0.1ms、
+   端口成功率 100%；期间真发了 net.ping×3 + net.tcp×1（没有多余的探测）✓
+② 落盘后仍在：清掉内存那份再读，条数 3 → 3，落盘 1026 字节（等价于重启不丢）✓
+③ 环形上限：喂 70 条 → 只留 60 条，且留的是最新的 ✓
+④ 按天聚合：跨两天喂数 → 22 日 4200B / 23 日 1200B，合计 5400B = 预期，昨天的桶没被丢掉 ✓
+⑤ 连接计数（推原生 state 事件，**零新增网络调用**）：连接 2 次 · 失败 1 次 · 重连 1 次 · 失败率 33% · 最近原因 Connection reset ✓
+⑥ RTT 历史：走真心跳 3 次 → 3 条（本机夹具下 0ms，真机数字由 tester 量）✓
+⑦ 定时探测：默认关 → 1.5s 内 **0** 次 net.ping（开表返回 false）；开启后 probeTick 真发一次并进历史；
+   **省电档开表返回 false**（进省电停表）✓
+⑧ 网络页 4 行都能读回数字（例：丢包/延迟历史「最近 2 把 · 平均丢包 0% · 平均 6.2ms · 最差 20ms」、
+   按天「今天 ↑300B ↓900B」、连接「2 次连接 · 1 次失败 · 重连 1 次 · 33% 失败」），原有「延迟与丢包/端口连通/测试目标」三行读数不变 ✓
+⑨ 报错：pageerror / console.error 全程 **0** 条 ✓
+回归：R-25 省电（前台 2 / 省电档 0 / 实时档 2 / 最省档 0，报错 0）、R-29 钉底（离底 0/0、上翻不被抢回、报错 0）
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R27-网络统计-20260923.apk（5063367 字节，08:36 出包）
+整包 sha256：3f901e9fdc7ea0a13590efdba15af9ec485777ee53d7ad377e52473b0e03006c
+包内 assets/build-info.json：testVersion=unified-20260923-083630 · builtAt=2026-09-23 08:36 CST · featureId=R-27
+本次改动文件 sha256（包内 == 源树，逐字节）：
+  ui/netstats.js c6ced8b79dd0201c512f69d763aba3d562f1cea56661ed87a89837d6751a0ce5
+  ui/app.js      61d115ae444986feae02f980ef96d5a2a4fa99dba7f81832699ee7e12293401c
+  ui/panels.js   95aebca373df4809cb3165dcad981337287c5e414cbe6c0ae8055301c9c252db
+  ui/index.html  514902d17abcc5daddf9de0f0a3ff543fcbbd193e31cf8b57002c9770a7e6229
+复核：stamp-build.py --verify <apk> → PASS（这一版整树也对得上）
+
+== 别人同期在改什么 ==
+· author：talk.js 的 R-30 定位（可能不落代码）；R-29-4（9f5abf0）与 R-27/R-28 定位提交都在树里。
+· 包内还带我前几轮在树里未提交的 R-26（cache.js 等）/R-31/R-25 改动。git 我没动。
+
+== 没验的（未验 ≠ 通过）==
+· 设备↔NAS 的真实往返与探测耗电（batterystats）：单价 1.7s/次是本机实测，真机数字由 tester 在第 3 步量。
+· 定时探测的间隔误差 <20% 这条要真机跑够时间才谈得上；本地只证到「默认关＝零调用、开启＝真发、省电档停」。

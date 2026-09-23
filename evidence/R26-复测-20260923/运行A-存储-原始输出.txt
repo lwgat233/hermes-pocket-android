@@ -1,0 +1,64 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R26-复测-本地存储": {
+    "check": {
+      "C1": {
+        "fed": 200,
+        "storedItems": 41,
+        "storedKeys": [
+          "items"
+        ],
+        "storedBytes": 3571,
+        "maxItemsPref": 50
+      },
+      "C2": {
+        "calls": 10,
+        "throttleMs": 500,
+        "realWritesBySetItem": 1,
+        "writesDelta": 1,
+        "value": "\"v9\"",
+        "mergedSkipped": 9
+      },
+      "C3": {
+        "beforeKB": 18.4,
+        "afterKB": 12,
+        "droppedKB": 6.4,
+        "countBefore": 8,
+        "countAfter": 6,
+        "deltaMatches": true
+      },
+      "C4": {
+        "setReturned1": false,
+        "setReturned2": false,
+        "uncaughtInProbe": null,
+        "thrownBySetItem": 1,
+        "toasts": 1,
+        "degraded": true,
+        "lastError": "配额满了：quota exceeded (test)",
+        "skippedAfterDegrade": 1
+      },
+      "C5": {
+        "occupancyLine": "本地占用」明细关（默认）：只显示一行合计数；开：进设置页时多算一遍各键字节（要多花一点 CPU，省电档建议关着，按「看明细」随时手动算）触摸转鼠标（TUI 里点按钮）点击终端弹出键盘默认关闭：手机上随手一点就被键盘盖住半屏。要打字请用功能键条的「⌨ 键盘」长按弹出菜单显示功能键条显示输入框（手机打字更顺手）输入框实时上",
+        "nativeLine": "原生侧：暂不可用（等原生加只读口 app.storage） 看明细 清理 数字是真读数（进这一页算一次，没有定时扫描）：合计按 UTF-16 折半算，桌面实测配额 ≈",
+        "hasStorageReportToggle": false,
+        "reportTotalKB": 12
+      },
+      "C6": {
+        "filledChars": 5178519,
+        "filledKB": 5057,
+        "quotaHitAtKB": 5057,
+        "errorName": "QuotaExceededError",
+        "spillImplemented": false,
+        "restoredLengthAfterCleanup": 7
+      },
+      "verdict": {
+        "①200条只落50条": false,
+        "②10次连写只落1次": true,
+        "③清理2键占用对账": true,
+        "④满配额一次提示+降级不抛": true,
+        "⑤设置页能读回占用": true,
+        "⑤原生侧如实写暂不可用": true
+      }
+    }
+  }
+}

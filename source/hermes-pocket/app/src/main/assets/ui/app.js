@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260923-012200";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-23 01:22 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "版本串与打包时间每包自动写入（出包时刻盖章）", "featureId": "F1", "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build.py 在出包时自动写，不再手写", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260923-012200"};
+  HP.BUILD = "unified-20260923-084401";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-23 08:44 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "本轮收尾：R-25/26/27/29/31 已合入当前源树的一版", "featureId": "收尾", "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build.py 在出包时自动写，不再手写", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260923-084401"};
   /* —— 打包信息结束 —— */
 
   const THEME = {
@@ -164,7 +164,7 @@
       const val = (v === undefined || v === null) ? '' : String(v);
       this.prefs[k] = val;
       try { await this.rpc('pref.set', { k, v: val }); }
-      catch (e) { localStorage.setItem('hp.' + k, val); }   // 通道没起来时只兜底存本地
+      catch (e) { HP.Cache.setPrefFallback(k, val); }   // 通道没起来时只兜底存本地；配额满也不把异常冒给调用方（R-26）
       if (HP.Panels && HP.Panels.syncPrefInputs) HP.Panels.syncPrefInputs(k);
       if (!opts || opts.apply !== false) this.applySettings();
       return val;
@@ -175,7 +175,7 @@
       catch (e) {
         this.prefs = {};
         HP.Panels.S.forEach((s) => {
-          const v = localStorage.getItem('hp.' + s.k);
+          const v = HP.Cache.getPrefFallback(s.k);
           if (v !== null) this.prefs[s.k] = s.type === 'bool' ? v === 'true' : v;
         });
       }
@@ -355,6 +355,7 @@
 
     onState(s, m) {
       this.state = s;
+      if (HP.NetStats) HP.NetStats.connState(s, (m && (m.msg || m.reason)) || '');   // R-27：连接次数/失败率/重连（零网络）
       const dot = $('dot');
       dot.className = s;
       if (s === 'connected') {
@@ -699,6 +700,7 @@
       try {
         await this.rpc('ping', {}, 8000);
         this.lastRtt = Math.round(performance.now() - t0);
+        if (HP.NetStats) HP.NetStats.addRtt(this.lastRtt);      // R-27：端到端 RTT 留存（复用这个 20s 心跳，不新增采集）
         $('tb-rtt').textContent = this.lastRtt + 'ms';
       } catch (e) { /* 心跳失败由 state 事件兜底 */ }
     },
@@ -1634,13 +1636,15 @@
       try { await this.rpc('session.kick', {}, 6000); } catch (e) { }
     },
 
-    /** 停掉"只在看得见时才有意义"的活（每帧 rAF + 三个定时器） */
+    /** 停掉"只在看得见时才有意义"的活（每帧 rAF + 三个定时器 + 聊天轮询/发送状态表，R-25） */
     pauseWork() {
       if (this._watchRaf) { cancelAnimationFrame(this._watchRaf); this._watchRaf = 0; }
       this.stopTrafficTimer();
       if (this._tickTimer) { clearInterval(this._tickTimer); this._tickTimer = 0; }
       this.stopPing();
       clearTimeout(this._sbT);
+      if (HP.Talk && HP.Talk.onPowerSave) HP.Talk.onPowerSave(true);   // 轮询按档位降频/停 + 缓存节流表落盘
+      if (HP.NetStats) HP.NetStats.onPowerSave(true);                  // 网络定时探测：省电档一律停（R-27）
     },
 
     resumeWork() {
@@ -1648,6 +1652,8 @@
       this.startTrafficTimer();
       if (!this._tickTimer) this._tickTimer = setInterval(() => { try { this.trackCommandTick(); } catch (e) { } }, 1000);
       if (this.state === 'connected') this.startPing();
+      if (HP.Talk && HP.Talk.onPowerSave) HP.Talk.onPowerSave(false);  // 回前台：轮询开表并立刻补一次
+      if (HP.NetStats) HP.NetStats.onPowerSave(false);                 // 网络定时探测：按设置决定要不要开回来（R-27）
       this.syncViewport(); this.fitChrome(); this.resetGeometry();
     },
 
@@ -1667,6 +1673,12 @@
         + ' · 心跳=' + (s.keepalive ? s.keepalive + 's' : '关')
         + ' · 屏幕=' + (s.interactive === false ? '灭' : '亮')
         + ' · App=' + (document.hidden ? '后台' : '前台');
+      const pl = $('pw-poll');
+      if (pl && HP.Talk && HP.Talk.pollStats) {
+        const p = HP.Talk.pollStats();
+        pl.textContent = '聊天轮询：' + (p.间隔秒 ? ('每 ' + p.间隔秒 + 's') : '已停（省电档）')
+          + ' · 本次省电期间已轮询 ' + p.省电期间轮询次数 + ' 次';
+      }
     },
 
     /* ========================================================== 流量统计 */
@@ -1738,6 +1750,7 @@
       if (t.rateDown > t.peakDown) t.peakDown = t.rateDown;
       // 采样点 = 这一段的区间（有增量才记，空转的秒不占图上的位置）
       if (d > 0 || u > 0) t.samples = HP.Net.pushSample(t.samples, { t0: t._at, t1: now, up: u, down: d });
+      if (HP.NetStats && (d > 0 || u > 0)) HP.NetStats.trafficTick(u, d, now);   // R-27：顺手归到「今天」的桶，零新增采集
       t._d = t.down; t._u = t.up; t._at = now;
       t.cum += d;
       this.renderTraffic();
@@ -2203,6 +2216,7 @@
         keepAwake: this.bool('keepAwake', true),
         keepalive: this.num('keepalive', 30)
       }).catch(() => { });
+      if (HP.NetStats) HP.NetStats.startProbe();      // R-27：定时探测（默认关；省电档不跑）跟着设置走
       this.resetGeometry();
     },
 

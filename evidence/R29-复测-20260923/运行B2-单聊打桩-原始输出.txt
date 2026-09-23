@@ -1,0 +1,72 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-单聊打桩传输层-B2": {
+    "check": {
+      "stub": {
+        "ok": true,
+        "thread": 40
+      },
+      "open": {
+        "on": "tab-talk",
+        "view": "role",
+        "box": true
+      },
+      "B1_first": {
+        "bubbles": 40,
+        "gap": -1,
+        "scrollTop": 3667,
+        "pinned": true,
+        "scrollable": true,
+        "anchorTop": 360,
+        "rpcCalls": [
+          "talk.roles",
+          "talk.asks",
+          "talk.since",
+          "talk.thread"
+        ]
+      },
+      "B2_afterSwipe": {
+        "bubbles": 40,
+        "gap": 399,
+        "scrollTop": 3267,
+        "pinned": false,
+        "scrollable": true,
+        "anchorTop": 356,
+        "rpcCalls": [
+          "talk.asks",
+          "talk.since",
+          "talk.thread",
+          "talk.since"
+        ]
+      },
+      "B3_afterNew": {
+        "ok": false,
+        "error": "this.pullRoleOutput is not a function"
+      },
+      "B3_state": {
+        "bubbles": 41,
+        "gap": 521,
+        "scrollTop": 3267,
+        "pinned": false,
+        "scrollable": true,
+        "anchorTop": 356,
+        "rpcCalls": [
+          "talk.since",
+          "talk.thread",
+          "talk.since",
+          "talk.thread"
+        ]
+      },
+      "verdict": {
+        "⑤单聊首屏钉底": false,
+        "⑤上翻真起作用": true,
+        "⑤上翻后新消息不抢回(±2px)": true,
+        "⑤上翻后尊重用户位置(未钉底)": true
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:135:77",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:991:12)"
+  ]
+}

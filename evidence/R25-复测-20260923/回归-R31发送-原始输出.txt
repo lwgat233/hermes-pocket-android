@@ -1,0 +1,136 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R31-复测-发送反馈": {
+    "check": {
+      "stub": {
+        "ok": true,
+        "timing": true
+      },
+      "C1": {
+        "elapsed": 2017,
+        "final": {
+          "state": "sent",
+          "text": "我 → pipeline.tester · 已送达 1411ms",
+          "subs": [],
+          "retry": false
+        },
+        "seenCount": 19,
+        "firstWaitingAt": null,
+        "firstWaitingText": "",
+        "firstTimeoutAt": null,
+        "firstSentAt": 105
+      },
+      "C2": {
+        "elapsed": 5039,
+        "final": {
+          "state": "failed",
+          "text": "我 → pipeline.tester · 没送达：阶段没放行，不投递：pipeline.author（他名下全部阶段都还没放行）",
+          "subs": [],
+          "retry": true
+        },
+        "seenCount": 50,
+        "firstWaitingAt": null,
+        "firstWaitingText": "",
+        "firstTimeoutAt": null,
+        "firstSentAt": 103
+      },
+      "C34": {
+        "elapsed": 8572,
+        "final": {
+          "state": "timeout",
+          "text": "我 → pipeline.tester · 没送达：超时（8 秒没回执）",
+          "subs": [],
+          "retry": true
+        },
+        "seenCount": 85,
+        "firstWaitingAt": 3032,
+        "firstWaitingText": "我 → pipeline.tester · 还在发… 3.0s",
+        "firstTimeoutAt": 8068,
+        "firstSentAt": null
+      },
+      "C5": {
+        "elapsed": 101,
+        "final": {
+          "state": "sent",
+          "text": "我 → pipeline.tester · 已送达 1500ms"
+        }
+      },
+      "C6": {
+        "elapsed": 2015,
+        "final": {
+          "state": "sent",
+          "text": "我 → pipeline.tester · 已送达 1411ms",
+          "subs": [],
+          "retry": false
+        },
+        "seenCount": 20,
+        "firstWaitingAt": null,
+        "firstWaitingText": "",
+        "firstTimeoutAt": null,
+        "firstSentAt": 103
+      },
+      "C6_control": {
+        "elapsed": 2017,
+        "final": {
+          "state": "sent",
+          "text": "我 → pipeline.tester · 已送达 ≈2ms",
+          "subs": [],
+          "retry": false
+        },
+        "seenCount": 20,
+        "firstWaitingAt": null,
+        "firstWaitingText": "",
+        "firstTimeoutAt": null,
+        "firstSentAt": 103
+      },
+      "C7": {
+        "elapsed": 2521,
+        "final": {
+          "state": "partial",
+          "text": "我 → 全体（广播） · 1/2 已送达 120ms",
+          "subs": [
+            "· pipeline.author ✓ 120ms",
+            "· home.maid ✗ 已暂停（role），不投递"
+          ],
+          "retry": true
+        },
+        "seenCount": 25,
+        "firstWaitingAt": null,
+        "firstWaitingText": "",
+        "firstTimeoutAt": null,
+        "firstSentAt": 101
+      },
+      "C8": {
+        "timingNow": false
+      },
+      "C8_send": {
+        "elapsed": 2022,
+        "final": {
+          "state": "sent",
+          "text": "我 → pipeline.tester · 已送达",
+          "subs": [],
+          "retry": false
+        },
+        "seenCount": 20,
+        "firstWaitingAt": null,
+        "firstWaitingText": "",
+        "firstTimeoutAt": null,
+        "firstSentAt": 103
+      },
+      "C8_restore": {
+        "timingNow": true
+      },
+      "verdict": {
+        "①2s内终态已送达+ms": true,
+        "②5s内报出原因": true,
+        "③3s转还在发": true,
+        "④8s超时+有重试": true,
+        "⑤迟到回执覆盖终态": true,
+        "⑥界面耗时=台账ms(1411)": true,
+        "⑥对照:回执无ms时显示≈": true,
+        "⑦广播逐条状态": true,
+        "⑧省电档只留终态": true
+      }
+    }
+  }
+}

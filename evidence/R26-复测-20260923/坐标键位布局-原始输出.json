@@ -1,0 +1,284 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R26-复测-坐标键位布局v2": {
+    "check": {
+      "env": {
+        "cssW": 393,
+        "cssH": 778,
+        "dpr": 2.75
+      },
+      "settings": {
+        "coords": {
+          "本地占用行": {
+            "px": {
+              "x": 25,
+              "y": 251,
+              "w": 344,
+              "h": 17
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 259
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "DIV.sub",
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "本地占用：8 个键 · 21KB"
+          },
+          "原生侧行": {
+            "px": {
+              "x": 25,
+              "y": 274,
+              "w": 344,
+              "h": 17
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 283
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "DIV.sub",
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "原生侧：暂不可用（等原生加只读口 app.storage）"
+          },
+          "看明细键": {
+            "px": {
+              "x": 25,
+              "y": 300,
+              "w": 71,
+              "h": 42
+            },
+            "centerPx": {
+              "x": 60,
+              "y": 321
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.btn",
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "看明细"
+          },
+          "清理键": {
+            "px": {
+              "x": 104,
+              "y": 300,
+              "w": 57,
+              "h": 42
+            },
+            "centerPx": {
+              "x": 133,
+              "y": 321
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.btn",
+            "coveredByChrome": false,
+            "clipped": false,
+            "text": "清理"
+          }
+        },
+        "gapsPx": [
+          6,
+          8,
+          0
+        ],
+        "minGapPx": 0,
+        "cardTextBefore": 230,
+        "tap": {
+          "x": 60,
+          "y": 321,
+          "tag": "BUTTON",
+          "hitSelf": true
+        },
+        "cardY": 238
+      },
+      "afterTap": {
+        "cardTextAfter": 370,
+        "grew": true,
+        "detailKeys": [
+          "app.storage",
+          "thread.pipeline.tester",
+          "thread.probe",
+          "probe.keep2",
+          "probe.keep1"
+        ],
+        "head": "本地占用：8 个键 · 21KB 原生侧：暂不可用（等原生加只读口 app.storage） thread.pipeline.tester 7.8KB · thread.probe 7.8KB · p"
+      },
+      "group": {
+        "coords": {
+          "群聊抬头": {
+            "label": "抬头",
+            "px": {
+              "x": 14,
+              "y": 109,
+              "w": 365,
+              "h": 17
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 117
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "DIV.tk-title",
+            "coveredByChrome": false
+          },
+          "喊话输入框": {
+            "label": "输入框",
+            "px": {
+              "x": 12,
+              "y": 372,
+              "w": 233,
+              "h": 40
+            },
+            "centerPx": {
+              "x": 128,
+              "y": 392
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "INPUT.tk-askin",
+            "coveredByChrome": false
+          },
+          "广播键": {
+            "label": "广播键",
+            "px": {
+              "x": 253,
+              "y": 372,
+              "w": 56,
+              "h": 40
+            },
+            "centerPx": {
+              "x": 281,
+              "y": 392
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-act",
+            "coveredByChrome": false
+          },
+          "身份键": {
+            "label": "身份键",
+            "px": {
+              "x": 317,
+              "y": 372,
+              "w": 64,
+              "h": 40
+            },
+            "centerPx": {
+              "x": 349,
+              "y": 392
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "coveredByChrome": false
+          },
+          "投递台账键": {
+            "label": "台账键",
+            "px": {
+              "x": 12,
+              "y": 413,
+              "w": 77,
+              "h": 32
+            },
+            "centerPx": {
+              "x": 51,
+              "y": 429
+            },
+            "inViewport": true,
+            "ge44": false,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "coveredByChrome": false
+          },
+          "消息区": {
+            "label": "消息区",
+            "px": {
+              "x": 12,
+              "y": 132,
+              "w": 369,
+              "h": 240
+            },
+            "centerPx": {
+              "x": 197,
+              "y": 252
+            },
+            "inViewport": true,
+            "ge44": true,
+            "hitIsSelf": true,
+            "hitWhat": "DIV.tk-chat",
+            "coveredByChrome": false
+          }
+        },
+        "visibleButtons": 3,
+        "buttonLabels": [
+          "广播",
+          "本人说",
+          "投递台账"
+        ],
+        "streamEmptyText": "📢 pipeline.author →",
+        "bubbles3": [
+          {
+            "h": 72,
+            "w": 182,
+            "childHeights": [
+              16,
+              21,
+              12
+            ],
+            "overflowX": false
+          },
+          {
+            "h": 72,
+            "w": 182,
+            "childHeights": [
+              16,
+              21,
+              12
+            ],
+            "overflowX": false
+          },
+          {
+            "h": 72,
+            "w": 182,
+            "childHeights": [
+              16,
+              21,
+              12
+            ],
+            "overflowX": false
+          }
+        ],
+        "streamGap": 0,
+        "tapWho": {
+          "x": 349,
+          "y": 392,
+          "before": "本人说",
+          "hitSelf": true
+        }
+      },
+      "afterTapWho": {
+        "text": "经理说",
+        "asWho": "owner.me"
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:1027:12)",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:155:77"
+  ]
+}

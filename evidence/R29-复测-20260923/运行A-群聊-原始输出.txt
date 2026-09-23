@@ -1,0 +1,166 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-群聊钉底-A": {
+    "check": {
+      "open": {
+        "on": "tab-group",
+        "stream": true
+      },
+      "seed120": true,
+      "A1_after120": {
+        "scrollTop": 7660,
+        "scrollHeight": 8080,
+        "clientHeight": 420,
+        "gap": 0,
+        "children": 80,
+        "firstId": 1040,
+        "lastId": 1119,
+        "pinned": true,
+        "newCount": 0,
+        "chipText": "",
+        "chipCount": "0",
+        "chipDisplay": "none",
+        "chipRect": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      },
+      "mark": {
+        "markedId": 1080,
+        "atIndex": 40
+      },
+      "A2_afterAppend": {
+        "childrenBefore": 80,
+        "childrenAfter": 80,
+        "markedStillAlive": true,
+        "markedIdNow": 1080
+      },
+      "A2_state": {
+        "scrollTop": 7155,
+        "scrollHeight": 7975,
+        "clientHeight": 420,
+        "gap": 400,
+        "children": 80,
+        "firstId": 1045,
+        "lastId": 1124,
+        "pinned": false,
+        "newCount": 5,
+        "chipText": "⇣ 回到底部（新 5 条）",
+        "chipCount": "5",
+        "chipDisplay": "block",
+        "chipRect": {
+          "x": 197,
+          "y": 574,
+          "w": 143,
+          "h": 31
+        }
+      },
+      "swipe": {
+        "at": {
+          "x": 197,
+          "y": 342
+        }
+      },
+      "A3_afterSwipe": {
+        "scrollTop": 6555,
+        "scrollHeight": 7975,
+        "clientHeight": 420,
+        "gap": 1000,
+        "children": 80,
+        "firstId": 1045,
+        "lastId": 1124,
+        "pinned": false,
+        "newCount": 5,
+        "chipText": "⇣ 回到底部（新 5 条）",
+        "chipCount": "5",
+        "chipDisplay": "block",
+        "chipRect": {
+          "x": 197,
+          "y": 574,
+          "w": 143,
+          "h": 31
+        }
+      },
+      "A3_scrollTopBeforeAppend": 6555,
+      "A3_afterNewMsg": {
+        "scrollTopBefore": 6555,
+        "scrollTopAfter": 5973,
+        "delta": -582
+      },
+      "A3_state": {
+        "scrollTop": 5973,
+        "scrollHeight": 7912,
+        "clientHeight": 420,
+        "gap": 1519,
+        "children": 80,
+        "firstId": 1048,
+        "lastId": 1127,
+        "pinned": false,
+        "newCount": 8,
+        "chipText": "⇣ 回到底部（新 8 条）",
+        "chipCount": "8",
+        "chipDisplay": "block",
+        "chipRect": {
+          "x": 197,
+          "y": 574,
+          "w": 143,
+          "h": 31
+        }
+      },
+      "tapChip": {
+        "at": {
+          "x": 197,
+          "y": 574,
+          "w": 143,
+          "h": 31
+        }
+      },
+      "A4_afterTapChip": {
+        "scrollTop": 7492,
+        "scrollHeight": 7912,
+        "clientHeight": 420,
+        "gap": 0,
+        "children": 80,
+        "firstId": 1048,
+        "lastId": 1127,
+        "pinned": true,
+        "newCount": 0,
+        "chipText": "",
+        "chipCount": "0",
+        "chipDisplay": "none",
+        "chipRect": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      },
+      "A6_three": {
+        "children": 3,
+        "gap": 0,
+        "scrollable": false,
+        "chipDisplay": "none"
+      },
+      "A8_channel": {
+        "on": "tab-talk",
+        "roleRows": 0,
+        "hasDegrade": true
+      },
+      "verdict": {
+        "①钉到底0px": true,
+        "②追加后仍钉底": false,
+        "②老节点活着(未整块重建)": true,
+        "③上翻读数确实动了": true,
+        "③新消息后不被抢回(±2px)": false,
+        "③入口文案带新N条": false,
+        "④点入口后回到底部": true,
+        "④入口消失且计数清零": true,
+        "⑥3条不报错且钉底": true,
+        "⑦120条裁到80": true,
+        "⑧频道页行为不变": true
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-单聊-B": {
+    "check": {
+      "open": {
+        "on": "tab-talk",
+        "view": "role",
+        "box": true
+      },
+      "seed": true,
+      "B1_first": {
+        "children": 0,
+        "gap": 0,
+        "scrollTop": 0,
+        "pinned": true,
+        "scrollable": false,
+        "anchorTop": null
+      },
+      "B2_afterSwipe": {
+        "children": 0,
+        "gap": 0,
+        "scrollTop": 0,
+        "pinned": true,
+        "scrollable": false,
+        "anchorTop": null
+      },
+      "B3_afterNew": {
+        "ok": false,
+        "error": "Cannot read properties of undefined (reading 'push')"
+      },
+      "B3_state": {
+        "children": 0,
+        "gap": 0,
+        "scrollTop": 0,
+        "pinned": true,
+        "scrollable": false,
+        "anchorTop": null
+      },
+      "verdict": {
+        "⑤单聊首屏钉底": false,
+        "⑤上翻真起作用": false,
+        "⑤上翻后新消息不抢回(±2px)": false,
+        "⑤上翻后仍未钉底(尊重用户位置)": false
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:135:77"
+  ]
+}

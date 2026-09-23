@@ -1,0 +1,39 @@
+# R-29 复测结论（pipeline.tester · 设备真触摸 · 2026-09-23）
+
+对象：apk/测试版/hermes-pocket-R29-群聊钉底-20260923.apk（5062540 字节）
+整包 sha256 = 0f02746ce5c592cc5f36234457f9ff5bc0d578f5b6b3aa34df6a68fedda0058e（与派活单一致）
+stamp-build.py --verify = PASS（包内↔源树）· 包内 build-info testVersion = unified-20260923-081430 / builtAt 2026-09-23 08:14 CST
+包内 assets/ui/talk.js sha256 = 03200fe9bf61ec07d7cb57cddf045564fa407c6a1b181559317ac72611638499（与派活单一致）
+设备：emulator-5554 / Android 14 / AVD hpk34（容器 hp-emu）· adb install -r Success
+
+## 判据结果（逐条，数字都是设备页面里读回来的）
+
+① 切到群聊后钉到底 —— **通过**：喂 120 条后 gap=0px（scrollTop 7660 = max）
+② 新消息到达后仍钉底 + 老节点还在 —— **红（缺陷）**：
+   · 未满 80（不裁旧）追加 1 条：gap=0px、pinned=true、无入口 → 正常
+   · 满 80（裁旧）追加：gap=101px（1 条）/ 303px（3 条）/ 400~505px（5 条），pinned=false，
+     并弹出「⇣ 回到底部（新 N 条）」—— 用户本来就在底部，却被判成"不在底部"、视图不跟随。
+   · 触发条件：列表满 80、append 之后那一步 `while(children>80) 裁头` 把 max scrollTop 拉低了（一条气泡 101px）
+   · 读数推出的真因：`pinBottom()` 拿**上一次的 _lastHeight** 与**已被浏览器夹过的 scrollTop** 比较 ——
+     裁旧使 scrollTop 被夹低 101px，8080-420-7559=101 > NEAR_BOTTOM(24) → 判成"不在底部" → 不跟随、只计数。
+   · 老节点没被整块重建（标记节点全活）：**通过**（只有追加，DOM 未重建）
+③ 手动上翻后不被抢回 —— **通过**：真手势上翻后 gap=1000px；再追加 3 条 → **可见锚点 top 531px → 531px（Δ=0）**、
+   入口文案「⇣ 回到底部（新 3 条）」、data-count=3。
+   （说明：scrollTop 绝对值 7160→6578 变了 −582px，那是"顶部裁旧按被裁高度补偿"、可见内容不动；按绝对 scrollTop 判会假红。）
+④ 点入口回到底部 —— **通过**：真触摸点入口后 gap=0px、入口 display:none、data-count=0
+⑤ 单聊不退化 —— **通过**：首屏 gap=−1px（取整）pinned=true；上翻后 gap=399px；
+   又来一条并重画后，气泡 40→41、可见锚点 top 356px→356px（Δ=0）、未被抢回、仍尊重用户位置（pinned=false）
+⑥ 不足一屏（3 条）—— **通过**：children=3、gap=0px、不可滚、无异常、入口隐藏
+⑦ 120 条裁到 80 —— **通过**：children=80、firstId=1040（=第 41 条）
+⑧ 频道页行为不变 —— **通过**：tab-talk、角色行 0 条、降级文案在（连不上/还没拉到角色）
+⑨ 无 pageerror/console.error —— 群聊页全程 **0 条**；单聊页出现 **1 条既有异常**
+   `TypeError: this.pullRoleOutput is not a function`（talk.js:135，4 处调用 0 处定义）—— 不在本轮范围，如实记录。
+
+## 本轮测法的边界（说清楚，别当全绿）
+- 不接主机：群聊数据是在设备页面里**按后端形状喂进去**的（HP.Talk.msgs），单聊是**打桩传输层**（HP.App.rpc）——
+  喂的是数据；钉底/追加/裁旧/上翻/回到底部都是产品自己的代码 + 真手势在真设备上跑。
+- 附带发现（同一类既有缺陷，不在本轮范围）：单聊「他刚说的话」那一路恒空 ——
+  `this.live` 是布尔开关（talk.js:123），而 paintChat 把它当 map 用（`this.live[r.full_name]`，talk.js:978）。
+- 未验（不接主机，照旧）：点角色→信息窗 / 气泡 / 删会话 / 切会话 / 开左栏收起会话键 —— 未验 ≠ 通过。
+
+证据文件：运行A-群聊、运行A2-追加与锚点、运行A3-最小步、运行A4-同帧分帧、运行A5-边界与单聊、运行B2-单聊打桩（原始 JSON 输出）

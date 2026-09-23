@@ -1,0 +1,48 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-同帧与分帧-A4": {
+    "check": {
+      "S1_start": {
+        "gap": 0,
+        "pinned": true
+      },
+      "S1_sameTask": {
+        "gap": 101,
+        "pinned": false,
+        "newCount": 1,
+        "chipText": "⇣ 回到底部（新 1 条）",
+        "chipDisplay": "block"
+      },
+      "S2_start": {
+        "gap": 0,
+        "pinned": true
+      },
+      "S2_splitFrame": {
+        "gap": 101,
+        "pinned": false,
+        "newCount": 1,
+        "chipText": "⇣ 回到底部（新 1 条）",
+        "chipDisplay": "block"
+      },
+      "S3_start": {
+        "gap": 0,
+        "pinned": true
+      },
+      "S3_direct": {
+        "gap": 303,
+        "pinned": false,
+        "newCount": 3,
+        "chipText": "⇣ 回到底部（新 3 条）",
+        "chipDisplay": "block"
+      },
+      "verdict": {
+        "S1起点在底部": false,
+        "S1同帧追加后钉底": false,
+        "S2起点在底部": false,
+        "S2分帧追加后钉底": false,
+        "S3起点在底部": false,
+        "S3手动钉底后同帧追加3条仍钉底": false
+      }
+    }
+  }
+}

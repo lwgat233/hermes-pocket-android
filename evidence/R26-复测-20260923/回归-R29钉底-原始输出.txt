@@ -1,0 +1,82 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R29-复测-最小步-A3": {
+    "check": {
+      "T1_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none",
+        "chipText": "",
+        "bubbleH": 93
+      },
+      "T1_appendEqual": {
+        "gap": 0,
+        "scrollTop": 7660,
+        "scrollHeight": 8080,
+        "pinned": true,
+        "newCount": 0,
+        "chipDisplay": "none",
+        "chipText": "",
+        "firstId": 3005
+      },
+      "T2_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none",
+        "chipText": "",
+        "bubbleH": 93
+      },
+      "T2_appendShorter": {
+        "gap": 0,
+        "scrollTop": 7555,
+        "scrollHeight": 7975,
+        "pinned": true,
+        "newCount": 0,
+        "chipDisplay": "none",
+        "chipText": "",
+        "firstId": 4005
+      },
+      "T3_start": {
+        "gap": 0,
+        "pinned": true,
+        "children": 80,
+        "chipDisplay": "none",
+        "chipText": "",
+        "bubbleH": 93
+      },
+      "T3_appendOneShorter": {
+        "gap": 0,
+        "scrollTop": 7639,
+        "scrollHeight": 8059,
+        "pinned": true,
+        "newCount": 0,
+        "chipDisplay": "none",
+        "chipText": "",
+        "firstId": 5001
+      },
+      "T3_appendOneShorterAgain": {
+        "gap": 0,
+        "scrollTop": 7618,
+        "scrollHeight": 8038,
+        "pinned": true,
+        "newCount": 0,
+        "chipDisplay": "none",
+        "chipText": "",
+        "firstId": 5002
+      },
+      "verdict": {
+        "T1起点在底部": true,
+        "T1等高追加后仍钉底": true,
+        "T2变矮追加后仍钉底": true,
+        "T3单条变矮追加后仍钉底": true,
+        "T3再来一条仍钉底": true
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:1027:12)",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:155:77"
+  ]
+}
