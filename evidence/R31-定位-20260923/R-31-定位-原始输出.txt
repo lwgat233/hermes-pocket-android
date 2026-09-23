@@ -1,0 +1,104 @@
+### R-31「发送消息的迟滞与反馈」定位原始输出 —— 2026-09-23 · 角色 pipeline.author（只定位，未改代码）
+# 读到的源：source/hermes-pocket/app/src/main/assets/ui/talk.js（sha256 4a5f584c7b2c59fcd6a7ff0a1747bdcdb5b990dc9c42318b1a6e65645694d60a）
+#           source/hermes-pocket/app/src/main/java/dev/hermes/pocket/Bridge.kt（sha256 f082e569fb277e2385b55077a8e0b785c493e3e4c123fd2a48376450270e9030）
+#           roles-chat/tools/talk.py（sha256 3bafc84ed9ff2fc8ff4b2e1aab71bdfbcddb060ab4d50fee8d343536c98422f7）
+
+=== ① 界面侧（pocket）：现在这条链走到哪一步 ===
+talk.js:832/841   1:1 输入框与「发送」按键（data-testid talk-sayin / talk-sayok）；群聊广播键 talk.js:389/397
+talk.js:895-906   send()：await rpc('talk.say'|'talk.shout')  →  talk.js:901 HP.App.toast('已发出')  →  902 tick()  →  903 render()
+Bridge.kt:754-765 原生侧 talk.say：SSH 跑 `python3 tools/talk.py say --by --role --kind --body --topic`，
+                  回执 = {to, kind, delivered: r.isSuccess, raw: {…}}（delivered 只表示**那条命令没抛异常**）
+talk.py:779-818   say()：先写库（send）→ 再 deliver(role, text) → 返回 {id, delivered:true} 或 {id, delivered:false, error}；
+                  广播分支逐个角色投递，返回 {count, results:[{role, delivered}]}
+缺的三个环节：
+  a) **回执没人读**：send() 只 await 不看返回字段（talk.js:899-900），界面把任何返回都当成功 → 「已发出」
+  b) **没有耗时**：从点击到 rpc 返回、以及平台每目标的投递耗时，两段都没量、界面也没有位子显示
+  c) **没有 per-message 状态**：Talk 上没有任何 ack/state 字段，只有 send 完就消失的一行 toast（HP.App.toast，app.js:2137-2143，默认 1900ms 自动隐藏）
+
+=== ② 界面侧实测（跑真 HP.Talk.send，在原生桥那层拦回执；探针 source/hermes-pocket/tools/ui-harness/d-r31-send.mjs）===
+命令：cd source/hermes-pocket/tools/ui-harness && node harness.mjs d-r31-send.mjs
+{
+  "name": "R-31 定位：发送后的反馈与耗时（真 HP.Talk.send + 拦桥回执）",
+  "result": {
+    "check": {
+      "收据说没投成时": {
+        "发出去的请求": {
+          "op": "talk.say",
+          "role": "pipeline.tester",
+          "kind": "private"
+        },
+        "界面这段耗时ms": 33,
+        "报错": "",
+        "toast原文": "已发出",
+        "页面出现送达/发送中/耗时字样": false,
+        "Talk上的送达状态字段": [
+          "paintDeliveries"
+        ]
+      },
+      "桥不答时": {
+        "三秒后promise已结束": false,
+        "报错": "",
+        "发送前的toast": "已发出",
+        "发送后的toast": "已发出",
+        "toast在闪": false,
+        "页面出现还在发或发送中": false
+      }
+    }
+  }
+}
+读法：
+· 桥回一个「没投成」的收据（delivered:false，形状同 Bridge.kt）→ 界面耗时 33ms、无报错、toast 仍「已发出」、
+  页面没有「送达/发送中/耗时」任何字样、Talk 上也没有送达状态字段 ⇒ **失败被吞掉**（只有「投递台账」那个独立入口能事后查）。
+· 桥完全不答（不回执）→ 3 秒后 promise 仍未结束（没有超时）、无报错、toast 一个字没变、没有「还在发」⇒ **用户分不出卡没卡**。
+
+=== ③ 平台侧（roles-chat 投递）：迟滞从哪来、数据在哪 ===
+talk.py:880-925   deliver()：多行走 tmux load-buffer + paste-buffer → **sleep 0.8**（talk.py:915）→ Enter → **sleep 0.6**（916-917）→ 再 Enter 兜底（check=False）
+                  单行走 send-keys -l → **sleep 0.12**（talk.py:922）→ Enter
+talk.py:911-913   源码注释自认：粘贴后 0.25s 那一下回车会被 TUI 吞掉，所以才有这两段固定等待
+talk.py:800-806   广播 = **串行**逐角色 deliver ⇒ 每多一个目标就多约 1.4s（多行）/ 0.12s（单行）
+talk.py:66,664,1080  delivery 表：只有 (msg_id, role, at, ok, note) —— **没有耗时列**，at 是整数秒
+talk.py:1280-1290  「没回音」判定用的是 delivery.ok=1；而 ok=1 只代表 tmux 命令没报错（第二次 Enter 还是 check=False）⇒ ok≠真送达
+
+=== ④ 平台侧现有数据能算出什么（查的是跑着的库，不是估算）===
+# 每条的「写入 → 投递」差值（delivery.at - msg.created_at，秒级）：
+  msg   目标数  写入→首个投递(s)  写入→末个投递(s)  ok
+  710    5     0.00             1.00             3/5
+  684    5     2.00             2.00             2/5
+  682    5     1.00             2.00             2/5
+  725    4     5.00             5.00             3/4
+  722    4     0.00             1.00             3/4
+  719    4     4.00             5.00             2/4
+  718    4     5.00             5.00             2/4
+  717    4     4.00             5.00             2/4
+  716    4     4.00             4.00             2/4
+  715    4     1.00             1.00             0/4
+  · 每多一个目标 ~+1.0s（多行路径固定 0.8+0.6 ≈ 1.4s，秒级取整后看到 1.0~1.5s）；4 个目标 4~6s，5 个目标 1~5s。
+  · #863 第二个目标 1491s：那是**女仆的 QQ 通道**（按 5 分钟一批转达），量与 tmux 投递完全不同 —— 别混进同一个指标。
+  · 要毫秒级：deliver() 前后各取一次 time.monotonic()，给 delivery 加一列 ms（或写进 note）；
+    界面侧要的是「本目标投递 ms」+「本次点击到回执 ms」两个数。
+
+=== ⑤ 判据清单（真点怎么算过；真点由 tester 做，未验 ≠ 通过）===
+① 点发送后 2s 内，该条消息上出现终态之一：「已送达 ◯◯ms」或「没送达：<原因>」；不再只有一行全局 toast；
+② 桥回 delivered:false 时（构造：目标被 pause / 阶段没放行）5s 内必须显示「没送达：<原因>」并保留这条消息；
+③ 桥不回执（拔掉回执）时 3s 内必须显示「还在发…」+ 重试入口，而不是无反馈；
+④ 超时上限可读：>8s 仍未回执 → 转「没送达：超时」，且重试能真重发（回执到达后终态覆盖）；
+⑤ 耗时读数与平台台账能对上：界面「已送达 ◯◯ms」与 delivery 表该 (msg_id, role) 的 ms 之差 ≤ 100ms（或 ≤20%）；
+⑥ 广播给 3 个角色时，界面能看到 3 条各自的结果（或「3/3 已送达 · 共 ◯◯ms」）；
+⑦ 省电/省流量档：设置里关掉「发送耗时读数」后，仍显示终态（已送达/没送达），只是不显示 ms —— 实时读数不与省电冲突；
+⑧ 不回归：发送后滚动仍钉底（与 R-29 一致）、Runtime.exceptionThrown=0、console.error=0。
+
+=== ⑥ 实现建议（方案，本轮不动代码）===
+1) 界面：send() 里记 t0，rpc 返回后 t1；用回执字段渲染三态（发送中 / 已送达 ◯◯ms / 没送达:原因），状态挂在该条消息上（气泡或群里那一行），
+   不新增常驻按键；超时（建议 8s）转「没送达：超时」+ 点重试。
+2) 平台：deliver() 计时并把 ms 写进 delivery（加列或 note）；say() 把每目标的 ms 与 ok 一起回给界面；
+   建议同时把 ok 的语义分清：1=命令成功、2=读回确认（capture-pane 里命中该条编号才算真送达）——现在的 ok=1 不是送达回执。
+3) 新增设置项 `sendTiming`（默认开）：显示逐条耗时；省电/省流量档里默认关，只留终态（判据⑦）。
+4) 数据来源（平台侧归经理）：`delivery(msg_id, role, at, ok, note)` 现有字段可算秒级差；要毫秒就加 ms 列，
+   固定开销来源：多行 0.8+0.6s（talk.py:915/917）、单行 0.12s（talk.py:922）；女仆 QQ 通道是 5 分钟一批的另一条路，单独看。
+5) 打包配方位置（出包归 renderer）：`bash tools/build.sh --name "R31-发送反馈" --feature "…" --feature-id "R-31"`
+   （tools/build.sh + source/hermes-pocket/tools/stamp-build.py：盖章→核对→gradle→包内对账→归档 apk/测试版/）。
+   预计改动：pocket 侧 assets/ui/talk.js（+ 若平台配合则 roles-chat/tools/talk.py，不在本仓库）。
+
+=== ⑦ 边界 ===
+· 界面侧读数出自本地测试台（Chromium + 假原生桥，拦桥回执）；设备上的真触摸与真 SSH 往返由 tester 在第 3 步做。
+· 平台侧数字是从跑着的 talk.db 里查出来的（不是估算），秒级精度受 delivery.at 整数秒所限。
