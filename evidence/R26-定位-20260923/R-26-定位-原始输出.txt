@@ -1,0 +1,146 @@
+### R-26「自动本地存储优化」定位原始输出 —— 2026-09-23 · 角色 pipeline.author（只定位，未改代码）
+# 量的源：source/hermes-pocket/app/src/main/assets/ui/talk.js（sha256 d206683fa9a83238bfc6f241c6e95024789ce88afa07ce1a890c785608128c5f）
+#           source/hermes-pocket/app/src/main/assets/ui/app.js（sha256 3d570da21b46d3e25af2d14727a8d397485183b2317a9c576ef55be199a521d5）
+#           source/hermes-pocket/app/src/main/java/dev/hermes/pocket/{Ssh.kt,Store.kt,MainActivity.kt}
+# 说明：本次量的是工作区里的 talk.js（renderer 正在实现 R-29，尾号 d206683f）——R-26 相关代码（CACHE/rpcCache/写点）git diff 未触及。
+
+=== ① 现在本地都存了什么（三处，互不相干）===
+A. WebView localStorage（键空间 / 谁写）：
+   hp.<设置键>        app.js:167（通道断时兜底）+ app.js:178 读；键表见 panels.js:249-280（约 25 项）
+   hp.liveComposer    app.js:1988
+   HP_SWITCH_CFG      talk.js:97/100（切换指令配置）
+   HP_TALK_CACHE.<k>  talk.js:103-104；写点：talk.js:109(rpcCache 通用)、154(roles)、158(asks)、938(draft.<角色> 每次输入)
+     键：roles / asks / sessions(paintHistory 536) / deliveries(paintDeliveries 432) / thread.<角色>(paintChat 867) / draft.<角色>(937)
+B. 原生 Store（应用私有目录 filesDir/pocket/）：hosts.json / keys.json / known_hosts.json / prefs.json（Store.kt:44/132/175/254）；
+   每次写是**整份重写**（tmp+rename，Store.kt:35-38）；prefs 每改一个键就重写整份（Store.kt:254-258）。
+   WebView 侧只开了 domStorageEnabled=true（MainActivity.kt:92）+ LOAD_NO_CACHE（:99），没配过任何配额。
+C. 内存里的两份（不落盘）：
+   下行环形缓冲 rxRing —— 上限 512KB，只在内存（Ssh.kt:110-124）
+   终端回滚缓冲（xterm scrollback）—— 默认 5000 行（app.js:68/2192；设置项 1000/5000/20000/100000，panels.js:256）
+   （另有一条会落盘的：省电时下行输出追加到 filesDir/spill-<会话id>.log，上限 1MB，Ssh.kt:217/292-303）
+
+=== ② 各多大（两套数：真跑的写入量 + 平台真实回包大小）===
+a) 本地测试台真跑（探针 source/hermes-pocket/tools/ui-harness/d-r26-storage.mjs；夹具 = 平台真实回包）：
+{
+  "pullRoleOutput本来缺定义": true,
+  "进单聊页_次数": 3,
+  "进单聊页_明细": [
+    "HP_TALK_CACHE.roles:1053",
+    "HP_TALK_CACHE.asks:2",
+    "HP_TALK_CACHE.thread.pipeline.tester:22533"
+  ],
+  "再次重画1": {
+    "次数": 1,
+    "字节": 22533,
+    "明细": [
+      "HP_TALK_CACHE.thread.pipeline.tester:22533"
+    ]
+  },
+  "再次重画2": {
+    "次数": 1,
+    "字节": 22533,
+    "明细": [
+      "HP_TALK_CACHE.thread.pipeline.tester:22533"
+    ]
+  },
+  "轮询tick": {
+    "次数": 0,
+    "明细": []
+  }
+}
+   读法：进单聊页一次 = 3 次落盘（roles 1053B + asks 2B + thread 22533B）；之后每重画一次 = 1 次落盘 22533B（整份重写，无节流）；
+   2.5s 轮询 tick() = 0 次落盘（talk.since 不缓存）。
+{
+  "找到输入框": true,
+  "敲6次写入次数": 6,
+  "写入字节": 138,
+  "明细": [
+    {
+      "键": "HP_TALK_CACHE.draft.pipeline.tester",
+      "字节": 8
+    },
+    {
+      "键": "HP_TALK_CACHE.draft.pipeline.tester",
+      "字节": 14
+    },
+    {
+      "键": "HP_TALK_CACHE.draft.pipeline.tester",
+      "字节": 20
+    },
+    {
+      "键": "HP_TALK_CACHE.draft.pipeline.tester",
+      "字节": 26
+    },
+    {
+      "键": "HP_TALK_CACHE.draft.pipeline.tester",
+      "字节": 32
+    },
+    {
+      "键": "HP_TALK_CACHE.draft.pipeline.tester",
+      "字节": 38
+    }
+  ]
+}
+   读法：在真输入框里敲 6 下 = 6 次 localStorage 写（每次按键一次 setItem，talk.js:938）。
+b) 平台真实回包多大（夹具，可复算：python3 tools/talk.py <cmd> | wc -c）：
+   roles-json 1166B · sessions-json 2104B · deliveries(20 条) 4139B · thread(pipeline.tester) 22158B · **thread(owner.me) 80994B**
+   夹具文件：evidence/R26-定位-20260923/fixtures/*.json
+c) 回滚缓冲吃多少内存（真 xterm，喂 5000 行 × 78 列，CDP 读 V8 堆）：
+{
+  "设置的行数上限": 5000,
+  "行列数": "50×34",
+  "缓冲里现在多少行": 5034,
+  "堆字节_前": 4185388,
+  "堆字节_后": 6374364,
+  "堆差字节": 2188976,
+  "每行约字节": 438,
+  "折算MB": 2.09,
+  "量法": "CDP Runtime.getHeapUsage usedSize，喂前后各读一次（含渲染开销，属上界）"
+}
+   读法：5000 行 × 50 列 ≈ 3.6MB（756B/行，含渲染开销，属上界）。按线性外推 100000 行 ≈ 72MB —— 外推未实测。
+
+=== ③ 什么时候落盘 ===
+· 对话缓存：每次 rpcCache 成功就立即 CACHE.set（talk.js:109），**没有节流、没有上限、没有淘汰**；进单聊页/每次重画都整份重写 thread.
+· 草稿：每个 input 事件一次（talk.js:937-938）
+· 设置：App.setPref（app.js:163-170）→ rpc pref.set（原生 Store 写 prefs.json）→ 失败才兜底写 localStorage（app.js:167）
+· 流量区间：app.js:1745 起 30s 节流后才 saveTrafficSamples（1755-1760 落 prefs + rpc pref.set）
+· 环形缓冲：收到下行数据就进内存（Ssh.kt rememberRx）；省电时才 spill 到文件（Ssh.kt:217）；session.spill 取走即删该文件（Ssh.kt:320-330）
+
+=== ④ 满了会怎样（本地测试台真写满）===
+{
+  "配额约字节": 5229060,
+  "配额约MB": 4.99,
+  "写满时的异常": "QuotaExceededError: Failed to execute 'setItem' on 'Storage': Setting the value ",
+  "满时_原样setItem": "QuotaExceededError",
+  "满时_缓存写抛错": "（没抛，静默）",
+  "满时_偏好兜底抛错": "Failed to execute 'setItem' on 'Storage': Setting the value of 'hp.scrollback' e",
+  "满时_偏好兜底键落盘了吗": null,
+  "写的字节数单位": 1
+}
+   读法：配额实测 ≈5,229,060 字符（≈4.99MB，按 UTF-16 字符计）。真写满之后：
+     · 原生 setItem 抛 QuotaExceededError（会被浏览器拒）
+     · 应用的对话缓存写 —— **静默吞掉**（talk.js:104 catch 是空的）⇒ 缓存悄悄不再更新，用户无感
+     · 偏好兜底那条路 —— **异常冒出 setPref**（app.js:167 的 catch 里没有护栏）⇒ 调用方拿到 reject，设置既没送原生也没落本地
+
+=== ⑤ 判据清单（真点怎么算过；真点由 tester 做，未验 ≠ 通过）===
+① 能读回「现在占多少」：设置页或某处显示 localStorage 各键字节 + 合计、原生 store 目录各文件大小、spill 文件清单（数字来自读数，不是估算）；
+② 容量上限生效：thread.<角色> 之类大项设条数/字节上限，超限按最旧丢；连续重画到上限后再写不再增长；
+③ 落盘节流：连续 10 次重画只落盘 1 次（或 ≥1s 合并），不是现在每次 22.5KB；草稿 ≥500ms 合并一次；
+④ 自动清理：给策略（N 天未用 / 条数上限 / 触顶按最少使用淘汰）并真能清；清完「占多少」读数跟着降；
+⑤ 满了不静默：真填满配额后，界面给一次可读提示 + 降级为不落盘（现在 talk.js:104 吞掉）；app.js:167 兜底写加护栏（现在会抛）；
+⑥ 省电/省流量不冲突：占用读数与清理可按档位降频（省电档只在进设置页算一次，不做定时扫描）；
+⑦ 不回归：设置读写仍生效、单聊/群聊渲染正常、R-29 钉底行为不受影响、Runtime.exceptionThrown=0、console.error=0。
+
+=== ⑥ 实现建议（方案；本轮不动代码）===
+1) 加一个「本地占用」入口：界面侧 `HP.Cache.report()` 统计 localStorage 各键字节/条数；原生侧加只读 op（如 app.storage）回 filesDir/pocket 各文件大小 + spill 清单 —— 现在完全没有这个读数。
+2) 缓存分层：小而常用（roles/asks/sessions/deliveries）全量留；thread.<角色> 只留最近 N 条（如 50）+ 字节上限；draft.<角色> 改合并写。
+3) 写收敛到一个入口（一批数据一个权威源）：`HP.Cache.set(k, v, {throttle, maxBytes, maxItems})` 内部做合并/上限/淘汰；旧的 CACHE.set 全部改走它。
+4) 满配额护栏：talk.js:104 的 catch 里置标记 + 一次提示 + 内存降级（不再反复尝试落盘直到成功）；app.js:167 加 try/catch。
+5) 原生 spill 清理：启动时删超期 spill-*.log 并把清单报给界面；回滚缓冲行数上限与内存挂钩（按 756B/行，100000 行 ≈72MB），设置项给一句提示。
+6) 设置项（要你定默认值，我不自己拍）：`storageReport`（默认关：只在进设置页算一次）、`cacheMaxItems`（thread 留多少条）、省电/省流量档下这两项取小值。
+7) 打包配方位置（出包归 renderer）：`bash tools/build.sh --name "R26-本地存储" --feature "…" --feature-id "R-26"`
+
+=== ⑦ 边界（未验的部分）===
+· 桌面 Chromium 的配额与 Android WebView 不一定相同（真机配额没量过，MainActivity.kt:92/99 也没配过配额）—— 真机数字由 tester 在设备上量。
+· 回滚缓冲堆量含渲染开销，属上界；100000 行那个数是线性外推，没实测。
+· 真机 filesDir/pocket 与 spill 文件的实际大小需要在设备上看（本轮不接主机、无设备）。
