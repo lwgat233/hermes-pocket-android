@@ -1,0 +1,138 @@
+### R-25「省电模式优化」定位原始输出 —— 2026-09-23 · 角色 pipeline.author（只定位，未改代码）
+# 量的源：source/hermes-pocket/app/src/main/assets/ui/app.js（sha256 67139d605b1f0bc2b8a8358983b0a5c1046db7bc5786acff67fc3d14e5d180fc）· source/hermes-pocket/app/src/main/assets/ui/talk.js（sha256 39c79f7e7bd1d47cbc8ab9243a9e35df098c79f68fee0c4fabb737382343a36c）
+#           app/src/main/java/dev/hermes/pocket/{Ssh.kt,SessionService.kt,Bridge.kt,MainActivity.kt}
+
+=== ① 长连接心跳（文件与行）===
+Ssh.kt:24    传输层用 jsch serverAliveInterval 发 SSH keepalive（NAT/防火墙保活）
+Ssh.kt:184   lastKeepalive = host.keepalive（默认 30s）；Ssh.kt:460 ka = host.optInt("keepalive", 30)
+Bridge.kt:914/926  setKeepalive(前台=keepalive，省电=keepaliveSave)；app.power 回 {save, keepalive, interactive}（:930/934-938）
+app.js:1566  hostKeepalive() = host.keepalive || 30
+app.js:1569-1587 applyPowerSave(true)：**心跳不关**，30s → keepaliveSave=120（注释写明：关了连接可能被掐）
+app.js:693   Web 侧另有一个 20s 一次的 rpc("ping")（startPing/pingOnce）—— 用来量往返与探活
+
+=== ② 定时器/重绘清单（探针用工程自己的入口重开一遍量周期，可复算）===
+{
+  "resumeWork起的周期ms": [
+    1000,
+    1000
+  ],
+  "startPing起的周期ms": [
+    20000
+  ],
+  "Talk_startPoll起的周期ms": [
+    2500
+  ],
+  "pauseWork清掉的周期ms": [
+    1000,
+    1000,
+    20000
+  ],
+  "resumeWork里还有什么": "rAF 看门狗（requestAnimationFrame 自续，app.js:1647/238）—— 每秒约屏幕刷新率次，只读两个数字"
+}
+对应代码：app.js:1702-1705 流量每秒采样 · app.js:1649 每秒 tick（trackCommandTick）· app.js:693 ping 20s ·
+           talk.js:150-157 频道/群聊轮询 2.5s（行号按当前工作区） · app.js:238/1647 rAF 看门狗（每帧，只读两个数字）· ui.js:118 live 小窗 600ms（仅小窗开着时）
+
+=== ③ 前台 vs 省电 实测（本地测试台，探针 d-r25-power.mjs）===
+{
+  "前台空闲": {
+    "秒数": 4,
+    "DOM变更次数": 1,
+    "每秒DOM变更": 0.3,
+    "rpc次数": 0,
+    "rpc每秒": 0,
+    "rpc明细": {}
+  },
+  "前台_群聊页6s": {
+    "秒数": 6,
+    "DOM变更次数": 1,
+    "每秒DOM变更": 0.2,
+    "rpc次数": 2,
+    "rpc每秒": 0.33,
+    "rpc明细": {
+      "talk.since": 2
+    }
+  },
+  "进省电": {
+    "app_power请求": {
+      "save": true,
+      "keepalive": 30,
+      "keepaliveSave": 120,
+      "t": "app.power",
+      "_rid": 14
+    },
+    "省电标记": true,
+    "tick定时器还在": false,
+    "流量定时器还在": false,
+    "ping定时器还在": false,
+    "rAF看门狗还在": false,
+    "talk轮询还在": true
+  },
+  "省电时_群聊页6s": {
+    "秒数": 6,
+    "DOM变更次数": 1,
+    "每秒DOM变更": 0.2,
+    "rpc次数": 2,
+    "rpc每秒": 0.33,
+    "rpc明细": {
+      "talk.since": 2
+    }
+  },
+  "恢复": {
+    "省电标记": false,
+    "tick定时器还在": true,
+    "流量定时器还在": true,
+    "talk轮询还在": true
+  },
+  "恢复后前台": {
+    "秒数": 4,
+    "DOM变更次数": 4,
+    "每秒DOM变更": 1,
+    "rpc次数": 2,
+    "rpc每秒": 0.5,
+    "rpc明细": {
+      "talk.since": 2
+    }
+  }
+}
+读法：
+· 前台空闲 4s：DOM 变更 1 次（0.3/s）、rpc 0 次 ⇒ 空闲确实几乎不碰 DOM（设计如此）。
+· 前台群聊页 6s：talk.since ×2（2.5s 一次，符合 talk.js:150-157）。
+· 进省电（app.power 请求实测 {save:true, keepalive:30, keepaliveSave:120}）：tick/流量/ping 定时器都停了、rAF 取消、DOM 变更降到 0.2/s —— 这些都算省到了。
+· **但 talk 轮询还在跑**：省电下 6s 仍发 2 次 talk.since ⇒ 每 2.5s 唤醒一次、还走 SSH 起一次 python 调 talk.py。30 分钟≈720 次 —— 这是当前省电最大的漏点。
+· 回前台：tick/流量/轮询都回来了（ping 要 connected 才起，本次会话未连，故未重开 —— 如实记）。
+
+=== ④ 后台/熄屏还在跑什么（代码 + 上述读数）===
+停：每帧 rAF 看门狗（app.js:1637-1644 cancelAnimationFrame）、每秒 tick、每秒流量采样、20s ping；
+    唤醒锁——SessionService.kt:122 只有 keepAwake && !powerSave 才持 PARTIAL_WAKE_LOCK，省电时 releaseWake()（:131）；
+    重连——Ssh.kt:375 省电期间不重连（等亮屏 kick）。
+没停：talk.js:150-157 的 2.5s 轮询（本次实测）；TTY/SSH 连接本身照旧（这是要求：连接不能断）。
+原生侧省电时下行不进 WebView、改落 filesDir/spill-<会话id>.log（上限 1MB，Ssh.kt:217/292-303），亮屏后 app.js:1591-1635 按 ①暂存→②取盘→③关省电→④渲染盘→⑤放行 的顺序补渲染。
+WebView 冻结不可靠（app.js:568 注释），亮屏靠 MainActivity.onResume 显式 kick。
+
+=== ⑤ 与平台侧 ③「聊天要实时」的冲突 ===
+「实时」目前唯一来源 = talk.js:150-157 的 2.5s 轮询；省电档若不处理它，就等于没省（见 ③ 实测）。
+按 ⑤ 要给设置项，**不由我拍**，两个口径候选（都要 hint 写清牺牲什么）：
+  A) 省电时把轮询降到 30s（亮屏/回前台立刻补一次）：牺牲＝后台期间新消息最多晚 30s 才亮；
+  B) 只在前台且停在聊天页时保持 2.5s，后台一律停轮询、亮屏补一次：牺牲＝后台完全不刷（但省得最干净）。
+  现有设置项：powerSave（off / screenOff / background，默认 screenOff，panels.js:286-288）、powerSaveDelay（0/60/300/900，默认 0，:289-290）、keepAwake（默认 true，:284-285）。
+
+=== ⑥ 判据清单（怎么算过；真机数字由 tester 量，未验 ≠ 通过）===
+① 省电档下 6s 内 talk.since 调用 ≤1 次（现在 2 次）；实时口径下 6s ≥2 次（现测 2 次）；
+② 进出省电后定时器状态与表一致：省电＝tick/流量/ping 全无 + rAF 取消；回前台＝tick/流量回来（读数同 d-r25-power.mjs）；
+③ 心跳参数：省电请求带 keepaliveSave=120、回前台带 keepalive=30（抓 app.power 请求即可复算）；
+④ 唤醒锁：省电时 `adb shell dumpsys power | grep -i hermes-pocket` 查不到持有的 wake lock；设置页那行显示「唤醒锁=已释放」；
+⑤ 耗电对照怎么量：`adb shell dumpsys batterystats --reset` → 熄屏静置 30 分钟（不碰手机）→ `dumpsys batterystats | grep -i "Uid u0a"`（或 battery historian）取本 App UID 的 mAh；两档各跑一次；
+   另一个更直接的侧证：省电 30 分钟内 talk.py 被调用次数 —— 现在 2.5s 一次 ⇒ 约 720 次（会话侧能数）。
+⑥ 不回归：省电期间输出不丢（亮屏补渲染字节数>0 时 toast 会报）、连接不断、聊天状态/钉底等既有行为不变。
+
+=== ⑦ 实现建议（方案；本轮不动代码）===
+1) 把轮询纳入 pauseWork/resumeWork：省电时 Talk.stopPoll()（或改周期），回前台立刻 tick() 补一次；
+2) 设置项按上面的 A/B 口径二选一（推荐 A：降到 30s，兼顾「后台也知道有新消息」与省电），hint 写「最新消息可能晚 ≤30s，亮屏立刻补」；
+3) 设置页那行省电读数加两个可量数字：「本次省电期间 轮询 N 次 · 补渲染 M 字节」；
+4) 心跳/唤醒锁/spill 补渲染策略**保持不动**（已实测是对的）；
+5) 打包配方位置（出包归 renderer）：`bash tools/build.sh --name "R25-省电" --feature "…" --feature-id "R-25"`。
+
+=== ⑧ 边界（未验）===
+· 真机耗电数字（batterystats mAh）本轮没量（不接主机、无设备）——判据⑤给了量法与侧证。
+· 「后台 WebView 是否被系统冻结」在不同机型/Android 版本不一样，本轮只按代码与本地读数说明。
+· 本次量的是工作区里的 app.js/talk.js（renderer 正在实现 R-29/R-31）。app.js 的定时器/省电路径 git diff 未触及（4 行改动在别处）；talk.js 行号有位移（startPoll 现在 150-157），且 renderer 为 R-31 **新加了一个 500ms 发送状态定时器**（talk.js:1086-1093，只在有「发送中/等待」消息时才跑、空闲自停，powerSave 时不在 pauseWork 的停表清单里 —— 属于 R-25 第 2 步要一起看的点）。
