@@ -1,0 +1,66 @@
+{
+ "现场": {
+  "view": "role",
+  "style": "chat",
+  "sel": "home.maid",
+  "live": true,
+  "轮询秒": 2500,
+  "轮询开着": true,
+  "talk_js_里pullRoleOutput的调用点": [
+   173,
+   1024,
+   1025,
+   1065
+  ],
+  "有没有定义": "undefined"
+ },
+ "a_现状30s": {
+  "段": "现状（未改）",
+  "秒": 30,
+  "错误条数": 12,
+  "错误种类": {
+   "this.pullRoleOutput is not a function": 12
+  },
+  "间隔_ms": 2500,
+  "桥调用": {
+   "talk.since": 12,
+   "pref.set": 2
+  }
+ },
+ "b_删调用后30s": {
+  "段": "删调用（注入空壳模拟）",
+  "秒": 30,
+  "错误条数": 0,
+  "错误种类": {},
+  "间隔_ms": null,
+  "桥调用": {
+   "talk.since": 12
+  }
+ },
+ "c_补定义后30s": {
+  "段": "补定义（注入计数壳模拟）",
+  "秒": 30,
+  "错误条数": 0,
+  "错误种类": {},
+  "间隔_ms": null,
+  "桥调用": {
+   "pref.set": 2,
+   "talk.since": 12
+  },
+  "pullRoleOutput调用次数": 12
+ },
+ "错误明细前3条": [
+  {
+   "t": 1790255510094,
+   "msg": "this.pullRoleOutput is not a function"
+  },
+  {
+   "t": 1790255512401,
+   "msg": "this.pullRoleOutput is not a function"
+  },
+  {
+   "t": 1790255514900,
+   "msg": "this.pullRoleOutput is not a function"
+  }
+ ]
+}

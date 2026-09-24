@@ -1,0 +1,60 @@
+### hermes-pocket-R32 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r32-error.mjs（真页面 + 真 2.5s 轮询 + 平台真回包；三段各 30s 计时）
+
+=== ① 现状（量清）===
+  现场：view=role · style=chat · sel=home.maid · live=True · 轮询=2500ms · 轮询开着=True
+  `typeof HP.Talk.pullRoleOutput` = **undefined**（4 处调用、0 处定义，与登记表一致）
+
+  4 处调用点与时机：
+   · `talk.js:173` —— **每 2.5s 轮询里**（startPoll 的 setInterval 回调尾部，紧跟 `this.tick().catch(()=>{})` 之后），只在「单聊 + 聊天视图 + 有 sel」时执行；
+   · `talk.js:1024` / `talk.js:1025` —— **发完消息后**各挂一个 setTimeout(+2.5s、+6s)（`fire()` 里，send 之后）；
+   · `talk.js:1065` —— **每次 paintChat 末尾**（单聊聊天记录重画完成时）。
+  异常怎么被吞的：**没有吞**。173 那处所在回调没有 try/catch（同回调里的 `tick()` 自带 .catch，所以 tick 不受连累）；1024/1025 在 setTimeout 回调里；1065 在 async `paintChat` 末尾 → 都变成**未捕获异常/未处理的 rejection**，直接打到 pageerror/console。
+
+=== ② 三段各 30s 实测（同一页面，只差有没有改）===
+  现状（未改）
+    错误条数 **12** · 错误种类 {"this.pullRoleOutput is not a function": 12} · 平均间隔 2500 ms
+    同段桥调用：{"talk.since": 12, "pref.set": 2}
+  模拟改法 A：删调用（页面注入空壳等价）
+    错误条数 **0** · 错误种类 {} · 平均间隔 None ms
+    同段桥调用：{"talk.since": 12}
+  模拟改法 B：补定义（注入计数壳）
+    错误条数 **0** · 错误种类 {} · 平均间隔 None ms
+    同段桥调用：{"pref.set": 2, "talk.since": 12}
+    pullRoleOutput 被调 **12 次 / 30s** ⇒ 若补成真实现（老实现内部是 `rpc("talk.capture")`），就是**每 2.5s 一次 SSH+python**
+  结论读数：① 现状 **12 条/30s、每 2500ms 一条**，全是 `this.pullRoleOutput is not a function`；
+  ② 删调用后 **0 条**，而 `talk.since` 仍是 12 次 ⇒ **单聊刷新没被连累**；③ 补定义后 0 条错误，但 30s 内该函数被调 12 次。
+
+=== ③ 判定：**不该补，应删干净**（给结论，不留两头）===
+  这功能当年是真做过（历史：`5125614`「他直接在会话里回话（没走 reply）也会被捞成气泡显示」引入；
+  `f8f031d`「1:1 整段重写」把 `pullRoleOutput` + `lastAnswer` 的定义整段删掉，**4 处调用没跟着删**；`ee40d76` 只恢复了气泡部分）。
+  但**今天它的活已经被更好的路覆盖**：
+   · 他通过 talk.py 回的话 → 单聊气泡本来就取 `talk.thread`（`talk.js:1043` rpcCache('talk.thread')）✔
+   · 他直接在自己会话里说话 → 单聊页有「**终端**」开关（`talk.js:931` → paintRole 的 term 分支 → `talk.capture` 200 行）**手动看** ✔
+   · 而老实现 `lastAnswer()` 是"从整屏重画的终端里按框线猜哪段是他的回答"的**启发式**（脆弱、随 Hermes 界面形态变），还要维护 `said` 去重表。
+   · 代价对比（这次量出来的）：补定义 ⇒ **每 2.5s 一次 SSH+python**（12 次/30s）；而 R-25 定位里 2.5s 轮询 30 分钟 ≈720 次已经是省电的反面样板。
+  ⇒ 判定：**删掉 4 处调用**（连带 1024/1025 那两个 setTimeout），不补定义。
+
+=== ④ 改法（文件:行）===
+  1. 删 `talk.js:173`（轮询回调里那一行；删后回调只剩 `this.tick().catch(()=>{})`）
+  2. 删 `talk.js:1024-1025`（`fire()` 里发完后的两个 setTimeout）
+  3. 删 `talk.js:1065`（`paintChat()` 末尾那一行）
+  4. **顺带第二处死代码（建议一并收，或另开）**：`talk.js:1047` 的 `const live = ((this.live || {})[r.full_name] || [])` ——
+     `this.live` 是**布尔**（`talk.js:141 live: true`，被 166/187/250/275 当开关用），拿它取角色键永远是 undefined ⇒ 那个 live 分支**永远拿不到数据**（`talk.js:1046-1052`）。
+     没有任何地方给 `this.live[角色]` 写过值 ⇒ 建议连同删掉；若不删，至少要把布尔那个改名（`live` 一名两用）。
+
+=== ⑤ 牵连面（逐条）===
+  · 单聊刷新：**不受影响** —— 实测删掉后 `talk.since` 仍 12 次/30s（`tick()` 自带 .catch，本来就没被连累），气泡仍走 `paintChat` → `talk.thread`。
+  · 缓存（R-26 的 HP.Cache）：**不受影响** —— 单聊缓存键是 `thread.<角色>`（`rpcCache` 写的），与这条无关；
+    反倒是**删掉之后少了一个"以后可能每 2.5s 拉一次 talk.capture"的位置**（省电/省流量方向更好）。
+  · 状态行（R-31/R-36 的送达显示）：**无关** —— 那条走 `send()` 自己的 `sends` 状态机（`talk.js:1160-1200`）；实测 30s 内没有任何 talk.say/shout 调用。
+  · 轮询本身：删掉后 interval 回调里只剩 `tick()`，行为与"只有群聊页"时一致。
+
+=== ⑥ 代价与回归面（SPEC §10 点名板块）===
+  · 改动文件：`assets/ui/talk.js`（纯前端）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+  · 复测板块：主块 = **① 聊天页-单聊**（判据＝**连续 30s 内 0 条 pageerror/console.error**；外加：气泡仍随轮询刷新、发完消息状态行仍出终态）；
+    跨块 1 块 = **② 聊天页-群聊**（理由：两页共用同一个 `this.timer` 与 `tick()`，要确认群聊刷新没被这次删改影响）。
+  · 可复算的判据数字：现状 12 条/30s（2500ms 间隔）→ 改后 0 条；`talk.since` 保持 12 次/30s。
+
+=== ⑦ 边界 ===
+不接主机（不动 NAS authorized_keys）：全部读数来自**本机台**（真页面、真 2.5s 轮询、平台真回包），**未在真机上试** → 未验 ≠ 通过；真机复验（30s 无错误 + 单聊刷新）归 tester。
