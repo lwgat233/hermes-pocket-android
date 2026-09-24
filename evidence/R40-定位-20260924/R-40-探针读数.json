@@ -1,0 +1,187 @@
+{
+ "a_会话页": {
+  "整体文案": "在线：idle · 远端 tmux：2 个会话 | 当前选中：hermes | 刷新 | hermes | 窗口 1 · 建了 3 天 · 最后活动 4 分钟前 | attach 中 | roles | 窗口 6 · 建了 15 分钟 · 最后活动 15 分钟前 | 空闲",
+  "行数": 2,
+  "行": [
+   {
+    "testid": "session-hermes",
+    "文本": "hermes | 窗口 1 · 建了 3 天 · 最后活动 4 分钟前 | attach 中"
+   },
+   {
+    "testid": "session-roles",
+    "文本": "roles | 窗口 6 · 建了 15 分钟 · 最后活动 15 分钟前 | 空闲"
+   }
+  ],
+  "有井号编号": false,
+  "tmux_会话表": [
+   "hermes",
+   "roles"
+  ]
+ },
+ "b_频道页历史": {
+  "分组标题": [
+   "历史（14）"
+  ],
+  "历史行数": 14,
+  "历史行": [
+   "research.investigator　· 历史和话（hermes session）",
+   "hermes.agent　· 历史和话（hermes session）",
+   "pipeline.tester　· 历史和话（hermes session）",
+   "pipeline.renderer　· 历史和话（hermes session）",
+   "solo-solo1790090392　· 历史和话（hermes session）",
+   "owner.me　· 历史和话（hermes session）",
+   "pipeline.author　· 历史和话（hermes session）",
+   "solo-solo1790081404　· 历史和话（hermes session）",
+   "viewer　· 历史和话（hermes session）",
+   "mark-readnotes　· 历史和话（hermes session）",
+   "cdp　· 历史和话（hermes session）",
+   "hermes-pocket　· 历史和话（hermes session）",
+   "solo1790090392　· 普通会话",
+   "solo1790081404　· 普通会话"
+  ],
+  "有井号编号": false,
+  "读到的_roles_数组长度": "（见 §判定：talk.js:710 读的是 r.roles，而 roles-json 只有 scenes/channels）",
+  "频道页整页含_我_的行": [
+   "可爱女仆（个人助手：管生活，把要紧的话中转给我）",
+   "＋ 新对话（只对我）"
+  ]
+ },
+ "c_角色卡与信息窗": {
+  "卡片": [
+   {
+    "角色": "home.maid",
+    "第一行": "可爱女仆（个人助手：管生活，把要紧的话中转给我）",
+    "副行": "home.maid · role-home-maid",
+    "含编号": false
+   },
+   {
+    "角色": "owner.me",
+    "第一行": "经理（管流程/派活/判报告；不是本人）",
+    "副行": "owner.me · role-owner-me",
+    "含编号": false
+   },
+   {
+    "角色": "pipeline.author",
+    "第一行": "功能创造者",
+    "副行": "pipeline.author · role-pipeline-author",
+    "含编号": false
+   },
+   {
+    "角色": "pipeline.renderer",
+    "第一行": "渲染者",
+    "副行": "pipeline.renderer · role-pipeline-renderer",
+    "含编号": false
+   },
+   {
+    "角色": "pipeline.tester",
+    "第一行": "测试者",
+    "副行": "pipeline.tester · role-pipeline-tester",
+    "含编号": false
+   },
+   {
+    "角色": "research.investigator",
+    "第一行": "调查者（调研与功能分析，不改代码）",
+    "副行": "research.investigator · role-research-investigator",
+    "含编号": false
+   }
+  ],
+  "信息窗行": [
+   {
+    "键": "全名",
+    "值": "home.maid"
+   },
+   {
+    "键": "会话",
+    "值": "role-home-maid"
+   },
+   {
+    "键": "状态",
+    "值": "在线"
+   },
+   {
+    "键": "欠回复",
+    "值": "218"
+   },
+   {
+    "键": "标签",
+    "值": "（无）"
+   },
+   {
+    "键": "接入频道",
+    "值": "qqbot"
+   }
+  ],
+  "信息窗含编号": false
+ },
+ "d_素材映射": {
+  "2": {
+   "kind": "solo",
+   "role": null,
+   "tmux会话": "solo-solo1790081404",
+   "alive": false,
+   "name": "solo1790081404"
+  },
+  "4": {
+   "kind": "role",
+   "role": "home.maid",
+   "tmux会话": "qqbot",
+   "tmux窗口": "3FDE0CB3E30CD63FC5C635B4C657C844",
+   "alive": false,
+   "name": "可爱女仆（奈奈）"
+  },
+  "5": {
+   "kind": "role",
+   "role": "pipeline.tester",
+   "tmux会话": "roles",
+   "tmux窗口": "pipeline-tester",
+   "alive": true,
+   "name": "pipeline.tester"
+  },
+  "6": {
+   "kind": "role",
+   "role": "owner.me",
+   "tmux会话": "roles",
+   "tmux窗口": "owner-me",
+   "alive": true,
+   "name": "owner.me"
+  },
+  "7": {
+   "kind": "solo",
+   "role": null,
+   "tmux会话": "solo-solo1790090392",
+   "alive": false,
+   "name": "solo1790090392"
+  },
+  "8": {
+   "kind": "role",
+   "role": "pipeline.renderer",
+   "tmux会话": "roles",
+   "tmux窗口": "pipeline-renderer",
+   "alive": true,
+   "name": "pipeline.renderer"
+  },
+  "10": {
+   "kind": "role",
+   "role": "pipeline.author",
+   "tmux会话": "roles",
+   "tmux窗口": "pipeline-author",
+   "alive": true,
+   "name": "pipeline.author"
+  },
+  "11": {
+   "kind": "role",
+   "role": "research.investigator",
+   "tmux会话": "roles",
+   "tmux窗口": "research-investigator",
+   "alive": true,
+   "name": "research.investigator"
+  }
+ },
+ "e_源码位置": {
+  "会话页(⑤)": "panels.js:821-859 renderSessions()（数据＝HP.Sessions.list ← tmux.list 桥，只有 tmux 会话名/窗口数/attach，无编号无身份）",
+  "频道页历史(⑧)": "talk.js:706-780 paintHistory()（被 talk.js:413 调；数据＝talk.sessions + talk.roles + talk.hermesSessions）",
+  "角色卡": "talk.js:506-535 roleCard()（副行 talk.js:519 用 sess() 合成名）",
+  "信息窗": "talk.js:809-830 paintSheet()（「会话」行 talk.js:824 也用 sess()）",
+  "sess() 合成名": "talk.js:137 const sess = (full) => \"role-\" + full.replace(/\\./g, \"-\")"
+ }
+}

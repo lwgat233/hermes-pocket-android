@@ -1,0 +1,103 @@
+### hermes-pocket-R40 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改代码）
+需求文档：hermes-pocket/docs/需求-会话编号与身份.md（本人 2026-09-24 原话见文档开头）
+探针：source/hermes-pocket/tools/ui-harness/d-r40-identity.mjs（真页面 + **平台真回包**当夹具，视口 393×778）
+夹具：evidence/R40-定位-20260924/fixtures/{roles-json,sessions-json,hermes-sessions}.json + tmux-list-raw.txt（本机真 tmux 原文）
+
+=== ① 三处现在显示什么（实测 DOM 原文）===
+【⑤ 会话页】panels.js:821-859 renderSessions() —— 数据源＝HP.Sessions.list ← tmux.list 桥（**只有 tmux 会话名/窗口数/attach**）
+   实测（注入 sessionId 当"已连接"，走真 renderSessions）：
+     整页文案＝「在线：idle · 远端 tmux：2 个会话 | 当前选中：hermes | 刷新 | hermes | 窗口 1 · 建了 3 天 · 最后活动 4 分钟前 | attach 中 | roles | 窗口 6 · 建了 15 分钟 · 最后活动 15 分钟前 | 空闲」
+     行数 = 2：["hermes | 窗口 1 · 建了 3 天 · 最后活动 4 分钟前 | attach 中", "roles | 窗口 6 · 建了 15 分钟 · 最后活动 15 分钟前 | 空闲"]
+     **有 #编号 = False**；tmux 真值（本机 list-sessions）＝ ["hermes", "roles"]
+   ⇒ 会话页上只有**两个 tmux 容器**（hermes / roles），**看不到任何一个"人"**（6 个角色 + 女仆通道 + 临时对话全都装在 roles 里）——
+     这正是本人「我不太清楚哪个 session 是指向我」的现场：列表里根本没有"人"，也没有编号。
+   行模板（panels.js:850-857）：title=s.name（tmux 会话名）、sub=窗口 N · 建了 X · 最后活动 Y、right=attach 中/空闲。
+
+【⑧ 频道页「上次聊过」】talk.js:706-780 paintHistory()（由 talk.js:413 在 paintChannel 里调用）
+   实测分组标题：["历史（14）"]（**只有"历史"一组**）
+   实测行数 14：
+     · research.investigator　· 历史和话（hermes session）
+     · hermes.agent　· 历史和话（hermes session）
+     · pipeline.tester　· 历史和话（hermes session）
+     · pipeline.renderer　· 历史和话（hermes session）
+     · solo-solo1790090392　· 历史和话（hermes session）
+     · owner.me　· 历史和话（hermes session）
+     · pipeline.author　· 历史和话（hermes session）
+     · solo-solo1790081404　· 历史和话（hermes session）
+     · viewer　· 历史和话（hermes session）
+     · mark-readnotes　· 历史和话（hermes session）
+     · cdp　· 历史和话（hermes session）
+     · hermes-pocket　· 历史和话（hermes session）
+     · solo1790090392　· 普通会话
+     · solo1790081404　· 普通会话
+   **有 #编号 = False**
+   ⚠ 顺带发现的缺陷③：talk.js:710 读的是 r.roles，而 talk.roles（roles-json）顶层只有 scenes/channels ⇒ **roles 恒为空数组**
+     ⇒「在线」「没在线」两个分组**永远不出现**、known 恒空 ⇒ 所有 hermes session 都被当"历史"列出
+     （同一个人可能因此出现两条：一条角色卡 + 一条历史；例如 owner.me 既有角色卡也在历史里）。
+
+【角色卡 + 信息窗】talk.js:506-535 roleCard() / talk.js:809-830 paintSheet()
+   · 卡「home.maid」第一行＝可爱女仆（个人助手：管生活，把要紧的话中转给我） ｜ 副行＝**home.maid · role-home-maid** ｜ 含编号=False
+   · 卡「owner.me」第一行＝经理（管流程/派活/判报告；不是本人） ｜ 副行＝**owner.me · role-owner-me** ｜ 含编号=False
+   · 卡「pipeline.author」第一行＝功能创造者 ｜ 副行＝**pipeline.author · role-pipeline-author** ｜ 含编号=False
+   · 卡「pipeline.renderer」第一行＝渲染者 ｜ 副行＝**pipeline.renderer · role-pipeline-renderer** ｜ 含编号=False
+   · 卡「pipeline.tester」第一行＝测试者 ｜ 副行＝**pipeline.tester · role-pipeline-tester** ｜ 含编号=False
+   · 卡「research.investigator」第一行＝调查者（调研与功能分析，不改代码） ｜ 副行＝**research.investigator · role-research-investigator** ｜ 含编号=False
+   · 信息窗（home.maid）六行：全名=home.maid / 会话=role-home-maid / 状态=在线 / 欠回复=218 / 标签=（无） / 接入频道=qqbot
+   · **信息窗含编号 = False**
+   ⚠ 副行与「会话」值都来自 sess()（talk.js:137 "role-" + full.replace(/\./g,"-")）—— **前端合成的名字**，与真值对不上：
+     真值：`#6 owner.me → roles:owner-me`、`#10 pipeline.author → roles:pipeline-author`、`#4 home.maid → qqbot:3FDE0CB3…`；
+     合成名只跟一条**已废**记录撞上（老快照里的 `#3 tmux=role-pipeline-author`，alive=false）⇒ 界面上的 role-* 名字不对应任何在跑的窗口。
+
+=== ② 编号怎么取（单一来源，前端不造号）===
+  来源＝talk.sessions（＝python3 tools/talk.py sessions-json 的 sessions[].id），App 侧**已经在拿**（talk.js:709 rpcCache("talk.sessions")）。
+  实测映射（本轮真值，共 8 条）：
+    #2   kind=solo  role=None                   tmux=solo-solo1790081404 窗口=-                          alive=False
+    #4   kind=role  role=home.maid              tmux=qqbot            窗口=3FDE0CB3E30CD63FC5C635B4C657C844 alive=False
+    #5   kind=role  role=pipeline.tester        tmux=roles            窗口=pipeline-tester            alive=True
+    #6   kind=role  role=owner.me               tmux=roles            窗口=owner-me                   alive=True
+    #7   kind=solo  role=None                   tmux=solo-solo1790090392 窗口=-                          alive=False
+    #8   kind=role  role=pipeline.renderer      tmux=roles            窗口=pipeline-renderer          alive=True
+    #10  kind=role  role=pipeline.author        tmux=roles            窗口=pipeline-author            alive=True
+    #11  kind=role  role=research.investigator  tmux=roles            窗口=research-investigator      alive=True
+  取号规则：role → session 按 s.role === role.full_name 找；**多条时取 alive === true 的**（都 false 取 last_used 最大者）；
+  一条都没有 ⇒ **不显示号码**（显「未起会话」），**不许前端自造编号**。渲染统一 #<id>；会话页与信息窗用同一份映射（同号同人）。
+
+=== ③ 去重规则（按 tmux，不按 role）===
+  · 去重键＝tmux（`会话:窗口` 全名）：**同一个 tmux 全名只出一条**（本轮快照同 tmux 重复 = 0；
+    老快照出现过 `#3 role-pipeline-author`（废）与 `#10 roles:pipeline-author`（在跑）**同 role 两条**；女仆还会有"QQ 通道 #4"与将来"App 入口 maid-app"两条）。
+  · **绝不能按 role 去重**：本人明确「App 那条只是第二入口，QQ 通道才是本体/主线」——按 role 去重会把这两条合并，正好糊掉本人最想分清的东西。
+  · 同 role 多条（不同 tmux）⇒ 都显示，但身份行要能区分：alive=true 正常；alive=false 追加「（已废）」。
+  · kind="solo" ⇒ 归「临时对话」组，显示 `#7 临时对话`（无角色）。
+  · 容器会话（tmux 里的 roles、hermes）**不单独成行**（它们是盒子，不是人）。
+
+=== ④ 改法（文件:行）===
+  1. **编号↔人映射**：talk.js 新增 sessInfo(full)（放在 talk.js:137 sess() 旁），数据取已缓存的 talk.sessions（rpcCache("talk.sessions")，不新增网络请求）；
+     返回 {id, win, alive}；**删掉 sess() 合成名**（talk.js:137）。
+  2. **角色卡**（talk.js:519 副行那行）：改成 `#<id> · <真实窗口名>`，例 `#6 · owner-me`、`#10 · pipeline-author`、`#4 · 本人-女仆通道`；取不到号时保持 `full_name · 未起会话`。
+  3. **信息窗**（talk.js:824 的 ["会话", sess(...)] 那行）：值改成 `#<id> · <真实窗口名>`（与卡片同号同人）；「全名」行不动。
+  4. **⑤会话页**（panels.js:821-859）：**主数据源换成 talk.sessions**（人），tmux.list 只用来 join「在不在跑/窗口数」（按 tmux 会话名）；
+     每行 title＝`#<id> <身份>`，sub 保留 tmux 活读数；分组＝① 在跑（alive=true）② 没在跑（alive=false）③ 临时对话（kind=solo）；
+     sessionSheet（panels.js:760-818 弹窗）里同样显示 #id 与身份；容器 roles/hermes 不成行。
+  5. **顺带修缺陷③**：talk.js:710/711 的 r.roles → 用 scenes 展平（与 refreshRoles talk.js:195-203 一致），否则「在线/没在线」永远空、known 恒空导致同一人列两条。
+
+=== ⑤ 命名统一（本人定的叫法）===
+  · 角色窗口：owner-me / pipeline-author / pipeline-renderer / pipeline-tester / research-investigator（**直接用 sessions-json 的 tmux 冒号后半段**，不用合成名）。
+  · 女仆 QQ 通道：**「本人-女仆通道」**（#4）。⚠ 素材对不上：需求文档写「在 hermes 会话里」，而真值是 tmux=qqbot:3FDE0CB3E30CD63FC5C635B4C657C844
+    （hermes 那个 tmux 容器只有 1 个窗口，是另一回事）⇒ 界面按本人叫法显示「本人-女仆通道」，不显示 qqbot、也不显示 maid；这条差异按本行处理（我不改需求文档）。
+  · 「女仆」/「maid」：角色卡第一行是**平台给的 title**（「可爱女仆（个人助手：…）」）→ 保持平台值；App 自己造的文案统一用「女仆」；全名 home.maid、窗口名 home-maid 原样保留。
+  · 本人（署名 me）**不是角色行、也不是经理**：不给他造行；#6 那行显「经理（不是本人）」。
+
+=== ⑥ 牵连面 ===
+  · 会话页换主数据源后，点击弹窗 sessionSheet(s) 拿到的 s 要带 id/role/tmux；弹窗里显示 #id。
+  · 缓存（R-26 的 HP.Cache）：sessions 键本来就在缓存里 ⇒ **不新增请求、不动缓存策略**。
+  · sess() 只有 2 个调用点（519/824，已 grep 确认；talk.js:712 的 sessOfRole 是另一个东西，别混）⇒ 删除影响面就这两处。
+  · 编号取不到时**不显示号码**，不造号 ⇒ 不会因某角色没会话行而画错。
+
+=== ⑦ 代价与回归面（SPEC §10 点名板块）===
+  · 改动文件：assets/ui/talk.js + assets/ui/panels.js（纯前端）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+  · 复测板块：主块 = **⑤ 会话页** + **⑧ 频道页（角色列表/信息窗/历史）**；跨块 1 块 = **① 聊天页-单聊**
+    （理由：信息窗在单聊里也能打开 —— talk.js:679 点消息头/他的气泡走同一个 openRoleSheet，编号必须与角色卡同号同人）。
+  · 判据（照需求文档二）：每条能看到 #id + 一行身份；与信息窗一致（同号同人）；随便点一条能说出是谁；**同一窗口不出现两条**；其它板块布局不被挤坏。
+
+=== ⑧ 边界 ===
+不接主机（不动 NAS authorized_keys）：读数来自**本机台**（真页面真 DOM，夹具是平台真回包 + 本机真 tmux 原文），**未在真机上点过** → 未验 ≠ 通过；真机复验（含"随便点一条能说出是谁"）归 tester。
