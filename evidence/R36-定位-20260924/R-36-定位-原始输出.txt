@@ -1,0 +1,48 @@
+### hermes-pocket-R36 第 1 步「定位根因」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位，未改代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r36-fake-sent.mjs（在页面里按情况替换桥回包，走**真路径** HP.Talk.send()，读真 DOM 的状态行）
+视口 393×778；桥的错误封包用真形状 {t:"err",_rid,msg}（transport.js:127-132）
+
+=== ① 判定：**是假成功**（复现了 tester 的观察）===
+不接主机时 `talk.shout` 的真实回包 = `{broadcast:true, raw:{}}`（Bridge.kt:748-752 用 runCatching 吞掉「还没连接」异常后**无条件 ok**），
+App 侧 `talk.js:1181` 写的是 `const ok = (bridged === null) ? true : !!bridged;` —— **回执里没有 delivered 就默认成功**；
+`talk.js:1183-1184` 在没有平台 ms 时退回界面往返毫秒并打上 ≈ ⇒ 于是显示「已送达 ≈3ms」。
+实测（本机台，逐条走真 send()）：① 广播+不接主机 → **「我 → 全体（广播） · 已送达 ≈3ms」state=sent** —— 与 tester 真机看到的「≈29ms」同一条路径（那个数是本地往返，与投递无关）。
+
+=== ② 逐条路径实测（DOM 原文 / data-state）===
+① 广播_不接主机(桥吞异常回空raw)               sent   我 → 全体（广播） · 已送达 ≈3ms
+② 广播_连着主机(真回包_results)             partial 我 → 全体（广播） · 1/2 已送达 1491ms · home.maid ✓ 1491ms · pipeline.author ✗ tmux 没在跑 重试
+③ 单聊_不接主机(桥delivered=false)        failed 我 → 功能创造者 · 没送达：桥说这条没投成 重试
+④ 单聊_回包缺delivered                  sent   我 → 功能创造者 · 已送达 ≈5ms
+⑤ 单聊_平台raw说没投成但桥说成功                sent   我 → 功能创造者 · 已送达 ≈3ms
+⑥ 单聊_桥报错                           failed 我 → 功能创造者 · 没送达：还没连接 重试
+⑦a 桥不回_3s后                         waiting 我 → 全体（广播） · 还在发… 3.0s 重试
+⑦b 桥不回_8s后                         timeout 我 → 全体（广播） · 没送达：超时（8 秒没回执） 重试
+结论：
+  · **会误报（假成功）3 条**：① 广播+不接主机（桥吞异常、raw 空）；④ 回包缺 delivered 字段（乐观默认）；
+    ⑤ 平台 raw 明说 `delivered:false`、桥却说成功 —— 因为 `Bridge.kt:763-764` 的 `delivered = r.isSuccess` 语义是「命令有没有抛错」，**不是平台回报的投递结果**（这条最隐蔽：连着主机也可能误报）。
+  · **不会误报（真读数）4 条**：② 广播连主机走 `raw.results` 逐角色 →「1/2 已送达 1491ms」+ 每角色 ✓/✗；③ 桥明确 `delivered:false` →「没送达：桥说这条没投成」；
+    ⑥ 桥报真错（{t:"err"}）→「没送达：还没连接」；⑦ 桥不回 → 3s「还在发…」→ 8s「没送达：超时（8 秒没回执）」。
+
+=== ③ 根因定位（文件:行）===
+  talk.js:1181       const ok = (bridged === null) ? true : !!bridged;  ← 回执缺 delivered 就当成功
+  talk.js:1183       s.ms = (ms != null) ? ms : Math.round(performance.now() - s.t0); ← 没给耗时就用界面往返毫秒
+  talk.js:1184       s.msApprox = (ms == null);  ← 于是显示成「已送达 ≈Nms」
+  Bridge.kt:748-752  talk.shout：runCatching 吞异常后**无条件 ok**，只填 {broadcast:true, raw:{}} —— 从不填 delivered
+  Bridge.kt:763-764  talk.say：delivered = r.isSuccess（命令有没有抛错），**不是平台回报的投递结果**
+
+=== ④ 改法（把「送达」收紧成「只有真回执才算」）===
+A. `talk.js:1176-1186`：缺 `delivered` 不再默认成功，改成**第三态** —— `bridged === null` ⇒ `state="unconfirmed"`、文案「**已发出（未确认）**」、`ms=null`（不写毫秒、不带 ≈）；
+   只有 `bridged === true` 才写「已送达」；`false` →「没送达：原因」；广播无 `results` 时同样归 unconfirmed（有 results 时保持现状＝真读数）。
+   配套：`sendStateText()`（talk.js:1080-1089）与 `fillSends()`（talk.js:1090-1100）各加一支中性态（别归进 ok 绿）。
+B. `Bridge.kt:748-752`（talk.shout）：**别吞异常** —— `r.isFailure` 或 raw 为空时回 `ok=false, error="还没连接/命令没跑成"`；成功时 raw 放平台原文，并**补填 delivered**（= results 全 true）。
+C. `Bridge.kt:763-764`（talk.say）：`delivered` 改成「**平台 raw 里的 delivered**」（raw 没有就给 null，不填 true），**不要用 `r.isSuccess`** —— 这样 ⑤ 那类会显示「没送达：<平台原因>」。
+D. 广播有 `results` 的分支不用动（② 已经是对的）。
+
+=== ⑤ 代价与回归面（SPEC §10 点名板块）===
+· 改动文件：`assets/ui/talk.js`（前端 A）+ `Bridge.kt`（原生 B/C）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+· 复测板块：**② 聊天页-群聊**（广播状态行：连着主机 / **不接主机** 两种，负向用例就是本条）、**① 聊天页-单聊**（talk.say：delivered:false / 缺字段 / 平台 raw 说没投成 三种）。
+  跨块理由（§10 要求写明）：两页共用同一套发送状态机（`talk.js:1160-1200`）。
+· 与 R-31 的关系：改完后「≈ms」不再冒充送达耗时 —— 送达耗时只认平台 ms（如 1491ms），R-31 的迟滞读数才可信。
+
+=== ⑥ 边界 ===
+不接主机（不动 NAS authorized_keys）：以上读数全部来自**本机台**（真 DOM/真状态机，桥回包按 Bridge.kt 的真实形状构造），**未在真机上试** → 未验 ≠ 通过；真机负向复验（断开主机按广播）归 tester。

@@ -1,0 +1,108 @@
+{
+ "① 广播_不接主机(桥吞异常回空raw)": {
+  "行": "我 → 全体（广播） · 已送达 ≈3ms",
+  "状态": "sent",
+  "类": "tk-sendrow ok",
+  "内存态": {
+   "state": "sent",
+   "ms": 3,
+   "msApprox": true,
+   "note": "",
+   "parts": null
+  },
+  "状态文案": "我 → 全体（广播） · 已送达 ≈3ms"
+ },
+ "② 广播_连着主机(真回包_results)": {
+  "行": "我 → 全体（广播） · 1/2 已送达 1491ms · home.maid ✓ 1491ms · pipeline.author ✗ tmux 没在跑 重试",
+  "状态": "partial",
+  "类": "tk-sendrow bad",
+  "内存态": {
+   "state": "partial",
+   "ms": 1491,
+   "msApprox": false,
+   "note": "pipeline.author：tmux 没在跑",
+   "parts": [
+    {
+     "role": "home.maid",
+     "ok": true,
+     "ms": 1491,
+     "note": ""
+    },
+    {
+     "role": "pipeline.author",
+     "ok": false,
+     "ms": null,
+     "note": "tmux 没在跑"
+    }
+   ]
+  },
+  "状态文案": "我 → 全体（广播） · 1/2 已送达 1491ms"
+ },
+ "③ 单聊_不接主机(桥delivered=false)": {
+  "行": "我 → 功能创造者 · 没送达：桥说这条没投成 重试",
+  "状态": "failed",
+  "类": "tk-sendrow bad",
+  "内存态": {
+   "state": "failed",
+   "ms": 3,
+   "msApprox": true,
+   "note": "桥说这条没投成",
+   "parts": null
+  },
+  "状态文案": "我 → 功能创造者 · 没送达：桥说这条没投成"
+ },
+ "④ 单聊_回包缺delivered": {
+  "行": "我 → 功能创造者 · 已送达 ≈5ms",
+  "状态": "sent",
+  "类": "tk-sendrow ok",
+  "内存态": {
+   "state": "sent",
+   "ms": 5,
+   "msApprox": true,
+   "note": "",
+   "parts": null
+  },
+  "状态文案": "我 → 功能创造者 · 已送达 ≈5ms"
+ },
+ "⑤ 单聊_平台raw说没投成但桥说成功": {
+  "行": "我 → 功能创造者 · 已送达 ≈3ms",
+  "状态": "sent",
+  "类": "tk-sendrow ok",
+  "内存态": {
+   "state": "sent",
+   "ms": 3,
+   "msApprox": true,
+   "note": "",
+   "parts": null
+  },
+  "状态文案": "我 → 功能创造者 · 已送达 ≈3ms"
+ },
+ "⑥ 单聊_桥报错": {
+  "行": "我 → 功能创造者 · 没送达：还没连接 重试",
+  "状态": "failed",
+  "类": "tk-sendrow bad",
+  "内存态": {
+   "state": "failed",
+   "ms": null,
+   "msApprox": false,
+   "note": "还没连接",
+   "parts": null
+  },
+  "状态文案": "我 → 功能创造者 · 没送达：还没连接"
+ },
+ "⑦a 桥不回_3s后": {
+  "行": "我 → 全体（广播） · 还在发… 3.0s 重试",
+  "状态": "waiting"
+ },
+ "⑦b 桥不回_8s后": {
+  "行": "我 → 全体（广播） · 没送达：超时（8 秒没回执） 重试",
+  "状态": "timeout"
+ },
+ "判定依据": {
+  "talk.js:1181": "const ok = (bridged === null) ? true : !!bridged;  ← 回执缺 delivered 就当成功",
+  "talk.js:1183": "s.ms = (ms != null) ? ms : Math.round(performance.now() - s.t0); ← 没给耗时就用界面往返毫秒",
+  "talk.js:1184": "s.msApprox = (ms == null);  ← 于是显示成「已送达 ≈Nms」",
+  "Bridge.kt:748-752": "talk.shout：runCatching 吞异常后**无条件 ok**，只填 {broadcast:true, raw:{}} —— 从不填 delivered",
+  "Bridge.kt:763-764": "talk.say：delivered = r.isSuccess（命令有没有抛错），**不是平台回报的投递结果**"
+ }
+}
