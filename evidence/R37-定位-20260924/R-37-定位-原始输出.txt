@@ -1,0 +1,52 @@
+### hermes-pocket-R37 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改工程代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r37-bubble-tap.mjs
+  · 用 CDP 派**真触摸**（Input.dispatchTouchEvent + Emulation.setTouchEmulationEnabled），不是合成 click；
+  · 夹具＝平台真回包：evidence/R37-定位-20260924/fixtures/{roles-json,sessions-json,thread-home.maid}.json（单聊线程真实 272 条）
+  · 候选改法**只在页面里挂监听**（工程文件一行未动），用来验三条负向；页面一刷就没了。
+
+=== ① 现场读数（真回包、真触摸）===
+  单聊页（home.maid）气泡数：他人 90 个 / 本人 182 个（线程真实 272 条）；聊天区可滚 = True（scrollTop 62568 / 上限 66812）
+  抬头 .tk-title 位置 x=197 y=148；他人气泡样本 x=163 y=349；空白点（命中 #tk-chat 容器本身）x=375 y=517
+
+=== ② 现状：复现 tester 的红（点哪都不开窗）===
+  点他人气泡 → 窗在 = False ；点抬头 → 窗在 = False
+  代码同证：paintChat()（talk.js:1034-1066）整段**没有任何 click 监听、没有 openRoleSheet**；
+  群聊那条路在 paintStream() 里给非本人气泡挂了 click（talk.js:676-680，data-from + openRoleSheet）。
+  为什么单聊没有：两条路数据形状不同 —— 群聊用 m.from（有发信人字段）；单聊用 talk.thread 的 items（字段是 who: me/她，**没有 from**），
+  paintChat 是后来单独写的一段，既没挂监听也没设 data-from。
+
+=== ③ 改法（注入版实测通过；真实现按这 4 处落）===
+  A. talk.js:934-937（抬头 .tk-title）：加 head.style.cursor="pointer"; head.addEventListener("click", () => this.openRoleSheet(r.full_name));
+     —— 主入口：最大、语义最对（"这个角色"的信息），远离气泡正文，不与将来任何气泡内行为抢。
+  B. talk.js:1041-1058（paintChat 的 items.forEach）：**非本人**那支加
+     if (!me) { bu.setAttribute("data-from", r.full_name); bu.addEventListener("click", () => this.openRoleSheet(r.full_name)); }
+     —— 与群聊同构（talk.js:676-680）；注意单聊这里填的是 r.full_name（不是 m.from，items 里没有这个字段）。
+  C. talk.js:1060-1064（live 追加的那批，永远是他发的）：同样挂一份。
+  D. 守卫（**必须有**，见 ⑤ 负向 3）：touchstart 记坐标 → touchmove 位移 > 8px（或按住 > 500ms）置 _drag=true → click 里 if (this._drag) return;
+
+=== ④ 冲突检查（逐条给结论）===
+  · 长按复制 / 选词：**不冲突** —— 气泡是纯 div，body { -webkit-user-select:none; user-select:none }（style.css:43-44）本来就弹不出选择菜单；
+    click 与长按是不同事件，挂 click 不会抢长按。⚠ 反过来：**以后若想让气泡能选中复制文本**，就得把"可点区"收到抬头那一行。
+  · 点链接：**不冲突** —— 气泡正文是 textContent（talk.js:1049），DOM 里没有 <a>；将来若加链接，click 里先 if (e.target.closest("a")) return; 放行。
+  · 抽屉 / 边缘手势、滚动：**不冲突** —— 只挂 click，**不碰 touchmove、不 preventDefault**（实测见负向 3：拖 80px 后滚动照常）。
+
+=== ⑤ 三条负向（真触摸实测）===
+  1) 点**本人**气泡不该开：只有 him 挂监听、me 不挂 → 窗在 = False ✔
+  2) **空白处**不该开：监听只挂元素、**不挂 #tk-chat 容器** → 点"命中容器本身"的空白点 → 窗在 = False ✔
+  3) **滚动手势**不误触：在他人气泡上按住拖 80px → 窗在 = False ✔；scrollTop 62568 → 62633（滚动照常），守卫记到位移 = True ✔
+
+=== ⑥ 注入改法后的正向实测 ===
+  点他人气泡 → 窗在 = True，内容首两行 ["全名=home.maid", "会话=role-home-maid"]
+  点抬头    → 窗在 = True，内容首两行 ["全名=home.maid", "会话=role-home-maid"]
+  （注入范围：90 个他人气泡 + 抬头；容器没挂 = True）
+
+=== ⑦ 代价与回归面（SPEC §10 点名板块）===
+  · 改动文件：assets/ui/talk.js（纯前端）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+  · 复测板块：主块 = **① 聊天页-单聊**（抬头/气泡开窗 + 三条负向 + 点完仍能正常滚动）；
+    跨块 1 块 = **② 聊天页-群聊**（理由：同一套 bubbleEl 气泡结构与 openRoleSheet，要确认群聊原行为没被这次改动影响）。
+
+=== ⑧ 顺带观察（已知缺陷，非本条）===
+探针跑的时候控制台照旧报 this.pullRoleOutput is not a function（talk.js:1062 / talk.js:173）—— 就是已登记的 R-32，与本条无关，别当成新问题。
+
+=== ⑨ 边界 ===
+不接主机：以上全部读数来自**本机台**（真 DOM + CDP 真触摸事件，视口 393×778 与 tester 设备同尺寸），**未在真机上摸过** → 未验 ≠ 通过；真机复验（尤其三条负向）归 tester。
