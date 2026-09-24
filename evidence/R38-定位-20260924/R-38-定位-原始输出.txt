@@ -1,0 +1,59 @@
+### hermes-pocket-R38 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r38-bottom-cover.mjs（真页面真 DOM/CSS，视口对齐 tester 的 393×778，喂平台真回包 roles-json）
+
+=== ① 底部固定层清点（重要：它们**不是 fixed 浮层**，是 #app 这个 flex 列里的流内元素）===
+  #composer  rect y=612..681（h=69）· position=static · z-index=30 · padding-bottom=6px
+  #keybar    rect y=681..778（h=97）· position=static · z-index=30 · padding-bottom=3px
+  ⇒ 底部固定层合计占 166 px（composer 69 + keybar 97），"chrome 顶" = y=612；视口高 778
+  安全区：--safe-b = 0px（本机台无刘海；真机上有值）；两层都写了 calc(… + var(--safe-b)) ✔
+  固定层可见性：composer.hidden=False（display=flex）/ keybar.hidden=False（display=block），设置项 showComposer/showKeybar 都是 True
+
+=== ② 列表容器是谁、能滚多少 ===
+  容器 = .panel-body（**不存在 #tk-roles 这个元素**，角色卡直接 append 进 #tab-talk）
+  rect y=85..612 · clientHeight=527 · scrollHeight=1030 · 可滚=503 px · **底部内边距 = 24px**（死值，**不含 safe-b**）
+
+=== ③ 两种状态实测（同一页面、同一视口，只差"有没有滚到底"）===
+=== a_初始位置 ===
+  scrollTop=0 / 可滚 503；完整可见的卡 5 / 5
+  最后一张卡：{"x": 12, "y": 629, "w": 369, "h": 60, "bottom": 689, "文本": "测试者 15 › pipeline.tester · role-pipeline"}
+  最后一张卡中心 elementFromPoint 命中：**TEXTAREA.**
+  「去群聊 →」：{"x": 12, "y": 1047, "w": 86, "h": 44, "bottom": 1091, "在视口内": false, "中心命中": "null"}
+  与底部固定层重叠像素：**77**
+=== b_滚到底 ===
+  scrollTop=503 / 可滚 503；完整可见的卡 2 / 5
+  最后一张卡：{"x": 12, "y": 126, "w": 369, "h": 60, "bottom": 186, "文本": "测试者 15 › pipeline.tester · role-pipeline"}
+  最后一张卡中心 elementFromPoint 命中：**BUTTON.card**
+  「去群聊 →」：{"x": 12, "y": 544, "w": 86, "h": 44, "bottom": 588, "在视口内": true, "中心命中": "BUTTON.tk-act"}
+  与底部固定层重叠像素：**0**
+  ⇒ 滚到底时：末尾卡下沿 186、去群聊下沿 588、composer 顶 612 → 末尾到固定层的间隙 = **24 px**（正好等于 .panel-body 的 padding-bottom 24px）
+  c) 再验一次 scrollIntoView（nearest）最后一张卡：{"y": 126, "bottom": 186, "视口高": 778, "中心命中": "BUTTON.card", "命中是自己或后代": true}
+
+=== ④ 判定 ===
+  · 本地台（无系统栏/键盘 inset）：**滚到底后末尾完整可见、命中自己、重叠 0px** ⇒ **不是"底部固定层盖住列表"的遮挡缺陷**：
+    两层在 #app 的 flex 流里（position:static），只会把 #stage 挤小，不会叠在滚动容器上；.panel-body 的 rect.bottom = composer.top = 612。
+  · tester 那两条读数是**列表没滚到底**时的状态：末卡 y=588（本地未滚时 629，滚到底后 126）、「去群聊 →」y=882 在视口以下；
+    按本地高度反推，他们当时 scrollTop 只走了可滚量(503px)的一小部分。
+  · 本地**无法**排除的一条（没有系统栏/键盘 inset，safe-b=0）：若真机上"滚到底也不可达"，成因会是 --vh/--vtop 与可视区不一致
+    （#app{top:var(--vtop);height:var(--vh)}，变量在 app.js:188-230 由 visualViewport 写）。这时滚动容器会比可视区更长，才会出现"滚到底也够不到"。
+    要定性，请 tester 在真机同一次读数里给出四个数：.panel-body 的 rect.bottom / #composer 的 rect.top / window.innerHeight / window.visualViewport.height。
+    （本地对照值：612 / 612 / 778 / 778 ⇒ 三者一致，所以本地看不到该现象。）
+
+=== ⑤ 改法（两条，按本人判）===
+  ① **复测口径**（不改代码就能消掉误报）：判"末尾卡/末键能不能点"之前，必须先滚到底（或对目标 scrollIntoView），否则它必然落在 composer 带里、必然命中 TEXTAREA —— 本轮 2/3 轮的红就是这么来的。
+  ② 若要把"列表末尾到固定层的间隙"抬到 SPEC §10 的 ≥44dp：`style.css:223`.panel-body 的 `padding-bottom: 24px` → `calc(44px + var(--safe-b))`（一行；全板块共用）。
+     副作用：每个面板页底部多约 20px 空白（不影响任何固定层、不动手势、不动滚动逻辑）。
+  ③ 若真机四个数证实是 --vh/--vtop 失配（滚动容器比可视区更长），那不是 padding 能修的：要改 `#app` 高度口径与 visualViewport 更新（style.css:56-64 + app.js:188-230）。**这条等真机读数再定，我不先动。**
+
+=== ⑥ 影响面（这份改法会不会碰到别的页面）===
+  `.panel-body` 是**所有面板页共用的滚动容器**（`.tabpage` 全在里面：主机/密钥/设置/Hermes/会话/网络/角色/群聊）。
+  改 (②) 等于**每个面板页底部统一多 ~44px 空白**（现在 24px）——单聊、群聊、设置页、网络页都会跟着变，属"一致的间距口径"，不是局部特例；
+  如果不想要这个全局效果，就只能给角色列表所在的 `#tab-talk` 单独加 padding-bottom（会与其它页不一致）。
+  ⚠ 注意单聊页的输入条是 `#tk-sayline{position:sticky;bottom:0}`（talk.js:1004-1010），也在这个滚动容器里 —— 改 padding-bottom 不影响它，但复测时要顺带看一眼它贴底的样子。
+
+=== ⑦ 代价与回归面（SPEC §10 点名板块）===
+  · 走 (①) 纯口径：**不出包**；走 (②) 改 style.css（纯前端）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+  · 复测板块：主块 = **⑧ 频道页（角色列表）**——**这条必须有：真机滚到底后点末尾卡与「去群聊 →」**（两个都要点到）；
+    跨块 = **① 聊天页-单聊**、**② 聊天页-群聊**、**③ 设置页**（理由：共用 .panel-body 滚动容器，改 padding-bottom 三个板块的底部留白都会变；§10 要求写明为什么跨）。
+
+=== ⑧ 边界 ===
+不接主机（不动 NAS authorized_keys）：全部读数来自**本机台**（真 DOM/CSS，视口 393×778 与 tester 设备同尺寸，但**没有系统栏/键盘 inset**、safe-b=0）→ **未验 ≠ 通过**；真机复验（滚到底点末尾 + ④ 那四个数）归 tester。

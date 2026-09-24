@@ -1,0 +1,177 @@
+{
+ "显示层": {
+  "composer": {
+   "hidden": false,
+   "显示": "flex"
+  },
+  "keybar": {
+   "hidden": false,
+   "显示": "block"
+  },
+  "显示输入框设置": true,
+  "显示键条设置": true
+ },
+ "a_初始位置": {
+  "视口高": 778,
+  "列表容器": {
+   "class": ".panel-body",
+   "rect": {
+    "x": 0,
+    "y": 85,
+    "w": 393,
+    "h": 527,
+    "bottom": 612,
+    "top": 85
+   },
+   "scrollTop": 0,
+   "clientHeight": 527,
+   "scrollHeight": 1030,
+   "可滚到": 503,
+   "底部内边距": "24px"
+  },
+  "卡片数": 5,
+  "最后一张卡": {
+   "x": 12,
+   "y": 629,
+   "w": 369,
+   "h": 60,
+   "bottom": 689,
+   "文本": "测试者 15 › pipeline.tester · role-pipeline"
+  },
+  "最后一张卡中心命中": "TEXTAREA.",
+  "去群聊": {
+   "x": 12,
+   "y": 1047,
+   "w": 86,
+   "h": 44,
+   "bottom": 1091,
+   "在视口内": false,
+   "中心命中": "null"
+  },
+  "底部固定层": {
+   "composer": {
+    "x": 0,
+    "y": 612,
+    "w": 393,
+    "h": 69,
+    "bottom": 681,
+    "top": 612
+   },
+   "composer_css": {
+    "position": "static",
+    "zIndex": "30",
+    "paddingBottom": "6px",
+    "height": "69px",
+    "overflow": "visible"
+   },
+   "keybar": {
+    "x": 0,
+    "y": 681,
+    "w": 393,
+    "h": 97,
+    "bottom": 778,
+    "top": 681
+   },
+   "keybar_css": {
+    "position": "static",
+    "zIndex": "30",
+    "paddingBottom": "3px",
+    "height": "97px",
+    "overflow": "visible"
+   },
+   "chrome顶": 612,
+   "安全区变量": {
+    "safe_b": "0px",
+    "composer_h": "48px",
+    "keybar_h": "46px"
+   }
+  },
+  "重叠": 77,
+  "视口内可见的卡": 5
+ },
+ "b_滚到底": {
+  "视口高": 778,
+  "列表容器": {
+   "class": ".panel-body",
+   "rect": {
+    "x": 0,
+    "y": 85,
+    "w": 393,
+    "h": 527,
+    "bottom": 612,
+    "top": 85
+   },
+   "scrollTop": 503,
+   "clientHeight": 527,
+   "scrollHeight": 1030,
+   "可滚到": 503,
+   "底部内边距": "24px"
+  },
+  "卡片数": 5,
+  "最后一张卡": {
+   "x": 12,
+   "y": 126,
+   "w": 369,
+   "h": 60,
+   "bottom": 186,
+   "文本": "测试者 15 › pipeline.tester · role-pipeline"
+  },
+  "最后一张卡中心命中": "BUTTON.card",
+  "去群聊": {
+   "x": 12,
+   "y": 544,
+   "w": 86,
+   "h": 44,
+   "bottom": 588,
+   "在视口内": true,
+   "中心命中": "BUTTON.tk-act"
+  },
+  "底部固定层": {
+   "composer": {
+    "x": 0,
+    "y": 612,
+    "w": 393,
+    "h": 69,
+    "bottom": 681,
+    "top": 612
+   },
+   "composer_css": {
+    "position": "static",
+    "zIndex": "30",
+    "paddingBottom": "6px",
+    "height": "69px",
+    "overflow": "visible"
+   },
+   "keybar": {
+    "x": 0,
+    "y": 681,
+    "w": 393,
+    "h": 97,
+    "bottom": 778,
+    "top": 681
+   },
+   "keybar_css": {
+    "position": "static",
+    "zIndex": "30",
+    "paddingBottom": "3px",
+    "height": "97px",
+    "overflow": "visible"
+   },
+   "chrome顶": 612,
+   "安全区变量": {
+    "safe_b": "0px",
+    "composer_h": "48px",
+    "keybar_h": "46px"
+   }
+  },
+  "重叠": 0,
+  "视口内可见的卡": 2
+ },
+ "c_scrollIntoView最后一张卡": {
+  "y": 126,
+  "bottom": 186,
+  "视口高": 778,
+  "中心命中": "BUTTON.card",
+  "命中是自己或后代": true
+ }
+}
