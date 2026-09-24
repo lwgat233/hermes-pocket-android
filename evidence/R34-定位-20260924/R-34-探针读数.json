@@ -1,0 +1,127 @@
+{
+ "桥注入": {
+  "真实roles夹具": true,
+  "角色数": 5
+ },
+ "频道页角色卡": [
+  {
+   "角色": "home.maid",
+   "第一行": "可爱女仆（个人助手：管生活，中转要紧的话）",
+   "副行": "home.maid · role-home-maid",
+   "标签": [
+    "qqbot"
+   ],
+   "标签行存在": true,
+   "卡片高": 81
+  },
+  {
+   "角色": "owner.me",
+   "第一行": "我（经理：能管流程，但看不到私信内容）",
+   "副行": "owner.me · role-owner-me",
+   "标签": [],
+   "标签行存在": false,
+   "卡片高": 60
+  },
+  {
+   "角色": "pipeline.author",
+   "第一行": "功能创造者",
+   "副行": "pipeline.author · role-pipeline-author",
+   "标签": [],
+   "标签行存在": false,
+   "卡片高": 60
+  },
+  {
+   "角色": "pipeline.renderer",
+   "第一行": "渲染者",
+   "副行": "pipeline.renderer · role-pipeline-renderer",
+   "标签": [],
+   "标签行存在": false,
+   "卡片高": 60
+  },
+  {
+   "角色": "pipeline.tester",
+   "第一行": "测试者",
+   "副行": "pipeline.tester · role-pipeline-tester",
+   "标签": [],
+   "标签行存在": false,
+   "卡片高": 60
+  }
+ ],
+ "页面上有没有这些字": {
+  "含_接入频道": false,
+  "含_能接入": false,
+  "含_未接": false,
+  "含_qqbot": true
+ },
+ "信息窗_home_maid": {
+  "行": [
+   {
+    "键": "全名",
+    "值": "home.maid"
+   },
+   {
+    "键": "会话",
+    "值": "role-home-maid"
+   },
+   {
+    "键": "状态",
+    "值": "在线"
+   },
+   {
+    "键": "欠回复",
+    "值": "159"
+   },
+   {
+    "键": "标签",
+    "值": "生活,中转"
+   },
+   {
+    "键": "能接入",
+    "值": "qqbot"
+   }
+  ],
+  "文本": "可爱女仆（个人助手：管生活，中转要紧的话） | ✕ | 全名 | home.maid | 会话 | role-home-maid | 状态 | 在线 | 欠回复 | 159 | 标签 | 生活,中转 | 能接入 | qqbot | 跟他对话 | 改信息 | 暂停他 | 删除他"
+ },
+ "信息窗_pipeline_author": {
+  "行": [
+   {
+    "键": "全名",
+    "值": "pipeline.author"
+   },
+   {
+    "键": "会话",
+    "值": "role-pipeline-author"
+   },
+   {
+    "键": "状态",
+    "值": "在线"
+   },
+   {
+    "键": "欠回复",
+    "值": "17"
+   },
+   {
+    "键": "标签",
+    "值": "（无）"
+   },
+   {
+    "键": "能接入",
+    "值": "（无）"
+   }
+  ],
+  "文本": "功能创造者 | ✕ | 全名 | pipeline.author | 会话 | role-pipeline-author | 状态 | 在线 | 欠回复 | 17 | 标签 | （无） | 能接入 | （无） | 跟他对话 | 改信息 | 暂停他 | 删除他"
+ },
+ "频道区": {
+  "折叠时": "频道（1）▸",
+  "展开": [
+   "qqbot home.maid"
+  ]
+ },
+ "源码位置": {
+  "角色卡-标签循环": "talk.js:522-529（.tags/.tk-tag，逐个 channel 一个无标注标签）",
+  "信息窗-能接入行": "talk.js:826（['能接入', channels.join('、') || '（无）']）",
+  "频道区-顶层注册表": "talk.js:366-384（this.channels ← roles-json 顶层 channels）",
+  "桥-取数": "Bridge.kt:708（talk.roles → talk.py roles-json）",
+  "刷新入口": "talk.js:195-203 refreshRoles()"
+ }
+}

@@ -1,0 +1,55 @@
+### hermes-pocket-R34 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改工程代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r34-channels.mjs（喂**平台真实 roles-json 回包**，走真路径 showBoard("talk")→refreshRoles→render / openRoleSheet）
+夹具：evidence/R34-定位-20260924/fixtures/roles-json.json（平台 python3 tools/talk.py roles-json 原样回包，1171 字节）
+视口 393×778（与 tester 设备同尺寸；1 CSS px = 1 dp）
+
+=== ① 结论先说：App **已经**把「接入频道」画出来了，缺的是标注与空态 ===
+实测（真回包，5 个角色）：
+  角色卡（.tk-rolecard）：home.maid 高 81dp、其 .tags 行有一个**无标注**标签「qqbot」；
+    另外 4 个（channels=[]）高 60dp、**连 .tags 行都没有**（看上去分不清「没接」还是「字段没做」）。
+  信息窗（点角色弹出的 .tk-sheet）：6 行 = 全名 / 会话 / 状态 / 欠回复 / 标签 / **能接入**；
+    home.maid →「能接入 qqbot」；pipeline.author →「能接入 （无）」。
+  整页字面检查：含「qqbot」= True；含「接入频道」= **False**；含「能接入」= **False**（卡片上）；含「未接」= False。
+  ⇒ 经理说的「没有一栏显示它」在**当前树**上已不成立（数据到了、也画了），真正缺的是：① 角色卡那行没有名字 ② 空数组没有口径。
+
+=== ② 现状位置（文件:行）与现在显示了哪几项 ===
+· 角色列表（频道页）= talk.js:506-535 roleCard()：
+    第一行 .row1：状态点 + 描述 r.title || r.name + 欠回复角标 r.pending + 箭头（talk.js:512-517）
+    副行 .sub：full_name · 会话名（+ 不在线/被停）（talk.js:519-521）
+    标签行 .tags：每个 channel 一个 .tk-tag（**无前缀、无 label**，talk.js:522-529）
+    点击 → openRoleSheet(r.full_name)（talk.js:530）
+· 信息窗 = talk.js:809-830 paintSheet()：六行 = 全名 / 会话 / 状态 / 欠回复 / 标签 / 能接入（talk.js:823-826）；
+    「能接入」的值 = (r.channels||[]).join("、") || "（无）"（talk.js:826）
+· 顶层「频道（N）」折叠区 = talk.js:366-384：折叠显示「频道（1）」，展开一行 qqbot → home.maid
+    （这是**另一个东西**：频道注册表，值＝谁能收到；见 ⑤ 的坑）
+· 频道页其它部分：抬头两个开关（实时 / 含私信 🔒，talk.js:275-276）、服务端状态行（talk.js:279+）、角色卡列表（talk.js:325）、
+    「＋ 新角色」（talk.js:355-363）、常驻 3 键（talk.js:389+）
+
+=== ③ 数据来源（这一侧不用改）===
+Bridge.kt:708（talk.roles → talk.py roles-json）→ talk.js:195-203 refreshRoles()：this.channels = r.channels（顶层）、每个角色对象自带 channels。
+实测每角色 channels：{"home.maid": ["qqbot"], "owner.me": [], "pipeline.author": [], "pipeline.renderer": [], "pipeline.tester": []}
+顶层 channels：{"qqbot": ["home.maid"]}（= 频道区那行）
+
+=== ④ 改法（3 处，全在 assets/ui/）===
+① talk.js:522-529（roleCard 的标签循环）—— 给这行**明确标注**。二选一：
+   (a) 最小改动：保留标签样式，在 .tags 里最前面插一个 <span class="tk-label">接入频道</span>（只动这一处，样式基本不用改）
+   (b) 推荐：换成一行副行 <div class="sub">接入频道：qqbot</div>，channels 为空时**不出这行**（列表保持紧凑：有频道的 81dp、没有的 60dp）
+② talk.js:826（信息窗）—— 键名「能接入」→「**接入频道**」，空值「（无）」→「**未接**」（与卡片口径统一）
+③ CSS：走 (b) 需要在 talk.css 加一条（如 .tk-chanline { color: #8b93a5; font-size: 12px; }）或直接复用 .sub（不新增样式）；走 (a) 可完全不加 CSS
+
+=== ⑤ 一个坑（点名）===
+this.channels（talk.js:199，**顶层注册表**：频道 → 谁能收到，喂给「频道（N）」那一区）与 r.channels（**每个角色的数组**）**同名不同物**。
+改的时候别把两者串了：卡片上要显示的是 r.channels（这个角色接在哪些频道），频道区要显示的是 this.channels（这个频道谁收得到）。
+
+=== ⑥ 空数组怎么显示（我的建议，等本人判）===
+建议：**角色卡上不显示这一行**（空态不占位，列表紧凑），**信息窗里写「未接」**（点开能看全：既不误导成"没做"，也不把列表撑长）。
+备选：卡片上也一律显示「接入频道：未接」——代价是 5 张卡片全部从 60dp 变 81dp（列表多 105dp，滚动更长）。
+
+=== ⑦ 代价与回归面（按 SPEC §10 点名板块）===
+· 改动文件：assets/ui/talk.js（+ 可能 talk.css）⇒ 纯前端资源，**必须重出 APK**，出包这一步归 **renderer**（第 2 步）。
+· 复测板块：主块 = **⑧ 频道页（角色列表）**（5 张卡片：描述/副行/新行/高度、列表滚动、点击仍开信息窗）；
+  跨块 1 块 = **① 聊天页-单聊**（理由：信息窗是共用的 —— talk.js:679 在单聊里点消息头也开同一个 openRoleSheet，「接入频道」那行会一起出现；按 §10 要求写明为什么跨）。
+· 不需要动的：桥与平台侧（Bridge.kt:708、talk.py roles-json 已经带 channels）。
+
+=== ⑧ 边界 ===
+不接主机（不动 NAS authorized_keys）：上面全部读数来自**本地台**（Playwright + 真 DOM，喂平台真实回包，视口同尺寸），**未在真机点过** → 未验 ≠ 通过；真机复验归 tester。
