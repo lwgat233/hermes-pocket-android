@@ -1,0 +1,379 @@
+{
+ "注入的CSS": ".btn { min-height: 44px; }\n.tk-chip { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }\n.tk-askin { min-height: 44px; box-sizing: border-box; }\n.tk-act { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }",
+ "注入前_设置页": {
+  "视图": "设置页-注入前",
+  "目标": {
+   "设置页看明细": {
+    "选择器": "[data-store=\"detail\"]",
+    "x": 25,
+    "y": 338,
+    "w": 72,
+    "h": 42,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": false,
+    "css_minHeight": "42px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "设置页清理": {
+    "选择器": "[data-store=\"clean\"]",
+    "x": 105,
+    "y": 338,
+    "w": 58,
+    "h": 42,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": false,
+    "css_minHeight": "42px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊喊话输入框": {
+    "缺失": true,
+    "选择器": "#tk-shoutin"
+   },
+   "群聊广播键": {
+    "缺失": true,
+    "选择器": "#tk-shoutok"
+   },
+   "群聊身份键": {
+    "缺失": true,
+    "选择器": "#tk-whosay2"
+   },
+   "群聊投递台账键": {
+    "缺失": true,
+    "选择器": "#tk-delivbtn"
+   }
+  },
+  "横向间距": {
+   "看明细→清理": 8,
+   "喊话输入框→广播键": null,
+   "广播键→身份键": null
+  },
+  "纵向间隙": {
+   "喊话行底→台账键顶": null
+  },
+  "横向溢出": {
+   "群聊喊话行_内容宽超过容器": null,
+   "设置页按钮行_内容宽超过容器": null,
+   "文档横向溢出": false
+  },
+  "文档高": 778
+ },
+ "注入前_群聊": {
+  "视图": "群聊-注入前",
+  "目标": {
+   "设置页看明细": {
+    "选择器": "[data-store=\"detail\"]",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "42px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "设置页清理": {
+    "选择器": "[data-store=\"clean\"]",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "42px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊喊话输入框": {
+    "选择器": "#tk-shoutin",
+    "x": 12,
+    "y": 151,
+    "w": 232,
+    "h": 38,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": false,
+    "css_minHeight": "auto",
+    "css_padding": "9px 10px",
+    "css_fontSize": "14px"
+   },
+   "群聊广播键": {
+    "选择器": "#tk-shoutok",
+    "x": 252,
+    "y": 151,
+    "w": 56,
+    "h": 38,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": false,
+    "css_minHeight": "auto",
+    "css_padding": "10px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊身份键": {
+    "选择器": "#tk-whosay2",
+    "x": 316,
+    "y": 151,
+    "w": 65,
+    "h": 38,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": false,
+    "css_minHeight": "auto",
+    "css_padding": "6px 12px",
+    "css_fontSize": "13px"
+   },
+   "群聊投递台账键": {
+    "选择器": "#tk-delivbtn",
+    "x": 12,
+    "y": 189,
+    "w": 78,
+    "h": 32,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": false,
+    "css_minHeight": "0px",
+    "css_padding": "6px 12px",
+    "css_fontSize": "13px"
+   }
+  },
+  "横向间距": {
+   "看明细→清理": 0,
+   "喊话输入框→广播键": 8,
+   "广播键→身份键": 8
+  },
+  "纵向间隙": {
+   "喊话行底→台账键顶": null
+  },
+  "横向溢出": {
+   "群聊喊话行_内容宽超过容器": false,
+   "设置页按钮行_内容宽超过容器": null,
+   "文档横向溢出": false
+  },
+  "文档高": 778
+ },
+ "注入后_设置页": {
+  "视图": "设置页-注入后",
+  "目标": {
+   "设置页看明细": {
+    "选择器": "[data-store=\"detail\"]",
+    "x": 25,
+    "y": 336,
+    "w": 72,
+    "h": 44,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": true,
+    "css_minHeight": "44px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "设置页清理": {
+    "选择器": "[data-store=\"clean\"]",
+    "x": 105,
+    "y": 336,
+    "w": 58,
+    "h": 44,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": true,
+    "css_minHeight": "44px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊喊话输入框": {
+    "选择器": "#tk-shoutin",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "44px",
+    "css_padding": "9px 10px",
+    "css_fontSize": "14px"
+   },
+   "群聊广播键": {
+    "选择器": "#tk-shoutok",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "44px",
+    "css_padding": "10px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊身份键": {
+    "选择器": "#tk-whosay2",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "44px",
+    "css_padding": "6px 12px",
+    "css_fontSize": "13px"
+   },
+   "群聊投递台账键": {
+    "选择器": "#tk-delivbtn",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "44px",
+    "css_padding": "6px 12px",
+    "css_fontSize": "13px"
+   }
+  },
+  "横向间距": {
+   "看明细→清理": 8,
+   "喊话输入框→广播键": 0,
+   "广播键→身份键": 0
+  },
+  "纵向间隙": {
+   "喊话行底→台账键顶": null
+  },
+  "横向溢出": {
+   "群聊喊话行_内容宽超过容器": false,
+   "设置页按钮行_内容宽超过容器": null,
+   "文档横向溢出": false
+  },
+  "文档高": 778
+ },
+ "注入后_群聊": {
+  "视图": "群聊-注入后",
+  "目标": {
+   "设置页看明细": {
+    "选择器": "[data-store=\"detail\"]",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "44px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "设置页清理": {
+    "选择器": "[data-store=\"clean\"]",
+    "x": 0,
+    "y": 0,
+    "w": 0,
+    "h": 0,
+    "上沿命中": "topbar",
+    "下沿命中": "null",
+    "中心命中": "topbar",
+    "ge44": false,
+    "css_minHeight": "44px",
+    "css_padding": "0px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊喊话输入框": {
+    "选择器": "#tk-shoutin",
+    "x": 12,
+    "y": 151,
+    "w": 232,
+    "h": 44,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": true,
+    "css_minHeight": "44px",
+    "css_padding": "9px 10px",
+    "css_fontSize": "14px"
+   },
+   "群聊广播键": {
+    "选择器": "#tk-shoutok",
+    "x": 252,
+    "y": 151,
+    "w": 56,
+    "h": 44,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": true,
+    "css_minHeight": "44px",
+    "css_padding": "10px 14px",
+    "css_fontSize": "14px"
+   },
+   "群聊身份键": {
+    "选择器": "#tk-whosay2",
+    "x": 316,
+    "y": 151,
+    "w": 65,
+    "h": 44,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": true,
+    "css_minHeight": "44px",
+    "css_padding": "6px 12px",
+    "css_fontSize": "13px"
+   },
+   "群聊投递台账键": {
+    "选择器": "#tk-delivbtn",
+    "x": 12,
+    "y": 195,
+    "w": 78,
+    "h": 44,
+    "上沿命中": "self",
+    "下沿命中": "self",
+    "中心命中": "self",
+    "ge44": true,
+    "css_minHeight": "44px",
+    "css_padding": "6px 12px",
+    "css_fontSize": "13px"
+   }
+  },
+  "横向间距": {
+   "看明细→清理": 0,
+   "喊话输入框→广播键": 8,
+   "广播键→身份键": 8
+  },
+  "纵向间隙": {
+   "喊话行底→台账键顶": null
+  },
+  "横向溢出": {
+   "群聊喊话行_内容宽超过容器": false,
+   "设置页按钮行_内容宽超过容器": null,
+   "文档横向溢出": false
+  },
+  "文档高": 778
+ },
+ "点投递台账键下沿": {
+  "点后": true,
+  "下沿命中的是": "tk-delivbtn"
+ }
+}

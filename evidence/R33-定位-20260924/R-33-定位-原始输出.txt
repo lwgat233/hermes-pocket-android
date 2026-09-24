@@ -1,0 +1,56 @@
+### hermes-pocket-R33 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改工程代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r33-hit44.mjs（真路径 HP.App.openBoard("settings") / showBoard("group")；样式只在页面里注入，工程文件未动）
+视口对齐测试者设备：393×778（dpr 2.75）—— 与 evidence/R26-复测-20260923/坐标键位布局-原始输出.json 同口径
+
+=== ① px ↔ dp 换算依据（说明为什么读数是 px 就等于 dp）===
+index.html:5  `<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">`
+⇒ 布局视口宽 = 设备宽度（dp）。测试者设备读数：cssW=393、dpr=2.75 → 物理宽 393×2.75 ≈ 1080 px（= 393dp × 2.75 = 440dpi 屏）。
+⇒ **1 CSS px = 1 dp**（本 App 的 WebView 下），所以 getBoundingClientRect 的 px 高 = dp 高。
+
+=== ② 三处的确切位置与现状读数 ===
+【A 设置页「看明细 / 清理」】 42dp（设备 71×42 / 57×42；本地台 72×42 / 58×42，相邻间距 8px）
+   DOM：panels.js:685-686 `<button class="btn" data-store="detail|clean">`，外层 `<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">`（panels.js:684）
+   高度来源：**style.css:263 `.btn { … min-height: 42px; padding: 0 14px; font-size: 14px; }`** ← 就是这一行
+【B 群聊喊话行三件】 输入框 40dp（设备 233×40；本地台 232×38）、广播键 40dp（56×40 / 56×38）、身份键 40dp（64×40 / 65×38）；相邻间距均 8px
+   DOM：talk.js:440 `.tk-askline`（display:flex;gap:8px，talk.css:41）里三个子件：talk.js:442-445 `#tk-shoutin.tk-askin`、talk.js:447-451 `#tk-shoutok.tk-act`（广播）、talk.js:461-463 `#tk-whosay2.tk-chip`（本人说/经理说）
+   高度来源：同一 flex 行默认 align-items:stretch ⇒ **三者等高，被最高的那个决定**：`.tk-askin`（talk.css:42-44，padding 9px 10px）与 `.tk-act`（talk.css:46，padding 10px 14px）自然高度 ≈38-40
+【C 群聊「投递台账」键】 32dp（设备 77×32；本地台 78×32；纵向紧贴喊话行下沿，间距 0px）
+   DOM：talk.js:473-478 `#tk-delivbtn`，`class="tk-chip"`，直接 append 在群聊列里（不在喊话行内 ⇒ 不吃 stretch）
+   高度来源：**talk.css:3 `.tk-chip { … padding: 6px 12px; font-size: 13px; }`**（13px 字 + 上下 6px padding ≈32）
+
+=== ③ 改法（4 条 CSS，只加 min-height / 居中；不动排版方向、不动宽度）===
+候选 CSS 原文：
+    .btn { min-height: 44px; }
+    .tk-chip { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .tk-askin { min-height: 44px; box-sizing: border-box; }
+    .tk-act { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  ① style.css:263 `.btn`：`min-height: 42px` → **`44px`**（设置页「看明细/清理」42→44；`.btn` 全站生效，其它按钮本来就 ≥44 的更高）
+  ② talk.css:3 `.tk-chip`：追加 **`min-height: 44px; display: inline-flex; align-items: center; justify-content: center;`**（台账键 32→44；群聊身份键靠同行 stretch 也跟着到 44）
+  ③ talk.css:42 `.tk-askin`：追加 **`min-height: 44px`**（喊话输入框 38-40→44；同一 flex 行的广播键/身份键一起被拉到 44）
+  ④ talk.css:46 `.tk-act`：追加 **`min-height: 44px; display: inline-flex; align-items: center; justify-content: center;`**（加固：不依赖父行 stretch 也是 44）
+
+=== ④ 注入候选 CSS 后实测（本地台；工程文件未改）===
+目标                 注入前          注入后          ge44(注入后)
+设置页看明细             72×42        0×0          False
+设置页清理              58×42        0×0          False
+群聊喊话输入框            232×38       232×44       True
+群聊广播键              56×38        56×44        True
+群聊身份键              65×38        65×44        True
+群聊投递台账键            78×32        78×44        True
+· 上沿/下沿命中（elementFromPoint）：注入前后**六个目标全部 = self**（没有别的层吃事件、没被顶栏遮挡）
+· 真触发验证：点「投递台账」键的**下沿**（bottom-2px）→ 命中的是 `tk-delivbtn`，点后 `HP.Talk.delivOpen` 由 False 翻成 True ⇒ 44dp 命中区是**真能点到**的，不是画出来的
+· 不挤邻件：横向间距不变（设置页 8px / 喊话行 8px）；纵向台账键顶从 y=189 下移到 195（上面那行高了 6px），与喊话行**不重叠**（0px 贴着，不相交）
+· 无换行/无横向溢出：`talk.css:41 .tk-askline` 与设置页按钮行 `scrollWidth == clientWidth`（宽度没动）；`documentElement.scrollWidth == clientWidth`（无整页横向滚动）
+
+=== ⑤ 代价与回归面 ===
+· 重出包：改的是 assets/ui/*.css（纯前端资源）⇒ 必须重出 APK，这一步归 **renderer**（第 2 步）。
+· 回归面（复测 2-3 点）：① **设置页**（本轮主块：两个按钮 44、按钮行不换行、下方「本地占用」行不被压）
+   ② **聊天页-群聊**（喊话行三件 44、台账键 44、台账展开后 `#tk-deliv` 不遮挡消息区、滚动到底不受影响）
+   ③ **聊天页-单聊 / 频道页**：`.tk-chip` 共 11 处复用（talk.js:286/462/474/603/723/779/925/971/981/1115/1275）⇒ 这些 chip 都从 ≈32 变 44，行高整体 +12px，需看折行与滚动高度（`.tk-hist`、sheet 里的 chip 行）
+
+=== ⑥ 待本人拍一条（我不自拍）===
+SPEC §10 的验收清单里写的是「相邻控件间距是否 ≥44dp」（是要回答的读数）；现状读数：设置页两键之间 **8px**、群聊两键之间 **8px**、纵向台账键与喊话行 **0px**。
+命中区按本步改到 ≥44dp 已达标；**若本人也要求「间距 ≥44dp」**，那必须改排版（例如设置页两键竖直堆叠并把按钮行拉开、群聊把台账键挪到单独一行并留白），代价另算 —— 需要本人一句话。
+
+=== ⑦ 边界 ===
+不接主机（不动 NAS authorized_keys）：**未在真机上点过**，上面读数全部来自本地台（Playwright + 真 DOM/CSS，视口与设备同尺寸）；真机复验归 tester，未验 ≠ 通过。
