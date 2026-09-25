@@ -1,0 +1,141 @@
+{
+ "a_未滚到底": {
+  "视口高": 778,
+  "sticky条": {
+   "position": "sticky",
+   "bottom": "0px",
+   "zIndex": "auto",
+   "height": 60,
+   "top": 528,
+   "bottomPx": 588,
+   "paddingBottom": "8px",
+   "marginBottom": "0px"
+  },
+  "聊天框": {
+   "top": 204,
+   "bottom": 577,
+   "clientHeight": 373,
+   "scrollHeight": 71265,
+   "scrollTop": 70892,
+   "可滚到": 70892,
+   "CSS_maxHeight": "373.44px",
+   "内边距": "0px"
+  },
+  "外层滚动": {
+   "rect": {
+    "top": 85,
+    "bottom": 612
+   },
+   "scrollTop": 0,
+   "可滚到": 101,
+   "内边距底": "24px"
+  },
+  "气泡数": 272,
+  "末条气泡": {
+   "top": 366,
+   "bottom": 577,
+   "高": 211,
+   "文本": "我 → 可爱女仆（个人助手：管生活，把要紧的话中",
+   "中心命中": "DIV.",
+   "下沿命中": "INPUT.tk-askin#tk-sayin"
+  },
+  "重叠px": 49,
+  "输入框清点": {
+   "tk_sayin个数": 1,
+   "tk_sayin_类": "tk-askin",
+   "tk_askin总数": 1,
+   "tk_sayline个数": 1,
+   "页面里所有input的id类": [
+    "tk-sayin/tk-askin"
+   ]
+  }
+ },
+ "b_滚到底": {
+  "视口高": 778,
+  "sticky条": {
+   "position": "sticky",
+   "bottom": "0px",
+   "zIndex": "auto",
+   "height": 60,
+   "top": 528,
+   "bottomPx": 588,
+   "paddingBottom": "8px",
+   "marginBottom": "0px"
+  },
+  "聊天框": {
+   "top": 103,
+   "bottom": 476,
+   "clientHeight": 373,
+   "scrollHeight": 71265,
+   "scrollTop": 70892,
+   "可滚到": 70892,
+   "CSS_maxHeight": "373.44px",
+   "内边距": "0px"
+  },
+  "外层滚动": {
+   "rect": {
+    "top": 85,
+    "bottom": 612
+   },
+   "scrollTop": 101,
+   "可滚到": 101,
+   "内边距底": "24px"
+  },
+  "气泡数": 272,
+  "末条气泡": {
+   "top": 265,
+   "bottom": 476,
+   "高": 211,
+   "文本": "我 → 可爱女仆（个人助手：管生活，把要紧的话中",
+   "中心命中": "DIV.",
+   "下沿命中": "DIV.tk-bub"
+  },
+  "重叠px": 0,
+  "输入框清点": {
+   "tk_sayin个数": 1,
+   "tk_sayin_类": "tk-askin",
+   "tk_askin总数": 1,
+   "tk_sayline个数": 1,
+   "页面里所有input的id类": [
+    "tk-sayin/tk-askin"
+   ]
+  }
+ },
+ "c_scrollIntoView末条": {
+  "末条top": 265,
+  "末条bottom": 476,
+  "条top": 528,
+  "重叠px": 0,
+  "中心命中": "DIV.",
+  "命中是自己或后代": true
+ },
+ "d_改法乙_内层补内边距": {
+  "注入的样式": "#tk-chat { padding-bottom: calc(68px + var(--safe-b)) !important; }",
+  "sticky条高": 60,
+  "改法前": {
+   "末条bottom": 577,
+   "条top": 528,
+   "重叠px": 49,
+   "中心命中": "DIV."
+  },
+  "改法后": {
+   "末条bottom": 509,
+   "条top": 528,
+   "重叠px": 0,
+   "中心命中": "DIV.",
+   "命中是气泡本身": true
+  }
+ },
+ "d2_甲案_外层补内边距": {
+  "注入的样式": ".panel-body { padding-bottom: calc(68px + var(--safe-b)) !important; }",
+  "外层不滚时_重叠px": 93,
+  "中心命中": "DIV."
+ },
+ "e_源码位置": {
+  "sticky 条创建": "talk.js:1113-1125（line.id=\"tk-sayline\"，line.style.position=\"sticky\"，bottom=0，背景 #0f1218）",
+  "单聊输入框": "talk.js:1129（inp.id=\"tk-sayin\"）",
+  "聊天框": "talk.js:1040-1048（#tk-chat：maxHeight 48vh、overflowY auto、overflowAnchor none）",
+  "DOM 顺序": "render() talk.js:373-375：先 paintRole（bar→head→#tk-chat→chips→#tk-sayline），**再 paintSends(el)** ⇒ 粘性条后面还有内容（发送状态行），这就是\"滚到底仍被压\"的原因",
+  "外层滚动容器": ".panel-body（style.css:223，padding-bottom 24px）"
+ }
+}
