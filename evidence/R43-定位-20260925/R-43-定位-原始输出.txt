@@ -1,0 +1,62 @@
+### hermes-pocket-R43 第 1 步「定位与改法」原始输出 —— 2026-09-25 · 角色 pipeline.author（只定位、只出改法，未改代码、未跑平台写操作）
+探针：source/hermes-pocket/tools/ui-harness/d-r43-receipt.mjs（**四种真实回执形状**喂桥，走真 `HP.Talk.send()`，读真状态行）
+平台侧证据：`tools/talk.py` 源码逐行对照（见 ②，都是 文件:行，可复核）
+⚠ 说明：**没有**在正式库里跑 `talk.py say`（那会给真人投一条消息）——平台侧结论全部来自源码路径 + App 端四种形状实测。
+   （我先前想"复制一份库跑真 CLI"的做法已被安全策略拦下，那条路放弃，不影响结论：CLI 的输出形态在源码里一目了然。）
+
+=== ① App 端四种回执形状的实测（真状态行）===
+  · A 现状真形状 → 状态行＝**我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 已发出（未确认）**（data-state=unconfirmed，内存态 {"state": "unconfirmed", "ms": null, "msApprox": false, "note": ""}）
+  · B 甲案真回执 → 状态行＝**我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 已送达 1491ms**（data-state=sent，内存态 {"state": "sent", "ms": 1491, "msApprox": false, "note": ""}）
+  · C 没投成 → 状态行＝**我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 没送达：没有会话 重试**（data-state=failed，内存态 {"state": "failed", "ms": 7, "msApprox": true, "note": "没有会话"}）
+  · D 乙案（只 confirmed） → 状态行＝**我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 已发出（未确认）**（data-state=unconfirmed，内存态 {"state": "unconfirmed", "ms": null, "msApprox": false, "note": ""}）
+  读数结论：
+   · A（＝现在线上真实形状）**复现了本人看到的「已发出（未确认）」** ✔
+   · B（只要平台给出 {delivered:true, ms:1491}）App **立刻显示「已送达 1491ms」** —— **App 端一行都不用改** ✔
+   · C（delivered:false）→「没送达：没有会话」✔
+   · D（只给 confirmed、不给 delivered）→ **仍是「已发出（未确认）」** ⇒ 乙案必须改 App 才生效 ✔
+
+=== ② 链路量清（文件:行）===
+  · App 发消息：talk.js `send()`（talk.js:1279）→ 桥 `talk.say`（Bridge.kt:772）。
+  · 桥取回值：`talkJson(listOf("say", …))`（Bridge.kt:784-786）→ `JSONObject(out)`，**解析失败就兜底** `JSONObject().put("raw", out).put("cmd", …)`（Bridge.kt:120-126）。
+  · 桥判 delivered（R-36 C 改的口径）：`val delivered = if (raw.has("delivered")) raw.optBoolean("delivered", false) else null`（Bridge.kt:790-792），回给 App 时 `delivered: null` 会被写成 JSON null（Bridge.kt:793-794）。
+  · App 判状态（R-36 A）：`bridged = (r.delivered !== undefined) ? r.delivered : (raw.delivered !== undefined ? raw.delivered : null)`（talk.js:1327-1328）；`bridged === null` ⇒ `state="unconfirmed"` ⇒ 文案「已发出（未确认）」（talk.js:1206、1345-1347）。
+  · **平台侧 `say` 的 CLI 打印的是人话**：`print("#%d 已记入并投给 %s（投递%s）" % …)`（talk.py:2459-2466）——而同仓给 App 用的其它子命令都打 `json.dumps(...)`（talk.py:2258 since-json、2282 thread、2286 doctor、2288 hermes-sessions …）。
+    ⇒ `JSONObject("…已记入并投给 home.maid（投递成功）")` **必然抛异常** ⇒ 桥走兜底 ⇒ `raw.has("delivered")` = false ⇒ `delivered = null` ⇒ **App 永远显示「已发出（未确认）」**。
+  · 而且**即便解成 JSON**，平台那个 `delivered` 的语义仍是"deliver() 没抛错"：`try: self.deliver(role, text); return {"id": mid, "delivered": True, "to": role}`（talk.py:896-900）—— 就是 R-36 判死的**假成功**语义。
+  · 真回执平台**已经有**（O-1）：`deliver()` 会写 `self.last_deliver_ms / last_deliver_attempts / last_deliver_confirmed`（talk.py:1091/1105、1074-1090、1096-1102），
+    且 `delivery` 表已加两列 `attempts`（按了几次回车）/`confirmed`（1=条数 +1 确证、0=没确证、NULL=读不到条数）（talk.py:182-183、717-720）。**只是 `say()` 从来没把它带出去**。
+
+=== ③ 判定（单边结论）===
+  **根因在平台侧，不是 App 没解析好。**
+  ① 平台没给机器可读的回执（`say` 打人话 ⇒ 桥解析失败 ⇒ 字段根本不存在）；
+  ② 就算给成了 JSON，那个 `delivered` 也只是"命令没抛错"（假成功语义）⇒ 即使打通也会反向误报成"已送达"；
+  ③ App 侧 R-36 的中性态是**正确的降级**（拿不到真回执就不装作送达）—— 四种形状实测证明：只要平台给出真回执，App 立刻显示「已送达 1491ms」（B 形状），App 不需要改。
+
+=== ④ 改法（两案，各自判据；我投甲）===
+  甲（推荐）**平台侧给真回执 + CLI 打 JSON**：
+    · `talk.py say()` 单聊分支（896-900）与广播分支（875-890）：`deliver()` 之后带上真回执 ——
+      返回形如 `{"id":mid,"to":role,"delivered":<confirmed==1>,"ms":last_deliver_ms,"attempts":last_deliver_attempts,"confirmed":last_deliver_confirmed,"note":…}`；
+      **`delivered` 的判据改成 `confirmed == 1`**（真确证）；`confirmed is None`（读不到条数）⇒ `delivered: null`（中性，不许猜）。
+    · CLI（talk.py:2459-2466）：`say` 改成 `print(json.dumps(r, ensure_ascii=False))`（人类文案可留到 `--human`；仓里其它给 App 的子命令都是 JSON）。
+    · 改动面：**只动 `talk.py` 一个文件、约 10-15 行**；**不需要重出 APK**（B 形状实测：App 已能显示「已送达 1491ms」）。
+    · 判据：App 发一条 → App 显示值必须与台账那一行**对得上**：
+      `confirmed=1` ⇒ App 显「已送达 Nms」且 N＝台账 `delivery.ms`；`confirmed=0` ⇒ 「没送达：…」；`confirmed IS NULL` ⇒ 「已发出（未确认）」。
+      复算命令：`sqlite3 /vol1/1000/airesults/roles-chat/talk.db "select msg_id,role,ok,ms,attempts,confirmed,note from delivery order by at desc limit 5"`
+  乙（App 侧按现有字段判）：`talk.js:1345` 附近让 `bridged` 认 `confirmed`，`Bridge.kt` 把 `confirmed` 透到顶层。
+    · 代价：动 **2 个文件**（talk.js + Bridge.kt）⇒ **必须重出包并真机复装**；且**治不了根**（平台仍给人话 + 旧语义），只是把「未确认」换成另一套判据。
+  与 R-31/R-36 显示口径的关系：甲**只把"真确证"那一种情况从中性态升级成「已送达 + 真 ms」**，
+    中性态（读不到条数）与失败态（confirmed=0）都保留 —— R-36 的三种态一个都不删。
+
+=== ⑤ 顺带：不留 ? ——「已送达 Nms」怎么复算 ===
+  · `ms` 来源：`deliver()` 用 `time.monotonic()` 计时并写 `delivery.ms`（talk.py:1091、1105）；`attempts`＝这次按了几次回车（重试 +1）；
+    `confirmed`＝投递后对方会话消息条数是否 +1（1/0/NULL，talk.py:1082、1102）；`ok`＝命令没抛错（旧的宽口径，**不要再拿它当"投成"**）。
+  · 复算：上面那条 SQL 取最近 5 条，App 显示的 Nms 必须等于该行 `ms`（`attempts`/`confirmed` 与该行同时给出）。
+
+=== ⑥ 代价与回归面（SPEC §10 点名板块）===
+  · 甲：改 `roles-chat/tools/talk.py`（**平台侧**；不需要重出 APK，但要重启 relay/中转让新代码生效 —— 那是平台的事，归 owner.me）。
+    复测板块：主块 **① 聊天页-单聊**（发一条 → 状态行＝真回执）、**② 聊天页-群聊**（广播分支也要带真回执）；外加"台账复算"一条（见 ⑤）。
+  · 乙：改 `talk.js` + `Bridge.kt` ⇒ **必须重出 APK 并真机复装**；复测主块同上。
+  · 不许留 `?`：无论走哪一案，判据都是"App 显示 = 台账那一行"，不许出现"看起来像成功"的第三种解释。
+
+=== ⑦ 边界 ===
+不接主机（不动 NAS authorized_keys）：App 侧读数来自**本机台**（真页面真状态行），平台侧来自源码逐行；**没有在正式库里跑过写操作** → 未验 ≠ 通过；真机复验归 tester。

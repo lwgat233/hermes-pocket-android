@@ -1,0 +1,47 @@
+{
+ "A_现状真形状（平台输出人话、Bridge 兜底）": {
+  "状态行原文": "我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 已发出（未确认）",
+  "data_state": "unconfirmed",
+  "内存态": {
+   "state": "unconfirmed",
+   "ms": null,
+   "msApprox": false,
+   "note": ""
+  }
+ },
+ "B_甲案（平台给真回执 JSON）": {
+  "状态行原文": "我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 已送达 1491ms",
+  "data_state": "sent",
+  "内存态": {
+   "state": "sent",
+   "ms": 1491,
+   "msApprox": false,
+   "note": ""
+  }
+ },
+ "C_没投成": {
+  "状态行原文": "我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 没送达：没有会话 重试",
+  "data_state": "failed",
+  "内存态": {
+   "state": "failed",
+   "ms": 7,
+   "msApprox": true,
+   "note": "没有会话"
+  }
+ },
+ "D_乙案（只认 confirmed、平台不给 delivered）": {
+  "状态行原文": "我 → 可爱女仆（个人助手：管生活，把要紧的话中转给我） · 已发出（未确认）",
+  "data_state": "unconfirmed",
+  "内存态": {
+   "state": "unconfirmed",
+   "ms": null,
+   "msApprox": false,
+   "note": ""
+  }
+ },
+ "E_App读的字段": {
+  "talk_js": "bridged = (r.delivered !== undefined) ? r.delivered : (raw.delivered !== undefined ? raw.delivered : null)（talk.js:1327-1328）",
+  "ms": "const ms = (r.ms != null) ? r.ms : (raw.ms != null ? raw.ms : null)（talk.js 同段）",
+  "中性态": "bridged === null ⇒ state=\"unconfirmed\" ⇒ 文案「已发出（未确认）」（talk.js:1206/1345-1347）"
+ }
+}
