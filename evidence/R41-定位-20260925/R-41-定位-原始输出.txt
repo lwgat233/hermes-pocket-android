@@ -1,0 +1,55 @@
+### hermes-pocket-R41 第 1 步「定位与改法」原始输出 —— 2026-09-24 · 角色 pipeline.author（只定位、只出改法，未改代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r41-enter.mjs（真页面 + **CDP 真键盘/真输入法事件**；计数＝桥里 talk.say / talk.shout 的实际调用）
+说明：本机台是**桌面 Chromium**（没有安卓输入法）—— 派发的是"输入法形状"的事件（Input.insertText / imeSetComposition）+ 真键盘事件，
+     所以下面分两段：**能复现的（事件形状层）** 与 **本地台复现不了的（真机输入法全链路）**。
+
+=== ① 接线现状（实测）===
+  群聊输入框 `#tk-shoutin`：标签 INPUT、type=(默认 text)、**enterkeyhint=null、inputmode=null**（talk.js:492-509，只挂 keydown→Enter→gfire）
+  单聊输入框 `#tk-sayin`：talk.js:1058-1083，只挂 `input`（存草稿，1066）+ `keydown→Enter→fire`（1083），**enterkeyhint=null**
+  授权回复框 `.tk-askline .tk-askin`：**存在**，talk.js:598-620 只建了输入框 + 发送键（`ok`），**全仓 keydown 只有 talk.js:509 与 talk.js:1083 两处官方挂点** ⇒ 这个框只有"点发送键"一条路（**漏挂**）
+  其它输入框（talk.js:390 新角色表单 / 891 改信息 / 1355 切换指令 / panels.js 设置项）：设置类，Enter 非必需，不算漏挂。
+  `enterkeyhint` 全仓 grep：**0 处**（实测页面里带该属性的元素数＝0）——与经理的判断一致。
+  投递侧（按经理已核 + 我复核行号）：`Bridge.kt:772 talk.say` → `talk.py deliver()`（talk.py:1039，load-buffer + paste-buffer + **Enter**，另有 0.8/0.6 双回车兜底与 O-1 条数确认）⇒ **不是"字躺在对方输入框"那类**。
+
+=== ② 本地台能复现的部分（真键盘真事件，看哪条路会发）===
+  · 群聊：**真 Enter → shout=1（发得出去）**；真 Enter 的事件序列＝`keydown(13) → keypress(13) → beforeinput(insertLineBreak) → keyup(13)`
+  · 群聊：**输入法提交（Input.insertText，只出 beforeinput/input，不出 keydown）+ 只补 keyup(13) → shout=0（发不出去）** ← 这就是"按回车没反应"的机制
+  · 群聊：只派 beforeinput(insertLineBreak) → shout=0（发不出去）
+  · 单聊：真 Enter → say=1；同样的"输入法提交 + keyup13" → **say=0**
+  · 输入法组字（imeSetComposition）的序列＝`compositionstart → compositionupdate → beforeinput(insertCompositionText, isComposing=true) → input(同)` —— **全程没有 keydown**
+  ⇒ 复现结论（老实说）：**机制层面能复现**（"没有 keydown 就发不出去"）；**真机输入法到底给不给 keydown/keyup/beforeinput，本地台给不出答案** —— 必须真机实测（默认键盘 + 第三方），所以本步不给"已复现"的结论，只给机制与改法。
+  · Shift+Enter 在本机台的事件序列与普通 Enter **完全相同**（单行 `<input>` 不产生换行）⇒ 现在两个框**根本没有换行能力**。
+
+=== ③ 候选接线实测（页面里注入，工程文件未动）===
+  注入内容：`enterkeyhint="send"` + keydown(Enter) + keyup(key==="Enter"||keyCode===13) + beforeinput/input(inputType==="insertLineBreak"||"insertParagraph") + 防重复时间窗。
+  · 一次真 Enter → **发了 1**（走 keydown）
+  · 输入法提交 + keyup13 → **发了 1**（走 keyup 兜底 ✓）
+  · 只派 beforeinput(insertLineBreak) → **发了 1**（走 beforeinput 兜底 ✓）
+  · **一次按键三条路都被触发 → 发了 1**（防重复生效 ✓）
+  · **连按两次 → 发了 2**（没有把真实的连发吞掉 ✓）
+  · ⚠ **Shift+Enter → 发了 1（误发！）** —— 我的注入版只给 keydown 带了 `!e.shiftKey` 守卫，beforeinput 兜底**没带** ⇒ 单行输入框里 Shift+Enter 也会走 insertLineBreak 那条兜底而被当成"发送"。
+    这条是**改法必须处理的坑**（对应经理问的 ④）：三条兜底都要带上"这次按键是不是 Shift/长按换行"的判定。
+
+=== ④ 改法（文件:行，四条都给）===
+  ① `enterkeyhint="send"`：加在 `talk.js:492-494`（群聊 gin）与 `talk.js:1058-1060`（单聊 inp）**两处**，顺手给授权回复框 `talk.js:598-600` 也加上（它现在连 Enter 都没有）。
+  ② `keyup` + `keyCode===13` 兜底：两处聊天输入框各加一条 `keyup`（判 `e.key === "Enter" || e.keyCode === 13`）；**必须与 keydown 共用同一个"这次算不算发送"的判定**（见 ⑤ 防重复）。
+  ③ `beforeinput`/`input` 兜底：单独加一个 `beforeinput` 监听，`if (e.inputType === "insertLineBreak" || e.inputType === "insertParagraph") fire()`；
+     这条是**专给"输入法只给 beforeinput 不给按键事件"的场景**，也是唯一能在"完全没有 keydown/keyup"时救回来的路。
+  ④ 与换行共存（两个方案，代价不同 —— 这条建议**由本人/经理拍**）：
+     A（最小改动，推荐先做）：**保持单行 `<input>`** ⇒ 不支持换行（现状也不支持）。三条兜底全部加 `!shiftKey` 判定 + 时间窗，Shift+Enter **一律不发送**（也不会换行）。
+     B（要真换行）：把两个输入框换成 `<textarea rows="1">`（带自动长高，先例＝`app.js:1892-1893 growComposer`），规则＝Enter 发送 / **Shift+Enter 换行**（textarea 里 insertLineBreak 才是真换行）。
+       代价：改动面变大（长高与滚动、草稿缓存、群聊那行是 flex 一行三件，得一起调），且要防"换行也被当发送"。
+  ⑤ 防重复（同一段文字不许发两次）——两条措施一起上：
+     · **时间窗**：每个输入框一个 `sentAt`，任何路径要发之前 `if (performance.now() - sentAt < 400) return;`（实测：三条路都触发时只发 1 次；连按两次仍发 2 次）；
+     · **发完清空**：现有 `fire()` 本来就 `inp.value = ""`（talk.js:1078 一带），第二条路再来时 `text` 为空会直接 `toast("先说点什么")` 返回 —— 天然第二道闸；
+       ⚠ 但**输入法提交那条路 value 是非空的**，所以时间窗不能省。
+     · 另外：仓库里已有"两边都接管 = 一次回车发两遍（本地实测抓到过）"的先例注释（`app.js:1901-1903`），所以这条要写进实现清单，出包后由 tester 专门验一次。
+
+=== ⑤ 代价与回归面（SPEC §10 点名板块）===
+  · 改动文件：`assets/ui/talk.js`（纯前端；若选方案 B 还要动 CSS/长高逻辑）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+  · 复测板块：主块 = **② 聊天页-群聊**（`#tk-shoutin` 回车）＋ **① 聊天页-单聊**（`#tk-sayin` 回车）——判据＝**真机按输入法回车能发出消息**
+    （App 出现自己的气泡 + 对方会话条数 +1）、**换行仍可用**（按方案 A/B 分别写口径）、**同一次回车不出现两条**；跨块 1 块 = **⑧ 频道页**（授权回复框也补了 Enter）。
+  · 建议真机复测要**至少两种输入法**（系统默认 + 一个第三方），并把"事件序列"打下来（哪个输入法给了哪些事件）——这决定 ② ③ 两条兜底是不是真的够。
+
+=== ⑥ 边界 ===
+不接主机（不动 NAS authorized_keys）：读数来自**本机台**（真页面 + CDP 真键盘/输入法形状事件），**未在真机上按过回车** → 未验 ≠ 通过；真机复验（尤其"不同输入法给什么事件"）归 tester。

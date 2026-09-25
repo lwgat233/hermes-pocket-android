@@ -1,0 +1,216 @@
+{
+ "a_接线现状": {
+  "群聊": {
+   "缺失": "#tk-shoutin"
+  },
+  "单聊": {
+   "缺失": "#tk-sayin"
+  },
+  "授权回复框": {
+   "缺失": ".tk-askline .tk-askin"
+  }
+ },
+ "a2_群聊输入框属性": {
+  "id": "tk-shoutin",
+  "标签": "INPUT",
+  "type": "(默认 text)",
+  "enterkeyhint": null,
+  "inputmode": null
+ },
+ "a3_授权回复框属性": {
+  "标签": "INPUT",
+  "enterkeyhint": null
+ },
+ "b_群聊_真Enter": {
+  "say": 0,
+  "shout": 1,
+  "bodies": [
+   "现状-真Enter"
+  ]
+ },
+ "c_群聊_输入法提交后keyup13": {
+  "say": 0,
+  "shout": 0,
+  "bodies": []
+ },
+ "d_群聊_只派beforeinput": {
+  "say": 0,
+  "shout": 0,
+  "bodies": []
+ },
+ "e_单聊_真Enter": {
+  "say": 1,
+  "shout": 0,
+  "bodies": [
+   "现状-单聊真Enter"
+  ]
+ },
+ "f_单聊_输入法提交后keyup13": {
+  "say": 0,
+  "shout": 0,
+  "bodies": []
+ },
+ "g_授权回复框_有没有挂Enter": {
+  "存在": true,
+  "说明": "talk.js:598-620 只建了输入框 + 发送键 ok（talk.js:622 一带），全仓 keydown 只有 talk.js:509 与 talk.js:1083 两处官方挂点 ⇒ 这个框只有点发送键一条路"
+ },
+ "h_事件序列": {
+  "就绪": true,
+  "输入框": "r41-probe-input"
+ },
+ "i_真Enter的事件序列": [
+  {
+   "事件": "keydown",
+   "key": "Enter",
+   "keyCode": 13,
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "keypress",
+   "key": "Enter",
+   "keyCode": 13,
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "beforeinput",
+   "inputType": "insertLineBreak",
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "keyup",
+   "key": "Enter",
+   "keyCode": 13,
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  }
+ ],
+ "j_输入法提交的事件序列": [
+  {
+   "事件": "beforeinput",
+   "inputType": "insertText",
+   "isComposing": false,
+   "data": "输入法提交"
+  },
+  {
+   "事件": "input",
+   "inputType": "insertText",
+   "isComposing": false,
+   "data": "输入法提交"
+  }
+ ],
+ "k_ShiftEnter的事件序列": [
+  {
+   "事件": "keydown",
+   "key": "Enter",
+   "keyCode": 13,
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "keypress",
+   "key": "Enter",
+   "keyCode": 13,
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "beforeinput",
+   "inputType": "insertLineBreak",
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "keyup",
+   "key": "Enter",
+   "keyCode": 13,
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  }
+ ],
+ "l_输入法组字的事件序列": [
+  {
+   "事件": "compositionstart",
+   "inputType": null,
+   "isComposing": false,
+   "data": ""
+  },
+  {
+   "事件": "compositionupdate",
+   "inputType": null,
+   "isComposing": false,
+   "data": "拼"
+  },
+  {
+   "事件": "beforeinput",
+   "inputType": "insertCompositionText",
+   "isComposing": true,
+   "data": "拼"
+  },
+  {
+   "事件": "input",
+   "inputType": "insertCompositionText",
+   "isComposing": true,
+   "data": "拼"
+  }
+ ],
+ "m_候选接线_结果": {
+  "接线": [
+   "keydown",
+   "keyup",
+   "beforeinput",
+   "input"
+  ],
+  "防重复": "300ms 内只认一次",
+  "enterkeyhint": "send"
+ },
+ "n_候选接线_一次真Enter": {
+  "发了": 1,
+  "触发路径": [
+   "keydown"
+  ]
+ },
+ "o_候选接线_输入法提交后keyup13": {
+  "发了": 1,
+  "触发路径": [
+   "keyup"
+  ]
+ },
+ "p_候选接线_只派beforeinput": {
+  "发了": 1,
+  "触发路径": [
+   "beforeinput"
+  ]
+ },
+ "q_候选接线_一次按键三条路都触发": {
+  "发了": 1,
+  "触发路径": [
+   "keydown"
+  ]
+ },
+ "r_候选接线_连按两次": {
+  "发了": 2,
+  "触发路径": [
+   "keydown",
+   "keydown"
+  ]
+ },
+ "s_候选接线_ShiftEnter": {
+  "发了": 1,
+  "触发路径": [
+   "beforeinput"
+  ]
+ },
+ "t_enterkeyhint全仓": {
+  "当前页面里带 enterkeyhint 的元素数": 1,
+  "单聊输入框的值": null
+ }
+}
