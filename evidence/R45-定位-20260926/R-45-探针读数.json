@@ -1,0 +1,168 @@
+{
+ "A_单聊_ShiftEnter": {
+  "say": 1,
+  "shout": 0,
+  "bodies": [
+   "R45-单聊-ShiftEnter"
+  ]
+ },
+ "B_单聊_普通Enter": {
+  "say": 1,
+  "shout": 0,
+  "bodies": [
+   "R45-单聊-普通Enter"
+  ]
+ },
+ "C_群聊_ShiftEnter": {
+  "say": 0,
+  "shout": 1,
+  "bodies": [
+   "R45-群聊-ShiftEnter"
+  ]
+ },
+ "D_输入框内部状态": {
+  "composing": false,
+  "sentAt": 0,
+  "timer": false
+ },
+ "E_候选接线": {
+  "now": {
+   "①ShiftEnter序列": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "②普通回车": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "③输入法提交后只补keyup13": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "④只派beforeinput": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "⑤一次按键三条路": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "⑥连按两次普通回车": {
+    "发了": 2,
+    "路径": [
+     "go",
+     "go"
+    ]
+   },
+   "⑦ShiftEnter后紧接着回车": {
+    "发了": 2,
+    "路径": [
+     "go",
+     "go"
+    ]
+   }
+  },
+  "fixAB": {
+   "①ShiftEnter序列": {
+    "发了": 0,
+    "路径": []
+   },
+   "②普通回车": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "③输入法提交后只补keyup13": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "④只派beforeinput": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "⑤一次按键三条路": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "⑥连按两次普通回车": {
+    "发了": 2,
+    "路径": [
+     "go",
+     "go"
+    ]
+   },
+   "⑦ShiftEnter后紧接着回车": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   }
+  },
+  "fixC": {
+   "①ShiftEnter序列": {
+    "发了": 0,
+    "路径": []
+   },
+   "②普通回车": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "③输入法提交后只补keyup13": {
+    "发了": 0,
+    "路径": []
+   },
+   "④只派beforeinput": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "⑤一次按键三条路": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   },
+   "⑥连按两次普通回车": {
+    "发了": 2,
+    "路径": [
+     "go",
+     "go"
+    ]
+   },
+   "⑦ShiftEnter后紧接着回车": {
+    "发了": 1,
+    "路径": [
+     "go"
+    ]
+   }
+  }
+ },
+ "F_源码位置": {
+  "公共入口": "talk.js:196-240 bindEnterSend(inp, fire)",
+  "祸根行（keyup 兜底）": "talk.js:221  inp.addEventListener(\"keyup\", (e) => { shiftDown = !!(e && e.shiftKey); if (isEnter(e)) go(e); });",
+  "shifted 判定": "talk.js:203  const shifted = (e) => (e && e.shiftKey === true) || shiftDown;",
+  "keydown 主路（有守卫）": "talk.js:214-220（if (shifted(e)) { e.preventDefault(); return; }）",
+  "beforeinput 兜底": "talk.js:222-225（go(e)）",
+  "三处调用点": "talk.js:565 群聊 gin(gfire) · talk.js:681 授权回复框 inp(reply) · talk.js:1152 单聊 inp(fire)"
+ }
+}

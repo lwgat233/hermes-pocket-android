@@ -1,0 +1,72 @@
+### hermes-pocket-R45 第 1 步「定位与改法」原始输出 —— 2026-09-26 · 角色 pipeline.author（只定位、只出改法，未改代码）
+探针：source/hermes-pocket/tools/ui-harness/d-r45-shiftenter.mjs（**CDP 真键盘序列**；夹具＝平台真回包 roles/sessions/thread）
+复现用的按键序列＝tester 给的（真机 input keycombination 59 66）：keydown Shift(shiftKey=false) → keydown Enter(shiftKey=true) → keyup Shift(shiftKey=true) → keyup Enter(shiftKey=false)
+
+=== ① 谁闯的祸（真输入框实测复现）===
+  · **单聊 `#tk-sayin`**：Shift+Enter 序列 → `talk.say` **1 次**（body=「R45-单聊-ShiftEnter」）⇒ **发出去了，复现 tester 的红**
+  · 单聊 普通 Enter → say **1 次**（正常功能没坏）
+  · **群聊 `#tk-shoutin`**：同一序列 → `talk.shout` **1 次** ⇒ 同一公共入口，群聊同样中招
+  · 发完之后输入框被重画（新 input），所以"不粘滞"（读数：__enterState = {"composing": false, "sentAt": 0, "timer": false}）
+
+  祸根行（talk.js）：**`talk.js:221`** `inp.addEventListener("keyup", (e) => { shiftDown = !!(e && e.shiftKey); if (isEnter(e)) go(e); });`
+  · 判定函数在 `talk.js:203`：`const shifted = (e) => (e && e.shiftKey === true) || shiftDown;`
+  · keydown 主路（talk.js:214-220）**是有守卫的**：`if (shifted(e)) { e.preventDefault(); return; }` ⇒ 序列里第 2 条（keydown Enter, shiftKey=true）被正确拦住；
+    但 **keyup 是"第二次机会"**：第 3 条 `keyup Shift`（shiftKey=true）把 `shiftDown` 置 **true**，第 4 条 `keyup Enter`（**shiftKey=false**，因为 Shift 已经松了）又把 `shiftDown` **覆盖成 false** ⇒ 紧接着 `go(e)` 里 `shifted()` 读到 false ⇒ **发送**。
+  · **为什么必然踩到**：真机上最常见的松键顺序就是"**Shift 先松、Enter 后松**"（先抬小指、再抬中指），keyup Enter 那一刻系统按"当前还没松的键"算修饰键 ⇒ 必为 false。
+    （若反过来 Enter 先松、Shift 后松，这一劫能躲过 —— 但这不受用户控制。）
+
+=== ② 同类风险扫描 ===
+  · **`beforeinput` 兜底同样脆弱**：`talk.js:222-225` 直接 `go(e)`，而 `beforeinput` 是 `InputEvent`、**没有 `shiftKey` 属性** ⇒ 只能依赖那个被 keyup 污染的 `shiftDown`。
+    （R-41 定位时抓到过 beforeinput 误发 Shift+Enter；本轮现状接线实测「只派 beforeinput」也照发 1 条，机制一致。）
+  · 三处调用点的逐处结论（都走同一个 `bindEnterSend`）：
+    ① `talk.js:565` 群聊 `gin`(gfire) —— **实测中招**（Shift+Enter → shout 1 次）
+    ② `talk.js:1152` 单聊 `inp`(fire) —— **实测中招**（Shift+Enter → say 1 次）
+    ③ `talk.js:681` 授权回复框 `inp`(reply) —— 同一函数、逻辑同构 ⇒ **同样中招**（本机台没有待授权条目，未逐条真按，标"同构推断"）
+  · 修公共入口 ⇒ 三处一起好。
+
+=== ③ 改法候选与实测对照（页面注入、工程文件未动）===
+  七个用例 × 三种接线（`发了` ＝ 真的调用了几次 fire）：
+  用例                         现状接线           候选 A/B 合并      候选 C 去掉 keyup 
+  ①ShiftEnter序列              1              0              0             
+  ②普通回车                      1              1              1             
+  ③输入法提交后只补keyup13           1              1              0             
+  ④只派beforeinput             1              1              1             
+  ⑤一次按键三条路                   1              1              1             
+  ⑥连按两次普通回车                  2              2              2             
+  ⑦ShiftEnter后紧接着回车          2              1              1             
+  读法：**候选 A/B 合并**＝把 Shift 记成"闩 400ms 的时间戳"，`shifted()` 读它；keyup **只记 true、绝不用 keyup 清 0**（另含"`e.key === 'Shift'` 也算按下"——真机上 Shift 的 keydown 可能 shiftKey=false）。
+   · ① Shift+Enter **1 → 0** ✔（修好）· ② 普通回车 1 ✔ · ③ 输入法提交+只补 keyup13 **仍 1** ✔（R-41 要救的那种输入法没被牺牲）· ④ beforeinput 1 ✔ ·
+   · ⑤ 同一次按键三条路 **1** ✔（防重复还在）· ⑥ 连按两次 2 ✔ · ⑦ Shift+Enter 后紧接着回车 1 ✔（不粘滞）
+   · **候选 C（去掉 keyup 兜底）**：① 也变成 0，但 **③ 输入法提交那条路变成 0** ✘ ⇒ 把 R-41 好不容易救回来的场景砍掉了 ⇒ **不要做 C**。
+  ⇒ **我推荐 A/B 合并实现**（等价于"keydown 时的 shift 状态闩 400ms 窗口、不从 keyup 读它的清除"）。
+
+=== ④ 改法（文件:行，只动 bindEnterSend 内部）===
+  · `talk.js:197`：`let sentAt = 0, composing = false, compTimer = null, shiftDown = false;` → 把 `shiftDown` 换成 **`shiftAt = 0`**（时间戳；0＝没按过）。
+  · `talk.js:203`：`const shifted = (e) => (e && e.shiftKey === true) || shiftDown;` → 改成
+    `const shifted = (e) => (e && e.shiftKey === true) || (shiftAt && now() - shiftAt < 400);`（`now()` = performance.now 兜底 Date.now）
+  · `talk.js:214-220`（keydown）：开头加 `if (e && (e.key === "Shift" || e.shiftKey === true)) shiftAt = now();`（**必须含 `e.key === "Shift"`**）。
+  · **`talk.js:221`（keyup，祸根行）**：`shiftDown = !!(e && e.shiftKey);` → `if (e && (e.key === "Shift" || e.shiftKey === true)) shiftAt = now();`（**只记 true，绝不清 0**），后面 `if (isEnter(e)) go(e);` 保持。
+  · `talk.js:222-225`（beforeinput）：**不用改**（它走同一个 `shifted`，闩锁一上它就跟着对了）。
+  · 规模：**约 4 行**，只在 `bindEnterSend` 内部换一个变量语义。
+
+=== ⑤ 明确不碰（经理点名）===
+  R-41 那条链（`enterkeyhint`、三条路并存、组字态 1.5s 兜底复位 talk.js:227-238）· R-31 防连点口径（`sentAt` 400ms 闸、新 keydown 重置）· R-36 状态机 · R-39 的 `padding-bottom` 与 `--sayline-h` · R-42 右缘热区 —— 本改法一行都不动它们。
+  （唯一交叠点是 `sentAt` 所在的同一行声明，改动只是"同一行里多/少一个变量"，闸门逻辑不变。）
+
+=== ⑥ 判据（可复算，探针里逐条量过）===
+  1. **Shift+Enter 序列 ⇒ `talk.say`/`talk.shout` 0 次**（现状 1 次）；
+  2. 普通回车 ⇒ 1 次；
+  3. **输入法提交（insertText）+ 只补 keyup(13) ⇒ 1 次**（R-41 不许回归）；
+  4. 只派 beforeinput(insertLineBreak) ⇒ 1 次；
+  5. 同一次按键三条路都触发 ⇒ 仍 1 次（防重复不破）；
+  6. 连按两次普通回车 ⇒ 2 次；
+  7. Shift+Enter 之后紧接着普通回车 ⇒ 1 次（不粘滞）。
+
+=== ⑦ 代价与回归面（SPEC §10 点名板块）===
+  · 改动文件：`assets/ui/talk.js`（约 4 行）⇒ **必须重出 APK**，出包归 renderer（第 2 步）。
+  · 复测板块：主块 = **① 聊天页-单聊** ＋ **② 聊天页-群聊**（理由：两页共用同一个 `bindEnterSend`，实测两处都中招）；
+    跨块 1 块 = **⑧ 频道页**（理由：授权回复框 `talk.js:681` 也走这同一个公共入口，改一处三处一起变）。
+  · 建议 tester 的真机验证：**实体键盘**打 Shift+Enter（0 条）+ 普通回车（1 条）+ 软键盘回车仍 1 条；并顺手看一眼"输入法组字确认"那条没被弄坏。
+
+=== ⑧ 边界 ===
+不接主机（不动 NAS authorized_keys）：读数来自**本机台**（真页面 + CDP 真键盘事件，序列按 tester 给的真机读数构造），**未在真机实体键盘上按过** → 未验 ≠ 通过；真机复验归 tester。
