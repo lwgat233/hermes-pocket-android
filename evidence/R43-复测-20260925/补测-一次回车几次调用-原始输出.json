@@ -1,0 +1,30 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R43-补测-一次回车=几次 rpc 调用（D/E 两行是不是重复发）": {
+    "check": {
+      "single": {
+        "calls": [
+          [
+            "say",
+            "pipeline.author"
+          ]
+        ],
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms"
+        ]
+      },
+      "group": {
+        "calls": [
+          [
+            "shout",
+            "R43-count-g"
+          ]
+        ],
+        "rows": [
+          "我 → 全体（广播） · 2/2 已送达 3402ms",
+          "我 → 全体（广播） · 2/2 已送达 3402ms"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R38-复测-补测": {
+    "check": {
+      "scroller": {
+        "sel": {
+          "id": null,
+          "cls": "panel-body"
+        },
+        "scrollTop": 356,
+        "scrollHeight": 863,
+        "clientHeight": 507,
+        "rectBottom": 594,
+        "composerTop": 594,
+        "innerHeight": 778,
+        "vvHeight": 778,
+        "lastChild": {
+          "tag": "SECTION",
+          "cls": "tabpage on",
+          "bottom": 570
+        },
+        "gapToComposer": 24,
+        "childCount": 1
+      },
+      "boardBefore": {
+        "visibleBoards": [
+          "tab-talk"
+        ],
+        "groupTitle": null,
+        "stream": false
+      },
+      "boardAfterGogroup": {
+        "visibleBoards": [
+          "tab-group"
+        ],
+        "groupTitle": "群聊",
+        "stream": true
+      }
+    }
+  }
+}

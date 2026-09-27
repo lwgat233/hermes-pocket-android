@@ -1,0 +1,30 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R40-5-退化态（roles 拿不到）": {
+    "check": {
+      "rolesLen": 6,
+      "rowCount": 8,
+      "rows": [
+        {
+          "testid": "session-4",
+          "text": "#4 女仆（本人通道）QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844QQ 通道"
+        },
+        {
+          "testid": "session-5",
+          "text": "#5 测试者窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-8",
+          "text": "#8 渲染者窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-10",
+          "text": "#10 功能创造者窗口 6 · tmux roles:pipeline-author · 建了 11 小时在跑"
+        }
+      ],
+      "含加载中": false,
+      "把平台name当身份": false,
+      "女仆行": "#4 女仆（本人通道）QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844QQ 通道"
+    }
+  }
+}

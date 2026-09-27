@@ -1,0 +1,38 @@
+R-41 第 4 步「修复」（真机红：单聊页回车 0 次） 结论与读数
+角色 pipeline.renderer · 2026-09-25 · 构件 hermes-pocket-R41-回车发送修正-20260925.apk
+依据：派活 #1335 + 测试者真机定位 `evidence/R41-复测-20260925/结论-R41-复测.txt`
+（真机事件序列：`compositionstart` → `keydown Enter keyCode=13 isComposing=true` → `…` → `keyup Enter 13 isComposing=true`，**全程没有 compositionend**）
+
+== 根因（我这边的问题，认）==
+上一版 `bindEnterSend` 里我写了 `if (composing || e.isComposing) return;` —— Gboard 在这个框里**只送 compositionstart、不送 compositionend**，
+`composing` 一置真就永不复位 ⇒ **单聊页回车永久失效**；群聊"有时通"＝那几次恰好没有组字态。这是我引入的守卫过严造成的。
+
+== 本次改了什么（**只动 assets/ui/talk.js**，函数就是 `bindEnterSend` 一处）==
+① **放行条件**：`key === 'Enter' && !shiftKey` 就**发送**；**只拦 `keyCode === 229`**（真正的合成中间态）；
+   **`isComposing === true` 不再单独拦**（Gboard 的 Enter 是 `isComposing=true` + `keyCode=13`＝确认/上屏并发送，正是本人要的行为）。
+② **组字态必须有兜底退出**：`compositionstart` 后启动 **1.5s 定时器**，到点无条件 `composing = false`；`compositionend` 照旧立即复位；谁先到算谁。
+   （`composing` 现在**只做状态记录**，不再参与拦截 —— 也就不会再出现"永久 composing"把路吞掉。）
+③ **保留不变**：`keyup(13)` / `beforeinput(insertLineBreak|insertParagraph)` 两条兜底、**400ms 一把闸**、值非空才发、发完清空、
+   Shift+Enter 不发送（文字留着）、`enterkeyhint="send"` 三处。
+④ 授权框 `.tk-askin` 走同一个 `bindEnterSend` ⇒ 一并生效。⑤ 投递侧（`Bridge.kt` / `deliver()`）**没碰**。
+
+== 四条读数（本地测试台真事件；原始 JSON 同目录 t-r41-enter-原始输出.json）==
+① **模拟 Gboard 形状**（`compositionstart` → `keydown(Enter, keyCode=13, isComposing=true)` → `beforeinput(insertLineBreak)` → `keyup(同)`，**不给 compositionend**）：
+   群聊 `#tk-shoutin` → `talk.shout` **1 条**、发完输入框清空 ✓；单聊 `#tk-sayin` → `talk.say` **1 条**（同一形状）✓；
+   授权框 `.tk-askin` → `talk.answer` **1 条** ✓（改前这三条真机都是 0）
+② **组字态兜底复位**：`compositionstart` 后立刻读 → `{composing:true, timer:true}`；1.8s 后再读 → `{composing:false, timer:false}` ✓
+③ **只拦 229**：`keydown(Enter, keyCode=229)` + `keyup(229)` → **0 条**（合成中间态不误发）✓；同一框随后正常回车 → **1 条** ✓
+④ **闸与 Shift**：一次完整回车（keydown→beforeinput→keyup 三路全触发）→ **1 条** ✓；间隔 600ms 连按两次 → **2 条** ✓；
+   Shift+Enter → **0 条**且文字留着（`Shift 不该发`）✓
+（另：单聊页 enterkeyhint=send ✓；pageerror + console.error **0 条** ✓）
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R41-回车发送修正-20260925.apk（5090339 字节）
+整包 sha256：99137db741643590e71d8d0b4865aa421289232220836e3a6cab0223f38b6434
+包内 assets/build-info.json：testVersion=unified-20260925-093752 · builtAt=2026-09-25 09:37 CST · featureId=R-41
+本次改动文件 sha256（**包内 == 源树，逐字节**）：
+  ui/talk.js  dcc3a9a7883a7a86c7c8fbbed252351c739db9b5c89fcfca760cd36db93c29cd
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树对账（整树）
+
+== 没验的（未验 ≠ 通过）==
+真机 Gboard/其它输入法复测归 tester 第 5 步；判据＝真机按回车 → App 出现自己气泡 + 对方会话条数 +1（单聊页重点看它是否不再永久失效）。

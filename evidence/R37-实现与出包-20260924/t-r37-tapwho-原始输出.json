@@ -1,0 +1,48 @@
+{
+  "name": "R-37 验收：抬头/他的气泡/live 追加都能点开信息窗、我的气泡不挂、位移 >8px 不触发",
+  "result": {
+    "check": {
+      "①_抬头": {
+        "抬头挂了tap": true,
+        "点了开窗": true,
+        "全名行": "全名 pipeline.tester"
+      },
+      "②_他的气泡": {
+        "挂了吗": true,
+        "dataFrom": "pipeline.tester",
+        "点了开窗": true,
+        "全名行": "全名 pipeline.tester"
+      },
+      "③_我的气泡": {
+        "我的气泡挂了tap": false,
+        "点了开窗": false,
+        "气泡数": 1
+      },
+      "④_live追加": {
+        "挂了吗": true,
+        "点了开窗": true,
+        "him气泡数": 2,
+        "那一句": "pipeline.tester → 我 （liv"
+      },
+      "⑤_位移守卫": {
+        "滑20px开窗了吗": false,
+        "点3px开窗了吗": true
+      },
+      "⑥_没碰滚动": {
+        "有touchmove": false,
+        "有preventDefault": false,
+        "只挂click": true,
+        "有touchstart只记坐标": true
+      },
+      "⑦_群聊未动": {
+        "群聊流在": true,
+        "群聊气泡仍在": false,
+        "群聊气泡没错挂tapwho": true
+      },
+      "⑧_报错": {
+        "条数": 0,
+        "明细": []
+      }
+    }
+  }
+}

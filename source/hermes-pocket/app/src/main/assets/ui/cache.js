@@ -154,28 +154,29 @@
       };
     },
 
-    /* 自动清理：① N 天没用过的整条删 ② 总量超预算 → 按「最后用过」最老的先删 */
-    cleanup(opts) {
+    /* 清理的**唯一规则**（只算不删）：7 天没用过的先删，再把总量压到预算以内（最老的先走）。
+     * 预览与执行共用这一处，避免界面自己复述规则。 */
+    plan(opts) {
       const o = opts || {};
       const days = o.days == null ? 7 : o.days;
       const budget = o.budgetBytes || 0;
       const now = Math.floor(Date.now() / 1000);
       const rep = this.report();
-      let removed = 0, freed = 0;
-      const cut = (it) => {
-        this.del(it.k);
-        removed++; freed += it.bytes;
-        return freed;
+      const doomed = days > 0 ? rep.items.filter((it) => it.at && (now - it.at) > days * 86400) : [];
+      const rest = rep.items.filter((it) => doomed.indexOf(it) < 0).sort((a, b) => (a.at || 0) - (b.at || 0));
+      let left = rep.total - doomed.reduce((a, it) => a + it.bytes, 0);
+      rest.forEach((it) => { if (budget > 0 && left > budget) { doomed.push(it); left -= it.bytes; } });
+      return {
+        items: doomed, count: doomed.length,
+        freed: doomed.reduce((a, it) => a + it.bytes, 0), total: rep.total
       };
-      if (days > 0) {
-        rep.items.filter((it) => it.at && (now - it.at) > days * 86400).forEach(cut);
-      }
-      if (budget > 0) {
-        let left = rep.total - freed;
-        rep.items.filter((it) => !(days > 0 && (now - it.at) > days * 86400))
-          .sort((a, b) => (a.at || 0) - (b.at || 0))              /* 最老的先走 */
-          .forEach((it) => { if (left > budget) left -= cut(it); });
-      }
+    },
+
+    /* 自动清理：按上面的规则真删 */
+    cleanup(opts) {
+      const p = this.plan(opts);
+      let removed = 0, freed = 0;
+      p.items.forEach((it) => { this.del(it.k); removed++; freed += it.bytes; });
       return { removed: removed, freed: freed, after: this.report().total };
     },
 

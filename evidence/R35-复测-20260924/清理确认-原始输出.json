@@ -1,0 +1,125 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R35-复测-清理确认": {
+    "check": {
+      "calibration": {
+        "before": "本人说",
+        "after": "经理说",
+        "changed": true,
+        "device": {
+          "x": 959,
+          "y": 624,
+          "css": {
+            "x": 317,
+            "y": 155,
+            "w": 64,
+            "h": 44
+          }
+        }
+      },
+      "before": {
+        "keys": 13,
+        "kb": 17.6,
+        "cardHead": "本地占用：11 个键 · 14KB 原生侧：暂不可用（等原生加只读口 app.storage",
+        "dialogOpen": false
+      },
+      "dialogAfterCleanTap": {
+        "open": true,
+        "text": "清理本地缓存？ 将清掉 0 个键（约 0.0KB）。 规则：7 天没用过的先删，再把总量压到 2MB 以内。 清理 取消",
+        "yesLabel": "清理",
+        "noLabel": "取消",
+        "yesDevice": {
+          "x": 307,
+          "y": 1106,
+          "w": 162,
+          "h": 44
+        },
+        "noDevice": {
+          "x": 773,
+          "y": 1106,
+          "w": 162,
+          "h": 44
+        }
+      },
+      "afterCancel": {
+        "keys": 13,
+        "kb": 17.6,
+        "cardHead": "本地占用：11 个键 · 14KB 原生侧：暂不可用（等原生加只读口 app.storage",
+        "dialogOpen": false
+      },
+      "afterCancelToasts": [
+        "已同步：1 个角色 · 0 条等你授权 · 1 个频道"
+      ],
+      "dialog2": {
+        "text": "清理本地缓存？ 将清掉 0 个键（约 0.0KB）。 规则：7 天没用过的先删，再把总量压到 2MB 以内。 清理 取消",
+        "yesDevice": {
+          "x": 307,
+          "y": 1106
+        }
+      },
+      "afterConfirm": {
+        "keys": 13,
+        "kb": 17.6,
+        "cardHead": "本地占用：13 个键 · 18KB 原生侧：暂不可用（等原生加只读口 app.storage",
+        "dialogOpen": false
+      },
+      "afterConfirmToasts": [
+        "已同步：1 个角色 · 0 条等你授权 · 1 个频道",
+        "清掉 0 个键，释放 0.0KB"
+      ],
+      "negativeDetail": {
+        "dialogOpen": false,
+        "toasts": []
+      },
+      "emptyState": {
+        "keys": 0,
+        "kb": 0
+      },
+      "emptyDialog": {
+        "open": true,
+        "saysZeroKeys": true,
+        "text": "清理本地缓存？ 将清掉 0 个键（约 0.0KB）。 规则：7 天没用过的先删，再把总量压到 2MB 以内。 清理 取消"
+      },
+      "chrome": {
+        "keybar": {
+          "n": 16
+        },
+        "composer": {
+          "n": 2
+        }
+      },
+      "r38": {
+        "gogroup": {
+          "px": {
+            "x": 12,
+            "y": 526,
+            "w": 87,
+            "h": 44
+          },
+          "inViewport": true,
+          "hitSelf": true,
+          "hitWhat": "BUTTON"
+        },
+        "homeMaid": {
+          "px": {
+            "x": 12,
+            "y": 232,
+            "w": 369,
+            "h": 63
+          },
+          "hitSelf": true,
+          "hitWhat": "SPAN.name",
+          "composerRect": {
+            "y": 594,
+            "h": 88
+          },
+          "overlapsComposer": false
+        },
+        "viewport": {
+          "w": 393,
+          "h": 778
+        }
+      }
+    }
+  }
+}

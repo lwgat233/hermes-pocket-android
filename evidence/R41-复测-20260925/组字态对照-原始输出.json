@@ -1,0 +1,600 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-复测-v2-组字态对照": {
+    "check": {
+      "A_单聊_非组字": {
+        "say": 0,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 0,
+        "vals": [
+          "R41-A-clean",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": []
+      },
+      "A2_单聊_三连击": {
+        "say": 0,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 0,
+        "vals": [
+          "R41-A2-burst",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": []
+      },
+      "A3_单聊_间隔600": {
+        "say": 0,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 0,
+        "vals": [
+          "R41-A3-gap",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": []
+      },
+      "A4_单聊_ShiftEnter": {
+        "say": 0,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 0,
+        "vals": [
+          "R41-A4-shift",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": true,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": true,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": []
+      },
+      "B_单聊_组字态_打字后": {
+        "say": 0,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 0,
+        "vals": [
+          "R41-B-ime",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "i",
+            "kc": 73,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "m",
+            "kc": 77,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "m",
+            "kc": 77,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "e",
+            "kc": 69,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "e",
+            "kc": 69,
+            "shift": false,
+            "comp": true,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": []
+      },
+      "B_单聊_组字态_回车": {
+        "say": 0,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 0,
+        "vals": [
+          "R41-B-ime",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "m",
+            "kc": 77,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "e",
+            "kc": 69,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "e",
+            "kc": 69,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": []
+      },
+      "C_群聊_非组字": {
+        "say": 0,
+        "shout": 1,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [
+          {
+            "body": "R41-群聊-非组字",
+            "by": "me"
+          }
+        ],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 1,
+        "vals": [
+          "R41-B-ime",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          }
+        ],
+        "toasts": [],
+        "sends": [
+          "我 → 全体（广播） · 1/1 已送达 1111ms"
+        ]
+      },
+      "C2_群聊_组字态": {
+        "say": 0,
+        "shout": 1,
+        "ans": 0,
+        "sayArgs": [],
+        "shoutArgs": [
+          {
+            "body": "R41-群聊-非组字",
+            "by": "me"
+          }
+        ],
+        "ansArgs": [],
+        "bubbles": 2,
+        "stream": 1,
+        "vals": [
+          "R41-B-ime",
+          "R41sayR41burstR41gaDBG2DBG3DBG41pR41shift",
+          null
+        ],
+        "evTail": [],
+        "toasts": [],
+        "sends": [
+          "我 → 全体（广播） · 1/1 已送达 1111ms"
+        ]
+      },
+      "D_授权框": {
+        "box": {
+          "x": 452,
+          "y": 1113,
+          "askId": "42"
+        },
+        "say": 0,
+        "shout": 1,
+        "ans": 1,
+        "sayArgs": [],
+        "shoutArgs": [
+          {
+            "body": "R41-群聊-非组字",
+            "by": "me"
+          }
+        ],
+        "ansArgs": [
+          {
+            "id": "42",
+            "text": "R41-授权答复"
+          }
+        ],
+        "bubbles": 0,
+        "stream": 1,
+        "vals": [
+          null
+        ],
+        "evTail": [
+          {
+            "tag": "askin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          }
+        ],
+        "toasts": [
+          "答复已回给 pipeline.author"
+        ],
+        "sends": [
+          "我 → 全体（广播） · 1/1 已送达 1111ms",
+          "我 → 全体（广播） · 1/1 已送达 1111ms"
+        ]
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

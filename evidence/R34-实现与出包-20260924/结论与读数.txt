@@ -1,0 +1,38 @@
+R-34 第 2 步「界面改动与出包」—— 角色卡/信息窗「接入频道」 结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R34-接入频道-20260924.apk
+
+== 本次我改了什么（只动 talk.js 两处，没碰 CSS、没碰 Bridge.kt、没碰频道折叠区）==
+source/hermes-pocket/app/src/main/assets/ui/talk.js
+  · 505-530 roleCard()：原来那排 `.tags/.tk-tag` 标签行**换成一行 `.sub`**（复用现有类，**没有新增 CSS**）：
+      文本 `接入频道：qqbot`（多个用「、」连）；`channels = []` 的角色**这条不追加**，
+      所以那四张卡还是原来的高度，不会被 5 张卡一起撑高。
+  · 823-826 信息窗（openRoleSheet）：键名 `能接入` → **`接入频道`**；空值 `（无）` → **`未接`**。
+  坑位提醒已照做：`this.channels`（顶层注册表，喂「频道（N）」折叠区）与 `r.channels`（每角色数组）
+  同名不同物 —— 卡片那行只读 `r.channels`，折叠区仍只读 `this.channels`，两处都没串。
+tools/ui-harness/t-r34-chans.mjs（新增探针：造 5 个角色 + 两份同名不同物的 channels 喂真渲染路径）
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r34-chans-原始输出.json）==
+① 角色卡（5 张）：有频道的 `pipeline.author` = 80px 且带一行「接入频道：qqbot」（class = `sub`，旧 `.tags/.tk-tag` 已不存在）；
+   无频道的四张 = 60/61/60/61px，**都没有那行**。60 与 61 的差是副行多了「· 不在线 / · 被停」的既有取整差
+   （改动前就有的后缀，跟本次无关）；没有一张卡被撑成两行。
+② 信息窗：有频道 → `接入频道 qqbot`；旧的 `能接入` 已消失；无频道 → `接入频道 未接`；旧的 `（无）` 已消失。
+③ 同名不同物没串：顶层注册表 = {qqbot, wechat} → 折叠区标题仍是「频道（2）▸」；
+   `pipeline.author` 卡片显示的是 r.channels 的 `qqbot`（不是顶层那两个）；`home.maid` 卡片没有该行。
+④ 「频道（N）」折叠区行为没动：点标题仍有折叠反应（display 由折叠态切回 block）。
+⑤ 报错：pageerror / console.error 全程 **0** 条。
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R34-接入频道-20260924.apk（5063344 字节，20:32 出包）
+整包 sha256：5c1556d8534712b48ff196b49933f67803b567dc1d8e83e0edff3e98f0c97e5e
+包内 assets/build-info.json：testVersion=unified-20260924-203214 · builtAt=2026-09-24 20:32 CST · featureId=R-34
+本次改动文件 sha256（包内 == 源树，逐字节）：
+  ui/talk.js  38ef250bfb46996d7ced7caaeca08561bedd07a6cd4b59741fa3f7c61c8c3cc1
+复核：stamp-build.py --verify <apk> → PASS（这一版整树也对得上）
+
+== 别人同期在改什么 ==
+author 已交 R-34 定位（evidence/R34-定位-20260924/）、没留未提交代码；出包时整树对账 PASS。
+我前几轮（R26/R31/R27/R25/R33）的改动仍在树里未提交，git 我没动。
+
+== 没验的（未验 ≠ 通过）==
+· 真机点角色卡与信息窗（真触摸命中、80px 在真机密度下的手感）：真点归 tester 第 3 步；
+  复测板块按经理口径＝主块 ⑧ 频道页 + 跨块 ① 聊天页-单聊（信息窗共用）。

@@ -1,0 +1,20 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R32-C-新消息气泡可点?": {
+    "check": {
+      "tapTarget": {
+        "text": "功能创造者 → 我R32g-新来的消息13:24",
+        "tapwho": "1",
+        "hitIsSelf": false,
+        "hitWhat": "INPUT.tk-askin",
+        "x": 212,
+        "y": 1592
+      },
+      "sheet250": false,
+      "sheet950": {
+        "open": false,
+        "全名": null
+      }
+    }
+  }
+}

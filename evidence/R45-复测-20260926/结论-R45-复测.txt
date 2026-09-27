@@ -1,0 +1,54 @@
+# R-45 复测结论（Shift+Enter 不误发 · pipeline.tester · 2026-09-26）
+
+对象：`apk/测试版/hermes-pocket-R45-Shift回车不误发-20260926.apk`
+整包 sha256 = c9615844…（前 16 位 c9615844b5defcb0）· **5,091,338 字节**（与派活单一致）
+包内 `assets/ui/talk.js` sha256 前 16 位 = **7cbe502b129a536c**（与派活单一致）
+包内 build-info：testVersion=unified-20260926-175117 / builtAt=2026-09-26 17:51 CST / featureId=R-45
+改动面（包内核对）：`bindEnterSend` 的 Shift 守卫 `shiftDown` 布尔 → **时间戳闩 `shiftAt`（400ms 过期）**；
+keydown `e.key === 'Shift' || e.shiftKey === true`；**keyup 只记 true 绝不清零**；R-41 的 keyup13/beforeinput 兜底与组字 1.5s 复位未动。
+设备：emulator-5554 / Android 14 / AVD hpk34 · 装包 Success · **取元素只取最上面那个可见 `#tk-sayin`**、数行只看**可见的 `#tk-sends`**
+
+**本次测了 3 块**：主块 ① 聊天页-单聊 ＋ 主块 ② 聊天页-群聊 ＋ 跨块 ⑧ 频道页（授权回复框）。
+**跨测理由**：三处输入框（`#tk-sayin` / `#tk-shoutin` / `[data-ask] .tk-askin`）**共用同一个 `bindEnterSend`**（作者实测单聊与群聊都中招、授权框同构），改公共函数必须三块分别真机点；另在同一包里顺手复核 R-39/R-42 各一条。
+
+## 1) Shift+Enter 不误发（核心）✔
+实体键盘形状：`adb shell input keycombination 59 66`（SHIFT_LEFT + ENTER；模拟器无实体键盘，按"模拟"记）
+| 位置 | 喂什么 | `talk.say` / `talk.shout` / `talk.answer` | 框里文字 |
+|---|---|---|---|
+| 单聊 | Shift+Enter | **0 条**（计数不动） | **留着**（`R45-shift`） |
+| 群聊 | Shift+Enter | **0 条** | **留着**（`R45-group-shift`） |
+| 授权框 | Shift+Enter | **0 条** | **留着**（`R45-ask-shift`） |
+· 紧接着按**普通回车** → **1 条**（不粘滞）。带时间戳的事件时间线（文档级捕获，实测三条）：
+  - 距 Shift 事件 **539ms** 时按普通回车 → **发出**（`sayAt` 有记录）
+  - 距 Shift 事件 **828ms** → **发出**
+  - 距 Shift 事件 **224ms** → **不发**（落在 400ms 闩内 ⇒ 按设计算作 Shift+Enter 的一部分）
+  ⇒ 边界如实报：闩 400ms，"紧接着"若在 400ms 内会被算作 Shift+Enter 而不发；**≥400ms 即恢复**，不粘滞。
+  （第一版读数里"600ms 那次不发"是**测量伪影**：`keycombination` 自身执行耗时吃掉了等待，实际间隔只有 ~200ms；带时间戳复测后才看清。）
+
+## 2) 普通回车 ⇒ 1 条 ✔（单聊与群聊各一次）
+· 单聊：`talk.say` 0→1，参数 `{role:"pipeline.author", body:"R45-plain", kind:"private", by:"me"}`，状态行「我 → 功能创造者 · 已送达 3329ms」
+· 群聊：`talk.shout` 0→1，状态行「我 → 全体（广播） · 1/1 已送达 3368ms」
+
+## 3) 软键盘（Gboard 形状：组字态后回车）⇒ 1 条 ✔（R-41 链没回归）
+真 IME 打字（`adb shell input text`，造出组字态）后**立刻**回车 → `talk.say` 2→3，body `R45-ime`，输入框清空 ✓
+
+## 4) 同一次回车不出两条 / 连按口径 ✔
+· **三连击（<400ms）**：`talk.say` 只 **+1**（`R45-burst` 一条）⇒ 三条路同触发的 400ms 闸仍在
+· **同一段文字 600ms 后再回车**：**+0** —— 原因是**发完就清空**、第二次是空文本（走"空文本不发"）
+· **重新输入再回车（间隔 600ms）**：**+1** ⇒ 即"间隔 600ms 连按两次 ⇒ 2 条"（中间要有内容），与 R-31 既有口径一致
+
+## 5) 读数要求 / 环境 ✔
+· `document.querySelectorAll('#tk-sayin').length` = **1**（本次全程单份；上一轮真机读到 2 是**首屏双份、重画后 1**，取元素按最上面那个取）
+· 行读数**只数可见的 `#tk-sends`**（页里两个，一个 0 高，跨容器数会把 1 条数成 2 条）
+· 常驻按键：`#keybar` 16、`#composer` 2；**0 未捕获异常 / 0 console.error**（3 份原始输出 json 的 `pageErrors` 均为空）
+
+## 6) 同一包里顺手复核（与本改动无关，各一条）✔
+· **R-39**：只滚内层到底（`#tk-chat` scrollTop **4655** ≥ 上限 **4654**；`padding-bottom` **68px** = `--sayline-h 60px + 8px`）；
+  末条与 `#tk-sayline` **重叠 0**（间隙 12px）、`elementFromPoint` 命中气泡自己；**真触摸末条 → 信息窗真开（全名 pipeline.author）**
+· **R-42**：`.tk-carethit` **44×61**、中心命中 `SPAN.tk-carethit`；真触摸热区 → **信息窗开且仍在频道页**；真触摸卡片名字 → **一步进单聊**（`view=role`、输入框在）
+
+## 未验（不接主机，未验 ≠ 通过）
+「对方会话条数 +1」照旧未验（App 的 rpc 到原生传输层就出不了本机）；
+实体键盘 Shift+Enter 是**模拟**（模拟器无实体键盘）；`input keycombination` 的按键顺序/时序与真实键盘可能略有差别（本轮的时序读数已给）。
+
+证据：Shift回车不误发-原始输出.json · 补测-Shift闩时间线-原始输出.json · 复核R39与R42-原始输出.json

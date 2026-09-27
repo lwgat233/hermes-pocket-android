@@ -1,0 +1,86 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R32-复测-发送终态（修正版）": {
+    "check": {
+      "dupIds": {
+        "tk-sayin": [
+          {
+            "panel": "tab-talk",
+            "visible": true,
+            "rect": {
+              "x": 12,
+              "y": 518,
+              "w": 305,
+              "h": 44
+            }
+          },
+          {
+            "panel": "tab-talk",
+            "visible": true,
+            "rect": {
+              "x": 12,
+              "y": 518,
+              "w": 305,
+              "h": 44
+            }
+          }
+        ],
+        "tk-sayok": [
+          {
+            "panel": "tab-talk",
+            "visible": true,
+            "rect": {
+              "x": 325,
+              "y": 518,
+              "w": 56,
+              "h": 44
+            }
+          },
+          {
+            "panel": "tab-talk",
+            "visible": true,
+            "rect": {
+              "x": 325,
+              "y": 518,
+              "w": 56,
+              "h": 44
+            }
+          }
+        ],
+        "tk-sends": []
+      },
+      "visible": {
+        "inp": {
+          "x": 452,
+          "y": 1619,
+          "css": {
+            "x": 12,
+            "y": 518,
+            "w": 305,
+            "h": 44
+          }
+        },
+        "ok": {
+          "x": 970,
+          "y": 1619,
+          "css": {
+            "x": 325,
+            "y": 518,
+            "w": 56,
+            "h": 44
+          }
+        }
+      },
+      "sendDelivered": {
+        "rows": [],
+        "sayCalls": 0,
+        "lastArg": null
+      },
+      "sendUnconfirmed": {
+        "rows": [],
+        "sayCalls": 0,
+        "lastArg": null
+      }
+    }
+  }
+}

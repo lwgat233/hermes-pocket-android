@@ -1,0 +1,204 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R33-复测-坐标段": {
+    "check": {
+      "meta": {
+        "cssW": 393,
+        "cssH": 778,
+        "dpr": 2.75,
+        "webview": {
+          "x": 0,
+          "y": 136,
+          "w": 1080,
+          "h": 2138
+        }
+      },
+      "settings": {
+        "cardY": 236,
+        "buttons": [
+          {
+            "t": "看明细",
+            "y": 298,
+            "h": 44
+          },
+          {
+            "t": "清理",
+            "y": 298,
+            "h": 44
+          }
+        ],
+        "cardHead": "本地占用：9 个键 · 21KB 原生侧：暂不可用（等原生加只读口 app.storage） 看明细 清理 数字是真读数",
+        "textLenBefore": 230
+      },
+      "tapDetail": {
+        "label": "看明细键",
+        "sel": "[data-store=\"detail\"]",
+        "px": {
+          "x": 25,
+          "y": 298,
+          "w": 71,
+          "h": 44,
+          "top": 298,
+          "bottom": 342
+        },
+        "dp": {
+          "x": 24.7,
+          "y": 297.6,
+          "w": 71.5,
+          "h": 44
+        },
+        "deviceTap": {
+          "x": 166,
+          "y": 1014
+        },
+        "hitIsSelf": true,
+        "hitWhat": "BUTTON.btn",
+        "overlapsChrome": [],
+        "text": "看明细"
+      },
+      "tapClean": {
+        "label": "清理键",
+        "sel": "[data-store=\"clean\"]",
+        "px": {
+          "x": 104,
+          "y": 298,
+          "w": 57,
+          "h": 44,
+          "top": 298,
+          "bottom": 342
+        },
+        "dp": {
+          "x": 104.2,
+          "y": 297.6,
+          "w": 57.5,
+          "h": 44
+        },
+        "deviceTap": {
+          "x": 365,
+          "y": 1014
+        },
+        "hitIsSelf": true,
+        "hitWhat": "BUTTON.btn",
+        "overlapsChrome": [],
+        "text": "清理"
+      },
+      "group": {
+        "buttons": [
+          "广播",
+          "本人说",
+          "投递台账"
+        ],
+        "chips": [
+          "本人说",
+          "投递台账"
+        ],
+        "delivBlockBefore": false,
+        "askline": true
+      },
+      "tapDeliv": {
+        "label": "投递台账键",
+        "sel": "#tk-delivbtn",
+        "px": {
+          "x": 12,
+          "y": 199,
+          "w": 77,
+          "h": 44,
+          "top": 199,
+          "bottom": 243
+        },
+        "dp": {
+          "x": 12,
+          "y": 199.5,
+          "w": 77.5,
+          "h": 44
+        },
+        "deviceTap": {
+          "x": 139,
+          "y": 745
+        },
+        "hitIsSelf": true,
+        "hitWhat": "BUTTON.tk-chip",
+        "overlapsChrome": [],
+        "text": "投递台账"
+      },
+      "tapShout": {
+        "label": "广播键",
+        "sel": "#tk-shoutok",
+        "px": {
+          "x": 253,
+          "y": 155,
+          "w": 56,
+          "h": 44,
+          "top": 155,
+          "bottom": 199
+        },
+        "dp": {
+          "x": 252.6,
+          "y": 155.5,
+          "w": 56,
+          "h": 44
+        },
+        "deviceTap": {
+          "x": 771,
+          "y": 624
+        },
+        "hitIsSelf": true,
+        "hitWhat": "BUTTON.tk-act",
+        "overlapsChrome": [],
+        "text": "广播"
+      },
+      "tapWho": {
+        "label": "身份键",
+        "sel": "#tk-whosay2",
+        "px": {
+          "x": 317,
+          "y": 155,
+          "w": 64,
+          "h": 44,
+          "top": 155,
+          "bottom": 199
+        },
+        "dp": {
+          "x": 316.6,
+          "y": 155.5,
+          "w": 64.5,
+          "h": 44
+        },
+        "deviceTap": {
+          "x": 959,
+          "y": 624
+        },
+        "hitIsSelf": true,
+        "hitWhat": "BUTTON.tk-chip",
+        "overlapsChrome": [],
+        "text": "本人说"
+      },
+      "tapIn": {
+        "label": "喊话输入框",
+        "sel": "#tk-shoutin",
+        "px": {
+          "x": 12,
+          "y": 155,
+          "w": 233,
+          "h": 44,
+          "top": 155,
+          "bottom": 199
+        },
+        "dp": {
+          "x": 12,
+          "y": 155.5,
+          "w": 232.6,
+          "h": 44
+        },
+        "deviceTap": {
+          "x": 353,
+          "y": 624
+        },
+        "hitIsSelf": true,
+        "hitWhat": "INPUT.tk-askin",
+        "overlapsChrome": [],
+        "text": ""
+      }
+    }
+  }
+}

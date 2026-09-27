@@ -1,0 +1,371 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-复测-群聊段（400ms 闸 / Shift+Enter / 组字态）": {
+    "check": {
+      "g1_单次": {
+        "shout": 0,
+        "shouts": [],
+        "ev": [
+          {
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true
+          }
+        ],
+        "toasts": [],
+        "val": "R41-G1",
+        "sends": []
+      },
+      "g2_三连击": {
+        "shout": 0,
+        "shouts": [],
+        "ev": [
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          }
+        ],
+        "toasts": [],
+        "val": "R41-G2",
+        "sends": []
+      },
+      "g3_间隔600": {
+        "shout": 0,
+        "shouts": [],
+        "ev": [
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true
+          }
+        ],
+        "toasts": [],
+        "val": "R41-G3",
+        "sends": []
+      },
+      "g4_ShiftEnter": {
+        "shout": 0,
+        "shouts": [],
+        "ev": [
+          {
+            "type": "keydown",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": true,
+            "comp": false
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": true,
+            "comp": true
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true
+          }
+        ],
+        "toasts": [],
+        "val": "R41-G4",
+        "sends": []
+      },
+      "g5_组字态": {
+        "before": {
+          "shout": 0,
+          "shouts": [],
+          "ev": [
+            {
+              "type": "keydown",
+              "key": "i",
+              "kc": 73,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false
+            },
+            {
+              "type": "keyup",
+              "key": "i",
+              "kc": 73,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "keydown",
+              "key": "m",
+              "kc": 77,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false
+            },
+            {
+              "type": "keyup",
+              "key": "m",
+              "kc": 77,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "keydown",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false
+            },
+            {
+              "type": "keyup",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true
+            }
+          ],
+          "toasts": [],
+          "val": "R41-G5-ime",
+          "sends": []
+        },
+        "after": {
+          "shout": 0,
+          "shouts": [],
+          "ev": [
+            {
+              "type": "keydown",
+              "key": "m",
+              "kc": 77,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false
+            },
+            {
+              "type": "keyup",
+              "key": "m",
+              "kc": 77,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "keydown",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false
+            },
+            {
+              "type": "keyup",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "keydown",
+              "key": "Enter",
+              "kc": 13,
+              "shift": false,
+              "comp": true
+            },
+            {
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false
+            },
+            {
+              "type": "keyup",
+              "key": "Enter",
+              "kc": 13,
+              "shift": false,
+              "comp": true
+            }
+          ],
+          "toasts": [],
+          "val": "R41-G5-ime",
+          "sends": []
+        }
+      }
+    }
+  }
+}

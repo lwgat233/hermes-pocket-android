@@ -1,0 +1,160 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R38-3-复测-末尾间隙两案读数": {
+    "check": {
+      "A_现状": {
+        "tag": "A 现状（滚到底，不改任何东西）",
+        "scroller": {
+          "top": 192,
+          "bottom": 566,
+          "clientHeight": 374,
+          "scrollTop": 4655,
+          "max": 4654,
+          "paddingBottom": "68px"
+        },
+        "sayline": {
+          "top": 510,
+          "bottom": 570,
+          "h": 60
+        },
+        "lastBub": {
+          "top": 426,
+          "bottom": 498,
+          "h": 72,
+          "w": 130
+        },
+        "gapToSayline": 12,
+        "clickableHeight": 72,
+        "hitWhat": "DIV.",
+        "hitSelf": true,
+        "fullyVisibleBubbles": 3,
+        "bubblePitch": 80,
+        "vars": {
+          "saylineH": "60px",
+          "safeB": "0px"
+        },
+        "viewport": {
+          "w": 393,
+          "h": 778
+        }
+      },
+      "R39_真触摸末条": {
+        "sheet": true,
+        "全名": "pipeline.author"
+      },
+      "B_补到44dp": {
+        "tag": "B 模拟（内层 padding-bottom 改成 条高+44px，只在本页内存里改）",
+        "scroller": {
+          "top": 192,
+          "bottom": 566,
+          "clientHeight": 374,
+          "scrollTop": 4691,
+          "max": 4690,
+          "paddingBottom": "104px"
+        },
+        "sayline": {
+          "top": 510,
+          "bottom": 570,
+          "h": 60
+        },
+        "lastBub": {
+          "top": 390,
+          "bottom": 462,
+          "h": 72,
+          "w": 130
+        },
+        "gapToSayline": 48,
+        "clickableHeight": 72,
+        "hitWhat": "DIV.",
+        "hitSelf": true,
+        "fullyVisibleBubbles": 3,
+        "bubblePitch": 80,
+        "vars": {
+          "saylineH": "60px",
+          "safeB": "0px"
+        },
+        "viewport": {
+          "w": 393,
+          "h": 778
+        }
+      },
+      "B_代价": {
+        "内层paddingBottom变化": "68px → 104px（+36px）",
+        "末尾多出空白px": 36,
+        "一屏可见气泡数A": 3,
+        "一屏可见气泡数B": 3,
+        "气泡间距px": 80
+      },
+      "restored": {
+        "tag": "还原后",
+        "scroller": {
+          "top": 192,
+          "bottom": 566,
+          "clientHeight": 374,
+          "scrollTop": 4655,
+          "max": 4654,
+          "paddingBottom": "68px"
+        },
+        "sayline": {
+          "top": 510,
+          "bottom": 570,
+          "h": 60
+        },
+        "lastBub": {
+          "top": 426,
+          "bottom": 498,
+          "h": 72,
+          "w": 130
+        },
+        "gapToSayline": 12,
+        "clickableHeight": 72,
+        "hitWhat": "DIV.",
+        "hitSelf": true,
+        "fullyVisibleBubbles": 3,
+        "bubblePitch": 80,
+        "vars": {
+          "saylineH": "60px",
+          "safeB": "0px"
+        },
+        "viewport": {
+          "w": 393,
+          "h": 778
+        }
+      },
+      "channel": {
+        "容器": {
+          "id": null,
+          "cls": "panel-body",
+          "paddingBottom": "24px",
+          "scrollTop": 134,
+          "max": 134
+        },
+        "末尾元素": {
+          "tag": "BUTTON",
+          "id": "tk-gogroup",
+          "cls": "tk-act",
+          "bottom": 570
+        },
+        "composerTop": 594,
+        "gapToComposer": 24,
+        "caret": {
+          "w": 44,
+          "h": 61,
+          "hitWhat": "SPAN.tk-carethit",
+          "device": {
+            "x": 985,
+            "y": 667
+          }
+        }
+      },
+      "R42_真触摸热区": {
+        "sheet": true,
+        "view": "channel"
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

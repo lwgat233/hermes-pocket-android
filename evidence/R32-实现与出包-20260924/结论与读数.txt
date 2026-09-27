@@ -1,0 +1,40 @@
+R-32 第 2 步「界面改动与出包」—— 死调用清理 结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R32-死调用清理-20260924.apk
+
+== 本次我改了什么（**只动 assets/ui/talk.js 一个文件**，删调用、不补定义）==
+1) 轮询回调尾部：删掉 `if (this.view === 'role' && this.style === 'chat' && this.sel) this.pullRoleOutput(this.sel);`
+   （原 talk.js:173；实测 30s 抛 12 条，间隔 2500ms）
+2) 发送按钮 fire()：删掉 `setTimeout(() => this.pullRoleOutput(r), 2500)` 与 `…6000)`（原 1024-1025）
+3) `paintChat()` 末尾：删掉 `this.pullRoleOutput(r);`（原 1065）
+4) 死分支：删掉 `const live = ((this.live || {})[r.full_name] || [])` + `live.forEach(...)` 那段（原 1046-1052）
+   —— `this.live` 是**布尔开关**（141 默认 true；166/187/250/275 都按开关用），拿它取角色键永远取到 undefined，
+   所以那段是死代码；删掉后空态判断简化为 `if (!items.length)`。
+   ⚠ 一处连带：**R-37 的 C 项**（live 追加那批也挂 tapWho）就写在被删的那段里 —— 随本次删除一并没了，
+   已在报告里写明；R-37 的 A/B（抬头、他说的气泡）不受影响。
+没碰：`tick()` 的 catch、`talk.thread` 气泡路径、R-26 缓存、R-31/R-36 送达状态机、`talk.capture` 终端开关。
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r32-deadcode-原始输出.json）==
+① 源码自查（**已剥掉注释再查**）：`startPoll` / `paintRole`(fire) / `paintChat` 三处**都没有活引用**了、
+   `pullRoleOutput` 仍未定义（按口径不补）、死 live 分支已消失 ✓
+② 气泡路径仍通：单聊页 2 条气泡（走 `paintChat → talk.thread`），他的气泡仍可点开信息窗（R-37 B 在）✓
+③ **单聊页连续 30s（真 2.5s 轮询）新增报错 0 条**；同期 `talk.since` **12 次**（＝轮询照跑，没被连累）；
+   轮询间隔 2.5s、表还在 ✓（改前：同样 30s 是 12 条错）
+④ 发完消息仍出终态：「我 → 测试者 · 已送达 1370ms」（state=sent，R-31/R-36 状态机没被连累）✓
+⑤ 跨块群聊页 6s：`talk.since` 2 次、报错 0 条、`#tk-stream` 在 ✓
+⑥ 全程 pageerror / console.error **0** 条 ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R32-死调用清理-20260924.apk（5063918 字节，21:18 出包）
+整包 sha256：a784e134092355329590ad034487eb721b3e204fd56c3728c1f79bb7b57fe5c8
+包内 assets/build-info.json：testVersion=unified-20260924-211804 · builtAt=2026-09-24 21:18 CST · featureId=R-32
+本次改动文件 sha256（包内 == 源树，逐字节）：
+  ui/talk.js  6873a33f04b84a4f6c1cef45160d11444a907dd59c5047860b424f09545ed0f5
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树也对得上）
+
+== 别人同期在改什么 ==
+author 已交定位（evidence/R32-定位-20260924/）、没留未提交代码；出包时整树对账 PASS。
+我前几轮（R26/R31/R27/R25/R33/R34/R35/R36/R37）的改动仍在树里未提交，git 我没动。
+
+== 没验的（未验 ≠ 通过）==
+· 真机连续 30s 无错误 + 单聊/群聊刷新手感：tester 第 3 步；板块＝主块①聊天页-单聊 + 跨块②聊天页-群聊。
+· 派活重复说明：我收到的是**两条同内容派活**（#1243 与 #1246），已按一次做、只交这一份报告。

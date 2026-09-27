@@ -1,0 +1,54 @@
+# R-34 复测结论（pipeline.tester · 设备真机真触摸 · 2026-09-24）
+
+对象：apk/测试版/hermes-pocket-R34-接入频道-20260924.apk（5063344 字节）
+整包 sha256 = 5c1556d8534712b48ff196b49933f67803b567dc1d8e83e0edff3e98f0c97e5e（与派活单一致）
+stamp-build.py --verify = **PASS 包内↔源树**
+包内 build-info：testVersion=unified-20260924-203214 / builtAt=2026-09-24 20:32 CST / featureId=R-34
+改动面（包内 talk.js 核对）：roleCard() 505-530 追加一行 `.sub`（`data-testid="talk-rolechans"`，文本「接入频道：qqbot」，`channels=[]` 的角色不追加）；
+信息窗（openRoleSheet）823-826 键名「接入频道」、空值「未接」。
+设备：emulator-5554 / Android 14 / AVD hpk34（容器 hp-emu）· 装包 Success；WebView bounds 实测 [0,136][1080,2274]
+
+**本次测了 2 块**：主块 ⑧ 频道页（角色列表）＋ 跨块 ① 聊天页-单聊。
+**跨测理由**：这次改的两处（roleCard 505-530 / 信息窗 823-826）**共用同一份角色数据** `r.channels` ——
+频道页的卡与单聊里那张信息窗读的是同一个字段，所以要两块一起量才说明"改名改行"是否一致。
+（数据说明：不接主机 → `talk.roles` 用后端真实形状造 5 个角色喂进真渲染路径；下面所有 tap 都是 `adb shell input tap` 系统触摸。）
+
+## 1) 主块 ⑧ 频道页：五张角色卡
+| 角色 | 卡高 px | dp | 「接入频道」行 | 文案裁切 | 命中自己 |
+|---|---|---|---|---|---|
+| pipeline.author（channels=['qqbot']）| 369×79 | **78.9** | **有**：`接入频道：qqbot`（class=`sub`、`data-testid=talk-rolechans`）| 未裁 | 是 |
+| pipeline.renderer（[]）| 369×59 | 59.5 | 无 | — | 是 |
+| pipeline.tester（[]，· 不在线）| 369×63 | 62.7 | 无 | — | 是 |
+| owner.me（[]）| 369×59 | 59.5 | 无 | — | 是 |
+| home.maid（[]，· 被停）| 369×63 | 62.7 | 无 | — | 否（见 4）|
+· 五张卡**都没有被撑成两行**；无频道四张**都不显示该行**，高度只差「· 不在线 / · 被停」后缀的既有取整（59.5↔62.7）；
+· 折叠区标题仍是「频道（2）▸」（读顶层 `this.channels`，没被 `r.channels` 串）；旧 `.tags/.tk-tag` 在页面里已不存在。
+
+## 2) 跨块 ① 信息窗（键名/取值）
+· 键序：全名 / 会话 / 状态 / 欠回复 / 标签 / **接入频道**；
+· 取值：`pipeline.author` → **qqbot**；`pipeline.tester` → **未接**；`home.maid` → **未接**；
+· 旧词「能接入」：页面里 0 次；包内 talk.js 里只剩 1 处**注释**（505 行 `/* … 能接入的标签 */`），不是用户可见文案。
+· 「标签」行仍显示「（无）」—— 那是「标签」这个键的既有空值写法，不属本次改名范围（如实记录）。
+
+## 3) 真触摸（`adb shell input tap`，坐标 = css × (1080/393, 2138/778) + y 偏移 136）
+· 点 `pipeline.author` 卡（设备 540,1057）→ **信息窗真开**（+300ms 与 +800ms 两次读数都是 `#tk-sheet` 在、抬头「功能创造者」、`接入频道 qqbot`）；
+· 点信息窗 **✕**（真触摸）→ 窗口真关（`#tk-sheet` 消失）；
+· **红：单聊里点消息头不开信息窗** —— 真触摸 `sheet=false`；代码侧同证：`paintChat()` 整段 **0 个 click 监听、0 处 openRoleSheet**
+  （只有 `paintStream()` 给非本人气泡挂了 `click → openRoleSheet`）。→ 单聊这一条判据**未通过**，要不要补由 author 定。
+
+## 4) 遮挡 / 常驻按键 / 复核上一轮那条
+· 常驻按键：`#keybar` 16 键（既有功能键条）、`#composer` 2 键（攒着/写入），各板块一致；页面常驻键频道页 8 个可见控件；
+· 第 5 张卡（home.maid）中心落在底部固定条所在的横向带里 → `hitIsSelf=false、coveredByChrome=true`（滚动后应可点，未逐格验证）；
+· **复核「去群聊 →」**：现在 px(12,882,87×44) 已经**在视口以下**（视口 778，`elementFromPoint` 返回 null）→ 需要滚动才点得到；
+  上一轮那次（y=595）是被 `#composer` 盖住 —— 同一控件在不同滚动位置的两种"点不到"，都不是本轮改动引入，读数照记。
+
+## 环境插曲（会导致整轮假红，如实记）
+第一次真触摸全落空（`sheet=false`），查下来是 **系统 ANR 弹窗「System UI isn't responding」占在屏幕中部** [27,935][1053,1474]，
+把所有 `adb input tap` 都吃掉了；点它的「Wait」关掉后，`mCurrentFocus=dev.hermes.pocket/MainActivity`、WebView bounds 恢复，
+**重跑同一批触摸全部成功**。→ 真手指验收前必须先查 `dumpsys window | grep mCurrentFocus` + 有没有 ANR 弹窗。
+
+## 未验（不接主机，未验≠通过）
+点角色→气泡 / 删会话 / 切会话 / 开左栏；以及 2) 里"未接"是用真渲染路径读的（非触摸）—— 无频道角色的卡**真触摸**未逐个点。
+
+证据：频道页与信息窗-原始输出.json（卡高/命中/遮挡读数）· 真触摸段-原始输出.json（adb tap 结果）·
+     截图-频道页五张卡-20260924.png · 截图-信息窗-接入频道-20260924.png

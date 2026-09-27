@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260923-084401";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-23 08:44 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "本轮收尾：R-25/26/27/29/31 已合入当前源树的一版", "featureId": "收尾", "note": "设置页「构建版本」这一行必须对上本包；版本串/打包时间由 tools/stamp-build.py 在出包时自动写，不再手写", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260923-084401"};
+  HP.BUILD = "unified-20260926-183153";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-26 18:31 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "09-26 汇总包：当前源树出的整包（含 R39/R40/R41/R42/R45 与更早 R25/R26/R27/R29/R31~R37 全部已收尾改动）；零代码改动", "featureId": "汇总-20260926", "note": "汇总包（不是单轮）：自 汇总-20260924 之后新增 R39/R40/R41/R42/R45；R43 是平台侧（App 一行未改）不含；R38 判非缺陷；R28/R30 未做（见 evidence/汇总-20260926/清单-轮次对照.txt）", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260926-183153"};
   /* —— 打包信息结束 —— */
 
   const THEME = {

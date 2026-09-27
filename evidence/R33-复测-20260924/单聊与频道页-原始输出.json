@@ -1,0 +1,289 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R33-复测-chip与布局": {
+    "check": {
+      "channel": {
+        "on": "tab-talk"
+      },
+      "channelScan": {
+        "scope": "tab-talk",
+        "label": "频道页",
+        "count": 8,
+        "chips": [
+          {
+            "cls": "tk-chip",
+            "text": "实时",
+            "px": {
+              "x": 14,
+              "y": 105,
+              "w": 51,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "含私信 🔒",
+            "px": {
+              "x": 73,
+              "y": 105,
+              "w": 84,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "搭服务端",
+            "px": {
+              "x": 12,
+              "y": 192,
+              "w": 77,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-act",
+            "text": "＋ 新角色",
+            "px": {
+              "x": 12,
+              "y": 302,
+              "w": 87,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 16.8,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-act",
+            "clipped": false
+          },
+          {
+            "cls": "tk-act",
+            "text": "🗣 全体喊话",
+            "px": {
+              "x": 14,
+              "y": 412,
+              "w": 105,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 16.8,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-act",
+            "clipped": false
+          },
+          {
+            "cls": "tk-act",
+            "text": "＋ 新对话（只对我）",
+            "px": {
+              "x": 127,
+              "y": 412,
+              "w": 157,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 16.8,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-act",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "测试者 · 没起会话",
+            "px": {
+              "x": 12,
+              "y": 547,
+              "w": 369,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-act",
+            "text": "去群聊 →",
+            "px": {
+              "x": 12,
+              "y": 595,
+              "w": 87,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 16.8,
+            "hitIsSelf": false,
+            "hitWhat": "DIV.",
+            "clipped": false
+          }
+        ],
+        "overlaps": [],
+        "verticalGaps": [
+          43,
+          4
+        ],
+        "chromeOverlap": [
+          "composer↔去群聊 →"
+        ]
+      },
+      "roleOpen": {
+        "view": "role",
+        "hasChat": true,
+        "bubbles": 6
+      },
+      "roleScan": {
+        "scope": "tab-talk",
+        "label": "单聊(角色页)",
+        "count": 7,
+        "chips": [
+          {
+            "cls": "tk-chip",
+            "text": "← 频道",
+            "px": {
+              "x": 14,
+              "y": 105,
+              "w": 68,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "聊天",
+            "px": {
+              "x": 90,
+              "y": 105,
+              "w": 51,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "终端",
+            "px": {
+              "x": 149,
+              "y": 105,
+              "w": 51,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "可见：只给他",
+            "px": {
+              "x": 12,
+              "y": 570,
+              "w": 103,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-chip",
+            "text": "身份：经理说",
+            "px": {
+              "x": 123,
+              "y": 570,
+              "w": 103,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 15.6,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-chip",
+            "clipped": false
+          },
+          {
+            "cls": "tk-askin",
+            "text": "",
+            "px": {
+              "x": 12,
+              "y": 518,
+              "w": 305,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 16.8,
+            "hitIsSelf": true,
+            "hitWhat": "INPUT.tk-askin",
+            "clipped": false
+          },
+          {
+            "cls": "tk-act",
+            "text": "发送",
+            "px": {
+              "x": 325,
+              "y": 518,
+              "w": 56,
+              "h": 44
+            },
+            "dp_h": 44,
+            "lines": 3,
+            "lineHeight": 16.8,
+            "hitIsSelf": true,
+            "hitWhat": "BUTTON.tk-act",
+            "clipped": false
+          }
+        ],
+        "overlaps": [],
+        "verticalGaps": [
+          8
+        ],
+        "chromeOverlap": [
+          "composer↔可见：只给他",
+          "composer↔身份：经理说"
+        ]
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:1062:12)",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:173:77"
+  ]
+}

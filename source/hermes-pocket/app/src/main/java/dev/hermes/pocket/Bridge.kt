@@ -749,7 +749,25 @@ print('@@OK', '1')
                 val by = if (m.optString("by", "me") == "owner.me") "owner.me" else "me"
                 val r = runCatching { talkJson(listOf("say", "--by", by, "--role", "全体",
                         "--kind", "broadcast", "--topic", talkText(m.optString("topic", "喊话")), "--body", body)) }
-                ok(id, JSONObject().put("broadcast", true).put("raw", r.getOrNull() ?: JSONObject()))
+                // R-36 B：**别吞「还没连接」这类异常** —— 失败就把 ok=false + 原因回给界面（以前这里静默成 raw={}，
+                // 界面拿不到原因只能当「发出去了」）。成功时才补出「是不是每个角色都投成」。
+                val err = r.exceptionOrNull()
+                if (err != null) {
+                    ok(id, JSONObject().put("broadcast", true).put("ok", false).put("delivered", false)
+                        .put("error", err.message ?: err.toString()).put("raw", JSONObject()))
+                } else {
+                    val raw = r.getOrNull() ?: JSONObject()
+                    val results = raw.optJSONArray("results")
+                    var all = results != null && results.length() > 0
+                    if (results != null) {
+                        for (i in 0 until results.length()) {
+                            if (results.optJSONObject(i)?.optBoolean("delivered", false) != true) all = false
+                        }
+                    }
+                    ok(id, JSONObject().put("broadcast", true)
+                        .put("delivered", if (results == null) JSONObject.NULL else all)
+                        .put("raw", raw))
+                }
             }
             "talk.say" -> if (hasId) {
                 val to = talkRole(m.optString("role"))
@@ -761,8 +779,19 @@ print('@@OK', '1')
                 val by = if (m.optString("by", "me") == "owner.me") "owner.me" else "me"
                 val r = runCatching { talkJson(listOf("say", "--by", by, "--role", to, "--kind", kind,
                         "--body", body, "--topic", talkText(m.optString("topic", "私信")))) }
-                ok(id, JSONObject().put("to", to).put("kind", kind).put("delivered", r.isSuccess)
-                    .put("raw", r.getOrNull() ?: JSONObject()))
+                // R-36 C：delivered 只认**平台 raw 里说的**（没有就给 null＝未确认），
+                // 不再拿「命令没抛错」当投成 —— 那就是假成功。
+                val err = r.exceptionOrNull()
+                if (err != null) {
+                    ok(id, JSONObject().put("to", to).put("kind", kind).put("ok", false).put("delivered", false)
+                        .put("error", err.message ?: err.toString()).put("raw", JSONObject()))
+                } else {
+                    val raw = r.getOrNull() ?: JSONObject()
+                    val delivered = if (raw.has("delivered")) raw.optBoolean("delivered", false) else null
+                    ok(id, JSONObject().put("to", to).put("kind", kind)
+                        .put("delivered", delivered ?: JSONObject.NULL)
+                        .put("raw", raw))
+                }
             }
             "talk.capture" -> if (hasId) ok(id, JSONObject().put("raw",
                 sshOrThrow().exec(talkCmd(listOf("capture", "--role", talkRole(m.optString("role")),

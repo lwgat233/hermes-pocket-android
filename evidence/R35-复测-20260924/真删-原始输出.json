@@ -1,0 +1,56 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R35-复测-真删": {
+    "check": {
+      "before": {
+        "keys": 4,
+        "kb": 160.2,
+        "cardText": "本地占用：4 个键 · 160KB 原生侧：暂不可用（等原生加只读口 app.s",
+        "dialog": false
+      },
+      "planPreview": {
+        "count": 3,
+        "freedKB": 120.1,
+        "doomed": [
+          "probe.old3",
+          "probe.old2",
+          "probe.old1"
+        ]
+      },
+      "dialog": {
+        "open": true,
+        "text": "清理本地缓存？ 将清掉 3 个键（约 120KB）。 规则：7 天没用过的先删，再把总量压到 2MB 以内。 清理 取消",
+        "yesLabel": "清理",
+        "noLabel": "取消",
+        "yesDevice": {
+          "x": 307,
+          "y": 1106,
+          "css": {
+            "w": 162,
+            "h": 44
+          }
+        },
+        "noDevice": {
+          "x": 773,
+          "y": 1106,
+          "css": {
+            "w": 162,
+            "h": 44
+          }
+        }
+      },
+      "afterConfirm": {
+        "keys": 1,
+        "kb": 40.1,
+        "cardText": "本地占用：1 个键 · 40KB 原生侧：暂不可用（等原生加只读口 app.st",
+        "dialog": false
+      },
+      "toasts": [
+        "清掉 3 个键，释放 120KB"
+      ],
+      "leftKeys": [
+        "probe.today"
+      ]
+    }
+  }
+}

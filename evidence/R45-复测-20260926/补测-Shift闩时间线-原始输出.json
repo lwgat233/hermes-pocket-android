@@ -1,0 +1,160 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R45-补测-Shift 闩到底多久（带时间戳的事件时间线）": {
+    "check": {
+      "gap_600ms": {
+        "sayCount": 1,
+        "sayAt": [
+          3300
+        ],
+        "tl": [
+          {
+            "ms": 2759,
+            "t": "keydown",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "val": "T-781"
+          },
+          {
+            "ms": 2760,
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": true,
+            "val": "T-781"
+          },
+          {
+            "ms": 2780,
+            "t": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": true,
+            "val": "T-781"
+          },
+          {
+            "ms": 2844,
+            "t": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-781"
+          },
+          {
+            "ms": 3299,
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-781"
+          }
+        ],
+        "val": ""
+      },
+      "gap_1000ms": {
+        "sayCount": 1,
+        "sayAt": [
+          6674
+        ],
+        "tl": [
+          {
+            "ms": 5833,
+            "t": "keydown",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "val": "T-754"
+          },
+          {
+            "ms": 5845,
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": true,
+            "val": "T-754"
+          },
+          {
+            "ms": 5850,
+            "t": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": true,
+            "val": "T-754"
+          },
+          {
+            "ms": 5900,
+            "t": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-754"
+          },
+          {
+            "ms": 6673,
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-754"
+          }
+        ],
+        "val": ""
+      },
+      "gap_400ms": {
+        "sayCount": 0,
+        "sayAt": [],
+        "tl": [
+          {
+            "ms": 9083,
+            "t": "keydown",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "val": "T-70"
+          },
+          {
+            "ms": 9131,
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": true,
+            "val": "T-70"
+          },
+          {
+            "ms": 9131,
+            "t": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": true,
+            "val": "T-70"
+          },
+          {
+            "ms": 9131,
+            "t": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-70"
+          },
+          {
+            "ms": 9355,
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-70"
+          },
+          {
+            "ms": 9355,
+            "t": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "val": "T-70"
+          }
+        ],
+        "val": "T-70"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+# R-42 复测结论（频道页一步进单聊 · pipeline.tester · 2026-09-25）
+
+对象：`apk/测试版/hermes-pocket-R42-频道页一步进单聊-20260925.apk`
+整包 sha256 = 92aaeb24639cef392c45216a61eba5772ab3c4be005ba9057a475c529dc24098 · **5,090,579 字节**（与派活单一致）
+包内 `assets/ui/talk.js` sha256 前 16 位 = **db4d5de93b495176**、`assets/ui/talk.css` = **e1503184e19447b2**（与派活单一致）
+包内 build-info：testVersion=unified-20260925-094957 / builtAt=2026-09-25 09:49 CST / featureId=R-42
+改动面（包内核对）：卡片 `click → openRole`（`talk.js:646`）、`.tk-carethit`（`talk.js:632` + `talk.css:26` `position:absolute;right:0;top:0;bottom:0;width:44px;min-height:44px`）、`.tk-chrow{min-height:44px}`（`talk.css:33`）
+设备：emulator-5554 / Android 14 / AVD hpk34 · 装包 Success · WebView [0,136][1080,2274] · 无 ANR
+数据：本机现取的平台真回包（`evidence/R40-复测2-20260925/fixture-*-当前.*`）；判定全走产品代码。
+
+**本次测了 2 块**：主块 ⑧ 频道页（角色列表）＋ 跨块 ① 聊天页-单聊。
+**跨测理由**：这次把「开信息窗」的入口从**点卡片**挪到**卡片右缘热区**，两个接触点一个在频道页、一个在单聊页（抬头），必须两头都真触摸一遍。
+
+## 1) 核心判据：卡片名称处 → 一步进单聊 → 回车真的发出去 ✔
+| 步骤（真触摸 `adb shell input tap`） | 读数 |
+|---|---|
+| 点卡片**名称处**（设备 198,1339） | `HP.Talk.view` **channel → role**；`#tk-sayin` 存在（输入框在）；抬头「经理（管流程/派活/判报告；不是本人）　在线 · 欠 174」 |
+| 接着真按键回车（`input keyevent 66`） | **`talk.say` 1 次**，参数 `{role:"owner.me", body:"R42-一步进单聊-回车", kind:"private", by:"me"}`；状态行「我 → 经理（…） · **已送达 1234ms**」 |
+| 发送后气泡（4 次轮询 600/1500/3000/4500ms） | 气泡 **1 → 2**、其中 `.me` **1** ⇒ **600ms 内出现"我自己的气泡"**（R-41 的成果在这条链上串通） |
+（气泡由 `talk.thread` 数据驱动：后端把这条记上后界面 600ms 内就画出来 —— 真机上后端＝平台真落库，故真机会出现。）
+
+## 2) 右缘箭头热区 ✔（含四角+中心命中）
+· `.tk-carethit` 实测 px(336,409,**44×58**) = **44dp 宽 × 58dp 高**（该卡整卡高 59px）；在含「接入频道」行的 `home.maid` 卡上实测 **44 × 80.7dp**（卡高 81px）
+  ⇒ **恒 44dp 宽 × 整卡高**（`top:0;bottom:0`），两例都 ≥44dp ✓。
+  渲染者报的 44×78px 是他台里卡片更高时的读数 —— 同口径、绝对高度随卡内容变，**复算一致**。
+· `elementFromPoint` 四角+中心 **全部命中 `SPAN.tk-carethit`**（原文：cornerTL/TR/BL/BR/center 皆 `SPAN.tk-carethit`）✓ 无死角
+· 真触摸热区（设备 985,1339）→ **信息窗真开（`.tk-sheetcard` 在）且仍在频道页**（`view=channel`、可见板块 `tab-talk`）✓
+
+## 3) R-37 回归 ✔
+单聊页真触摸**抬头** → 信息窗真开（`sheet=true`，仍停在 role 视图、抬头文案不变）。
+
+## 4) R-40 口径回归 ✔（**入口变了、显示口径没变**）
+· 卡片副行：`#4 · 女仆（本人通道）`、`#6 · owner-me`、`#10 · pipeline-author`、`#8 · pipeline-renderer`、`#5 · pipeline-tester`、`#11 · research-investigator`
+· 信息窗「会话」行：`#6 · owner-me`、`#5 · pipeline-tester`、`#4 · 女仆（本人通道）` —— 与卡片同号同人
+⇒ 这次只把「开信息窗」的**入口**从点卡片换成点右缘箭头，`#id · 窗口名` 的显示口径**未变**（明确写进本结论）。
+
+## 5) R-33 口径（行高 / 热区 ≥44dp）✔
+· `.tk-chrow` = px(14,892,365×**44**) = **44dp** ✓（`talk.css` `min-height:44px` 生效）
+· 右缘热区 = **44dp 宽** × 整卡高（44 / 58 / 81 三个样本都 ≥44dp）✓
+
+## 6) 常驻按键 / 遮挡 / 异常
+`#keybar` 16 键、`#composer` 2 键（既有）；**0 未捕获异常 / 0 console.error**（2 份原始输出 json 的 `pageErrors` 均为空）。
+
+## 未验（不接主机，未验 ≠ 通过）
+「对方会话条数 +1」同 R41-5 口径：App 的 rpc 到原生传输层就出不了本机 ⇒ 需一次主机连接才能复算（口径参照见 `evidence/R41-复测2-20260925/对方会话条数口径-参照.txt`）。
+
+证据：频道页一步进单聊-原始输出.json · 补测-chrow与发送后气泡-原始输出.json

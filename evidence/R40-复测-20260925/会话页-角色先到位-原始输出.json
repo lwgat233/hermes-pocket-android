@@ -1,0 +1,62 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R40-复测-会话页（角色先到位）": {
+    "check": {
+      "rolesLoaded": [
+        "home.maid",
+        "owner.me",
+        "pipeline.author",
+        "pipeline.renderer",
+        "pipeline.tester",
+        "research.investigator"
+      ],
+      "groups": [
+        "在线：已连接 · 人/通道 8 行（tmux 容器 2 个）",
+        "在跑（5）",
+        "没在跑（1）",
+        "临时对话（2）"
+      ],
+      "rowCount": 8,
+      "rows": [
+        {
+          "testid": "session-5",
+          "full": "#5 测试者窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-8",
+          "full": "#8 渲染者窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-10",
+          "full": "#10 功能创造者窗口 6 · tmux roles:pipeline-author · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-6",
+          "full": "#6 经理窗口 6 · tmux roles:owner-me · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-11",
+          "full": "#11 调查者窗口 6 · tmux roles:research-investigator · 建了 11 小时在跑"
+        },
+        {
+          "testid": "session-4",
+          "full": "#4 可爱女仆（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在跑"
+        },
+        {
+          "testid": "session-7",
+          "full": "#7 临时对话（已废）tmux solo-solo1790090392没在跑"
+        },
+        {
+          "testid": "session-2",
+          "full": "#2 临时对话（已废）tmux solo-solo1790081404没在跑"
+        }
+      ],
+      "女仆行": "#4 可爱女仆（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在跑",
+      "临时对话行": "#7 临时对话（已废）tmux solo-solo1790090392没在跑",
+      "tester行": "#5 测试者窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑",
+      "owner行": "#6 经理窗口 6 · tmux roles:owner-me · 建了 11 小时在跑",
+      "调查者行": "#11 调查者窗口 6 · tmux roles:research-investigator · 建了 11 小时在跑",
+      "domHead": "在线：已连接 · 人/通道 8 行（tmux 容器 2 个）刷新在跑（5）#5 测试者窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑#8 渲染者窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑#10 功能创造者窗口 6 · t"
+    }
+  }
+}

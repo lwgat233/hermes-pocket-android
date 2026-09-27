@@ -1,0 +1,67 @@
+# R-41 第 5 步复测结论（真机 Gboard 回车 · 修正包 · pipeline.tester · 2026-09-25）
+
+对象：`apk/测试版/hermes-pocket-R41-回车发送修正-20260925.apk`
+整包 sha256 = 99137db741643590e71d8d0b4865aa421289232220836e3a6cab0223f38b6434 · **5,090,339 字节**（与派活单一致）
+包内 `assets/ui/talk.js` sha256 前 16 位 = **dcc3a9a7883a7a86**（与派活单一致）
+包内 build-info：testVersion=unified-20260925-093752 / builtAt=2026-09-25 09:37 CST / featureId=R-41
+改动面（包内核对）：`bindEnterSend` 只拦 `keyCode===229`（`isComposing` 不再单独拦）＋ 组字态 1.5s 兜底复位；400ms 闸/非空/两条兜底不变。
+设备：emulator-5554 / Android 14 / AVD hpk34 · 装包 Success · WebView [0,136][1080,2274]（输入法弹出时 [0,136][1080,1507]）
+
+**本次测了 3 块**：主块 ① 单聊 ＋ 主块 ② 群聊 ＋ 跨块 ⑧ 频道页（授权框）。
+**跨测理由**：三处输入框共用同一套 `bindEnterSend`（`talk.js` 调用点 550/657/1128），改的是公共函数，必须三块分别真机点。
+手法与上一轮完全一致（便于红→绿对照）：`adb shell input keyevent 66` 真按键；组字态用 `adb shell input text` 造。
+
+## 1) 核心判据：单聊 `#tk-sayin`（上一轮的红）→ **绿**
+| 步骤 | 读数 |
+|---|---|
+| 输入法打字（造出组字态）→ **立刻**回车 | `talk.say` **0 → 1**；状态行「我 → 功能创造者 · **已送达 1234ms**」；rpc 参数 `{role:"pipeline.author", body:"R41-B-imeR41b-ime1", kind:"private", by:"me"}`；输入框清空 |
+| （上一轮同一手法） | `talk.say` **0 次**、气泡 0 个、文字留在框里 ⇒ **红转绿达成** |
+· 事件序列仍是 `compositionstart` → `keydown(Enter, kc=13, isComposing=true)` → `beforeinput(insertLineBreak)` → `keyup(Enter, kc=13, isComposing=true)`，
+  **修正后 keyCode=13 被放行**（只拦 229）⇒ 正是作者说的"Gboard 的 Enter = isComposing=true + keyCode=13"。
+
+## 2) 组字态兜底（派活判据 4）→ **绿**
+· 打字后 **立刻**回车：发出（见 1）；打字后 **等 1800ms** 再回车：`talk.say` **1 → 2**、状态行再出一条「已送达 1234ms」、输入框清空
+  ⇒ 1.5s 无条件复位生效，两条路径都能发（不是"这次恰好没组字态"）。
+· 组字态读数：两次回车的 keydown 都是 `isComposing=true`（原文在 json），修前被吞、修后放行。
+
+## 3) 主块②群聊 `#tk-shoutin` → **绿**
+输入法打字后立刻回车：`talk.shout` **0 → 1**；状态行「我 → 全体（广播） · **1/1 已送达 1234ms**”。
+
+## 4) 跨块⑧授权框 `[data-ask] .tk-askin` → **绿**
+真焦点 + 回车：`talk.answer` **0 → 1**（`{id:"42", text:…}`）+ toast「**答复已回给 pipeline.author**」，事件序列 `keydown(Enter, kc=13, isComposing=false)`。
+
+## 5) 同一次回车只 1 条 / 连按口径 → 如实报
+· **三连击（<400ms）**：`talk.say` 只 **+1**（1 次），输入框清空 ⇒ 同一批按键只发一条 ✓
+· **间隔 600ms 连按两次（框里只有一段文字）**：只 **1 条** —— 原因是**发完就清空**，第二次回车时框里没内容（走"空文本不发"分支），**不是防连点挡的**；
+  中间**重新输入再回车**时是 **2 条**（上一段 B 步实测 1→2）⇒ R-31 防连点口径照旧，如实记、不判红。
+
+## 6) **红：Shift+Enter 会把话发出去**（派活判据 3）
+`adb shell input keycombination 59 66`（模拟实体键盘；模拟器无实体键盘，按"模拟"记）后：
+```
+keydown Shift kc=16 shiftKey=false
+keydown Enter kc=13 shiftKey=true      ← 主路拦住了（没发）
+keyup   Shift kc=16 shiftKey=true      ← 把 shiftDown 置真
+keyup   Enter kc=13 shiftKey=false     ← 又把 shiftDown 置假，go() 认为"没按 Shift" ⇒ 发送
+```
+**实测结果：`talk.say` 1 次、body=`"R41-shift-seq"`、输入框被清空 ⇒ 消息真的发出去了。**
+根因（定位线索，不是修法）：**keyup 那条兜底只看"当下"的 `shiftKey`**，而 `keyup` 里还有 `shiftDown = e.shiftKey` 这行 ——
+Shift 先松、Enter 后松（真实键盘与本次模拟都是这个顺序）时，`shiftDown` 被 Enter 自己的 keyup 覆盖成 false，
+于是 keydown 里的 `preventDefault()` 没能拦住 keyup 这条路的发送。
+· 顺带：Shift+Enter 之后普通回车仍能发（`talk.say` 2 → 3，body `R41E2-after`）⇒ 不粘滞 ✓
+
+## 7) 「对方会话条数 +1」——**未验（不接主机）**，说明缺口
+· 本轮能拿到的**最硬读数**是 App 侧真的发出了 1 次 `talk.say`（参数原文见上）+ 界面出现自己的气泡（状态行终态）。
+· App 的 rpc 走到原生传输层就出不了本机（未配主机/未连主机的既有口径），所以**我数不到** `~/.hermes/state.db` 里那条 +1；
+  替它数＝我自己造一条，会把别人的会话污染（且不是"App 发出去的"）⇒ 不做。
+· 已把**复核口径**存进证据（`对方会话条数口径-参照.txt`）：台账最近真投递 `delivery(msg_id=1328, role=pipeline.author, ok=1, ms=6029)`；
+  `pipeline.author` 会话 `session_id=20260922_210353_677b99`，当前 `messages=1138` ⇒ **一旦放行一次主机连接，重数这条数即可证 +1**。
+
+## 8) 常驻按键 / 遮挡 / 异常
+`#keybar` 16 键、`#composer` 2 键（既有）；**全程 0 未捕获异常 / 0 console.error**（3 份原始输出 json 的 `pageErrors` 均为空）。
+
+## 未验（不接主机，未验 ≠ 通过）
+① 对方会话条数 +1（见 7，附复核口径）；② 真机多输入法（环境只有 Gboard 一种文字输入法，`ime list -a -s` 原文在上一轮证据里）；
+③ Shift+Enter 的结论是**模拟实体键盘**下得到的（无实体键盘）；④ 真机 `keyCode===229` 那条拦截分支没造出对应事件（未验）。
+
+证据：回车发送修正-原始输出.json · 三连击与间隔与Shift-原始输出.json · 间隔600与Shift-原始输出.json ·
+     ShiftEnter事件序列-原始输出.json · 对方会话条数口径-参照.txt

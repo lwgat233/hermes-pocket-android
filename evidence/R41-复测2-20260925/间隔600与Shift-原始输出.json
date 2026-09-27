@@ -1,0 +1,43 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-5-D/E 重跑（每步重新量坐标+真点）": {
+    "check": {
+      "D_enter_gap_600ms": {
+        "say": 1,
+        "args": [
+          "R41D-1"
+        ],
+        "ev": [
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "comp": true
+          }
+        ],
+        "val": "",
+        "focus": ""
+      },
+      "E_shift_enter": {
+        "say": 2,
+        "args": [
+          "R41D-1",
+          "R41E-shift"
+        ],
+        "ev": [],
+        "val": "",
+        "focus": ""
+      },
+      "E2_after_shift": {
+        "say": 3,
+        "args": [
+          "R41E-shift",
+          "R41E2-after"
+        ],
+        "ev": [],
+        "val": "",
+        "focus": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-调试3-单聊回车为什么什么也没发生": {
+    "check": {
+      "s0": {
+        "sends": [],
+        "busy": false,
+        "els": [
+          {
+            "i": 0,
+            "h": 44,
+            "v": "R41-B-ime"
+          },
+          {
+            "i": 1,
+            "h": 44,
+            "v": "R41-B-ime"
+          }
+        ]
+      },
+      "direct": {
+        "say": 1,
+        "sendCalls": 1,
+        "toasts": [
+          "已同步：1 个角色 · 0 条等你授权 · 0 个频道"
+        ],
+        "sends": 1
+      },
+      "info": {
+        "x": 452,
+        "y": 1109,
+        "target": "0",
+        "count": 1
+      },
+      "focus": {
+        "focusIdx": "0",
+        "focusId": "tk-sayin",
+        "isSame": true
+      },
+      "after": {
+        "say": 1,
+        "sendCalls": 1,
+        "sendArgs": [
+          [
+            "pipeline.author",
+            "private",
+            "R41-direct"
+          ]
+        ],
+        "toasts": [],
+        "ev": [
+          {
+            "type": "compositionstart",
+            "key": null,
+            "kc": null,
+            "comp": false
+          },
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "comp": true
+          },
+          {
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "comp": false
+          },
+          {
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "comp": true
+          }
+        ],
+        "vals": [
+          "R41-enter-clean"
+        ],
+        "sendsData": [
+          {
+            "n": 1,
+            "state": "sent",
+            "target": "pipeline.author"
+          }
+        ]
+      }
+    }
+  }
+}

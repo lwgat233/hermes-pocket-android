@@ -1,0 +1,40 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R39-补测2-回车链（走真输入法打字路径：谁被聚焦就往谁里打）": {
+    "check": {
+      "before": {
+        "bubs": 18,
+        "mine": 8
+      },
+      "focus": {
+        "activeIdx": 1,
+        "count": 2
+      },
+      "typed": {
+        "vals": [
+          "",
+          "R39c-ime-enter"
+        ]
+      },
+      "after": {
+        "say": 1,
+        "args": [
+          {
+            "role": "pipeline.author",
+            "body": "R39c-ime-enter",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "bubs": 10,
+        "mine": 5,
+        "toasts": [
+          "已同步：1 个角色 · 0 条等你授权 · 0 个频道"
+        ],
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms"
+        ]
+      }
+    }
+  }
+}

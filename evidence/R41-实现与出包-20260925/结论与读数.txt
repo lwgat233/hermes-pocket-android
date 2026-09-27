@@ -1,0 +1,46 @@
+R-41 第 2 步「界面改动与出包」—— 回车发送（走 A 案） 结论与读数
+角色 pipeline.renderer · 2026-09-25 · 构件 hermes-pocket-R41-回车发送-20260925.apk
+依据：派活 #1319（作者定位 #1315：机制＝有些输入法只给 beforeinput/keyup、不给 keydown ⇒「按回车没反应」）
+
+== 本次我改了什么（**只动 assets/ui/talk.js 一个文件**）==
+1) 新增共用入口 `bindEnterSend(inp, fire)`（放在 idTag 之后），一个输入框一套：
+   · `enterkeyhint="send"`（软键盘右下角显示「发送」）；
+   · **三条路**：`keydown(Enter)`（主）→ `keyup`（`key === 'Enter' || keyCode === 13`）/ `beforeinput`
+     （`inputType === 'insertLineBreak' || 'insertParagraph'`）兜底 —— 后者是**唯一能救「完全没有按键事件」的输入法**那条；
+   · **一把闸（400ms）**：同一次回车三条路同时触发也只发 1 条；**但新的 keydown 会把窗口清零**
+     ⇒ 用户连按两次是真按键，照样发两条（不吞第二次）；
+   · **Shift+Enter 一律不发送**（A 案：单行框本来也不支持换行），keydown 路径顺手 `preventDefault`；
+   · **组字中不发送**：`compositionstart/end` 记状态 + `e.isComposing` 双保险，组字中不拦 Enter（留给输入法确认候选）。
+2) 三处接线（把原来各自那条 `keydown` 换成同一个入口，行为不变、只多兜底）：
+   · 群聊 `#tk-shoutin`（原 talk.js:492 只挂 keydown）→ `bindEnterSend(gin, gfire)`
+   · 单聊 `#tk-sayin`（原 1058，草稿 input 监听没动）→ `bindEnterSend(inp, fire)`
+   · **授权回复框 `.tk-askin`**（原 598：**连 Enter 都没挂**）→ 把「答复」键里的发送抽成 `reply()`，
+     `bindEnterSend(inp, reply)`；成功时顺手 `inp.value = ''`（配合 400ms 闸防重复）
+3) **没动的**（按派活第 5 条）：投递侧 `Bridge.kt` / `deliver()` 没碰；草稿（`CACHE.set('draft.'+full…)`）、
+   群聊那行的既有行为、`.tk-askin` 的样式、R-26 缓存策略、R-31/R-36 状态机 都不动。
+   B 案（textarea 自动长高、Shift+Enter 换行）按口径**记为候选**，本轮没做。
+
+== 四条读数（本地测试台真事件；原始 JSON 同目录）==
+① **三处 `enterkeyhint` 到位**：群聊 `#tk-shoutin` = `send` ✓；单聊 `#tk-sayin` = `send` ✓；授权框 `#tk-asks .tk-askin` = `send` ✓
+   （改前全仓 0 处，与作者定位一致）
+② **兜底能救**：只给 `keyup(13)` → 群聊 **发 1 条**、发完输入框清空 ✓；
+   只给 `beforeinput(insertLineBreak)` → 单聊 **发 1 条** ✓；
+   输入法提交形状（beforeinput + keyup，**没有 keydown**）→ **发 1 条** ✓
+③ **同一次回车只发一条**：派完整序列（keydown(13) → beforeinput → keyup(13)）→ 单聊 **1 条** ✓、群聊 **1 条** ✓；
+   授权框一次回车 → `talk.answer` **1 条** ✓；**连按两次（间隔 600ms，第一次已落终态）→ 2 条** ✓
+④ **Shift+Enter 不误发**：keydown(shift)+beforeinput+keyup(shift) → **0 条**，输入框里的文字原样留着 ✓
+⑤ 组字中（compositionstart 之后）回车 → **0 条** ✓；pageerror + console.error **0 条** ✓
+   · 说明：连按两次的探针间隔取 600ms —— 因为 R-31 的防连点（`pending` 未落定时挡新发送）仍在，这是既有行为、按口径没动。
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R41-回车发送-20260925.apk（5064057 字节）
+整包 sha256：934257436a3089d83714c1f897b418010d61a831b6aeef6a2229e0a62b11b6df
+包内 assets/build-info.json：testVersion=unified-20260925-092803 · builtAt=2026-09-25 09:28 CST · featureId=R-41
+本次改动文件 sha256（**包内 == 源树，逐字节**）：
+  ui/talk.js  ba48cc02f41317b4d731082d2cc911fffb625349e9aa1c68c2aaca3804d1c675
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树）
+
+== 没验的（未验 ≠ 通过）==
+本地台给不出「真机输入法到底给不给 keydown/keyup/beforeinput」的答案（作者定位也这么说）⇒
+真机多输入法复测归 tester 第 3 步：判据＝真机按输入法回车能发出（App 出现自己气泡 + 对方会话条数 +1）、同一次回车不出两条；
+板块＝主块 ②聊天页-群聊 + ①聊天页-单聊（授权框那条一起看）。

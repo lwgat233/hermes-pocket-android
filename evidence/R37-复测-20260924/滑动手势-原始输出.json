@@ -1,0 +1,145 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R37-复测-补齐滑动手势": {
+    "check": {
+      "atBottom": {
+        "scrollTop": 4427,
+        "max": 4426,
+        "visible": 6,
+        "him": {
+          "css": {
+            "x": 12,
+            "y": 254,
+            "w": 124,
+            "h": 72
+          },
+          "x": 204,
+          "y": 932
+        },
+        "me": {
+          "css": {
+            "x": 257,
+            "y": 334,
+            "w": 124,
+            "h": 72
+          },
+          "x": 877,
+          "y": 1152
+        },
+        "sheet": false
+      },
+      "swipeDown70": {
+        "scrollTop": 4366,
+        "max": 4426,
+        "visible": 7,
+        "him": {
+          "css": {
+            "x": 12,
+            "y": 314,
+            "w": 124,
+            "h": 72
+          },
+          "x": 204,
+          "y": 1098
+        },
+        "me": {
+          "css": {
+            "x": 257,
+            "y": 394,
+            "w": 124,
+            "h": 72
+          },
+          "x": 877,
+          "y": 1318
+        },
+        "sheet": false
+      },
+      "swipeUp70": {
+        "scrollTop": 4427,
+        "max": 4426,
+        "visible": 6,
+        "him": {
+          "css": {
+            "x": 12,
+            "y": 254,
+            "w": 124,
+            "h": 72
+          },
+          "x": 204,
+          "y": 932
+        },
+        "me": {
+          "css": {
+            "x": 257,
+            "y": 334,
+            "w": 124,
+            "h": 72
+          },
+          "x": 877,
+          "y": 1152
+        },
+        "sheet": false
+      },
+      "tapAfterSwipe": {
+        "open": true,
+        "全名": "pipeline.author"
+      },
+      "swipeAfterTap": {
+        "scrollTop": 4402,
+        "max": 4426,
+        "visible": 6,
+        "him": {
+          "css": {
+            "x": 12,
+            "y": 278,
+            "w": 124,
+            "h": 72
+          },
+          "x": 204,
+          "y": 1000
+        },
+        "me": {
+          "css": {
+            "x": 257,
+            "y": 358,
+            "w": 124,
+            "h": 72
+          },
+          "x": 877,
+          "y": 1220
+        },
+        "sheet": false
+      },
+      "swipeDown20": {
+        "scrollTop": 4396,
+        "max": 4426,
+        "visible": 7,
+        "him": {
+          "css": {
+            "x": 12,
+            "y": 285,
+            "w": 124,
+            "h": 72
+          },
+          "x": 204,
+          "y": 1017
+        },
+        "me": {
+          "css": {
+            "x": 257,
+            "y": 365,
+            "w": 124,
+            "h": 72
+          },
+          "x": 877,
+          "y": 1237
+        },
+        "sheet": false
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:1065:12)",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:173:77"
+  ]
+}

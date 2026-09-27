@@ -1,0 +1,50 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R45-手感复核-R39 末条不被压 + R-42 右缘热区（同一包里过一眼）": {
+    "check": {
+      "r39": {
+        "inner": {
+          "scrollTop": 4655,
+          "max": 4654
+        },
+        "padBottom": "68px",
+        "saylineH": "60px",
+        "overlap": 0,
+        "gap": 12,
+        "hitSelf": true,
+        "device": {
+          "x": 211,
+          "y": 1405
+        }
+      },
+      "r39tapSheet": {
+        "sheet": true,
+        "全名": "pipeline.author"
+      },
+      "r42": {
+        "caret": {
+          "w": 44,
+          "h": 61,
+          "hitWhat": "SPAN.tk-carethit"
+        },
+        "cardDevice": {
+          "x": 198,
+          "y": 1035
+        },
+        "caretDevice": {
+          "x": 985,
+          "y": 1035
+        },
+        "view": "channel"
+      },
+      "r42caret": {
+        "sheet": true,
+        "view": "channel"
+      },
+      "r42card": {
+        "view": "role",
+        "sayin": true
+      }
+    }
+  }
+}

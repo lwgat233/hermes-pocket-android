@@ -1,0 +1,7 @@
+=== 台账口径参照（最近投给 pipeline.author 的真投递）===
+1328|pipeline.author|1|6029|2026-09-25 09:32:47
+1314|pipeline.author|1|3409|2026-09-25 09:22:55
+1270|pipeline.author|1|5858|2026-09-24 22:01:41
+=== pipeline.author 会话当前消息条数（只读；真连接后可复算 +1）===
+session_id: ['20260922_210353_677b99']
+messages 条数: 1138

@@ -1,0 +1,205 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R34-复测-频道页与信息窗": {
+    "check": {
+      "cleanStart": {
+        "sheet": false
+      },
+      "channel": {
+        "cardCount": 5,
+        "cards": [
+          {
+            "role": "pipeline.author",
+            "px": {
+              "x": 12,
+              "y": 296,
+              "w": 369,
+              "h": 79
+            },
+            "dp_h": 78.9,
+            "chanRowPresent": true,
+            "chanText": "接入频道：qqbot",
+            "chanClass": "sub",
+            "chanClipped": false,
+            "subText": "pipeline.author · role-pipeline-author",
+            "childRows": 3,
+            "hitIsSelf": true,
+            "hitWhat": "DIV.sub",
+            "coveredByChrome": false,
+            "deviceTap": {
+              "x": 540,
+              "y": 1057
+            }
+          },
+          {
+            "role": "pipeline.renderer",
+            "px": {
+              "x": 12,
+              "y": 383,
+              "w": 369,
+              "h": 59
+            },
+            "dp_h": 59.5,
+            "chanRowPresent": false,
+            "chanText": null,
+            "chanClass": null,
+            "chanClipped": null,
+            "subText": "pipeline.renderer · role-pipeline-render",
+            "childRows": 2,
+            "hitIsSelf": true,
+            "hitWhat": "SPAN.name",
+            "coveredByChrome": false,
+            "deviceTap": {
+              "x": 540,
+              "y": 1269
+            }
+          },
+          {
+            "role": "pipeline.tester",
+            "px": {
+              "x": 12,
+              "y": 450,
+              "w": 369,
+              "h": 63
+            },
+            "dp_h": 62.7,
+            "chanRowPresent": false,
+            "chanText": null,
+            "chanClass": null,
+            "chanClipped": null,
+            "subText": "pipeline.tester · role-pipeline-tester ·",
+            "childRows": 2,
+            "hitIsSelf": true,
+            "hitWhat": "SPAN.name",
+            "coveredByChrome": false,
+            "deviceTap": {
+              "x": 540,
+              "y": 1459
+            }
+          },
+          {
+            "role": "owner.me",
+            "px": {
+              "x": 12,
+              "y": 521,
+              "w": 369,
+              "h": 59
+            },
+            "dp_h": 59.5,
+            "chanRowPresent": false,
+            "chanText": null,
+            "chanClass": null,
+            "chanClipped": null,
+            "subText": "owner.me · role-owner-me",
+            "childRows": 2,
+            "hitIsSelf": true,
+            "hitWhat": "SPAN.name",
+            "coveredByChrome": false,
+            "deviceTap": {
+              "x": 540,
+              "y": 1649
+            }
+          },
+          {
+            "role": "home.maid",
+            "px": {
+              "x": 12,
+              "y": 588,
+              "w": 369,
+              "h": 63
+            },
+            "dp_h": 62.7,
+            "chanRowPresent": false,
+            "chanText": null,
+            "chanClass": null,
+            "chanClipped": null,
+            "subText": "home.maid · role-home-maid · 被停",
+            "childRows": 2,
+            "hitIsSelf": false,
+            "hitWhat": "TEXTAREA.",
+            "coveredByChrome": true,
+            "deviceTap": {
+              "x": 540,
+              "y": 1839
+            }
+          }
+        ],
+        "channelsToggleText": "频道（2）▸",
+        "oldTagsPresent": false,
+        "gogroupOcclusion": {
+          "px": {
+            "x": 12,
+            "y": 882,
+            "w": 87,
+            "h": 44
+          },
+          "hitSelf": false,
+          "hitWhat": null
+        }
+      },
+      "tapCard": {
+        "device": {
+          "x": 540,
+          "y": 1057
+        },
+        "sheetBefore": false,
+        "sheetAfter": {
+          "open": false
+        }
+      },
+      "sheetClosed": true,
+      "roleChatWithChan": {
+        "role": "pipeline.author",
+        "tapY": 736,
+        "bubbles": 3,
+        "closedBefore": true,
+        "sheet": {
+          "open": false
+        }
+      },
+      "roleChatNoChan": {
+        "role": "pipeline.tester",
+        "tapY": 736,
+        "bubbles": 3,
+        "closedBefore": true,
+        "sheet": {
+          "open": false
+        }
+      },
+      "chrome": {
+        "keybar": {
+          "n": 16,
+          "labels": [
+            "Esc",
+            "Tab",
+            "⇧Tab",
+            "↑",
+            "↓",
+            "←",
+            "→",
+            "⌫",
+            "Ctrl",
+            "Alt",
+            "^C",
+            "^D",
+            "⌨键盘",
+            "✎输入",
+            "▤",
+            "⌄更多"
+          ]
+        },
+        "composer": {
+          "n": 2,
+          "labels": [
+            "攒着",
+            "写入"
+          ]
+        }
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:1062:12)",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:173:77"
+  ]
+}

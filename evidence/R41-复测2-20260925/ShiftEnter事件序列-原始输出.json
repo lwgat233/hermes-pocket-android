@@ -1,0 +1,42 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-5-Shift+Enter 事件序列（重挂监听在当前输入框）": {
+    "check": {
+      "say": 1,
+      "args": [
+        "R41-shift-seq"
+      ],
+      "ev": [
+        {
+          "t": "keydown",
+          "key": "Shift",
+          "kc": 16,
+          "shift": false,
+          "prevented": false
+        },
+        {
+          "t": "keydown",
+          "key": "Enter",
+          "kc": 13,
+          "shift": true,
+          "prevented": false
+        },
+        {
+          "t": "keyup",
+          "key": "Shift",
+          "kc": 16,
+          "shift": true,
+          "prevented": false
+        },
+        {
+          "t": "keyup",
+          "key": "Enter",
+          "kc": 13,
+          "shift": false,
+          "prevented": false
+        }
+      ],
+      "val": ""
+    }
+  }
+}

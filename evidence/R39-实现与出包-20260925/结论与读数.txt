@@ -1,0 +1,38 @@
+R-39 第 2 步「界面改动与出包」—— 末条气泡不被粘性条压住（走乙案） 结论与读数
+角色 pipeline.renderer · 2026-09-25 · 构件 hermes-pocket-R39-末条不被压-20260925.apk
+依据：派活 #1389（作者定位 #1385；经理口径＝乙案 + 顺手做成「共用规则」）
+
+== 本次我改了什么（两个文件）==
+1) `assets/ui/talk.css`：新增
+   `#tk-chat { padding-bottom: calc(var(--sayline-h, 68px) + var(--safe-b, 0px) + 8px); }`
+   —— **内层滚动容器**（单聊页那个 `#tk-chat`）留出「粘性条高 + 安全区 + 8px」。
+   · 选择器用 **`#tk-chat`**（id）而不是 `.tk-chat`：群聊页那条流只是 `class="tk-chat"`、里面没有粘性条，
+     不该被加空档（第一版我写成 `.tk-chat`，会让群聊流底部多 68px 空白，已改掉）。
+   · **没动外层 `.panel-body`**（甲案按作者实测更糟：重叠变 93px）。
+2) `assets/ui/talk.js` · `paintRole()`：粘性条 `#tk-sayline` 挂进页面后量一次高度，写进 `:root` 的 `--sayline-h`
+   （`noteH()` 立刻量一次 + `requestAnimationFrame` 布局稳定后再量一次；量不到就用 CSS 里的 68px 兜底）
+   ⇒ **不写死数字**，字号/安全区一变不会失配。
+3) **共用规则**（经理口径，已进 SPEC §10）我按同一写法落实并留在注释里：
+   **凡「粘性/固定底部条」，上方滚动内容必须留 `calc(条高 + var(--safe-b))` 的底部内边距** —— ⑥讨论 B 案（频道页自带输入条）落地时照这条来。
+4) **没碰**：R-38（频道页那条，已判"非缺陷"）、R-42 的卡片/右缘热区、R-31/R-36 状态机、R-29 钉底与裁旧。
+
+== 四条读数（本地测试台；原始 JSON 同目录 t-r39-pad-原始输出.json）==
+喂 15 条消息（末条＝**他说的**，判据才成立），把**内层**滚到底：
+① **末条气泡下沿 = 561px**（粘性条上沿 665px；改前作者实测末条 577、被压在条下）
+② **重叠 = 0px** ✓
+③ 末条气泡**中心 `elementFromPoint` 命中的就是末条气泡本身**（不是粘性条、不是别的元素）✓
+④ `#tk-chat` 的 `padding-bottom` 实际值 = **68px** ＝ `--sayline-h`(量得 **60px**) + `--safe-b`(0) + 8 ✓（变量已写进 `:root`）
+判据：**滚内层到底后点最后一条气泡 → 信息窗开**（窗里是「测试者」）✓
+边角：群聊流 `#tk-stream` 的 `padding-bottom = 0px`（不受影响）✓；pageerror + console.error **0 条** ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R39-末条不被压-20260925.apk（5090985 字节）
+整包 sha256：a88a6e966a43ba4f0dbbbc62230f7546881ce3e6a11861661c1b36b358a030af
+包内 assets/build-info.json：testVersion=unified-20260925-101410 · builtAt=2026-09-25 10:14 CST · featureId=R-39
+本次改动文件 sha256（**包内 == 源树，逐字节**）：
+  ui/talk.js   32a24df71572158ad5375de828874815484fa10cd93ae054d901e532e387cc37
+  ui/talk.css  09d999e278a7e916d0d5fdd9343744e65e23f8cc9d95feafdfc33e6df703e4c3
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树）
+
+== 没验的（未验 ≠ 通过）==
+真机复测归 tester 第 3 步；判据＝只滚内层到底后点最后一条气泡能开信息窗 + 上述三读数（真机安全区/字体会让 `--sayline-h` 取到别的值，正好也验"不写死"这条）。

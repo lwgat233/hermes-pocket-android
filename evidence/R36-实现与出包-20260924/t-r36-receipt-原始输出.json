@@ -1,0 +1,53 @@
+{
+  "name": "R-36 验收：没 delivered 不算成功（已发出（未确认））、失败带原因、广播 results 分支不动",
+  "result": {
+    "check": {
+      "①_没delivered": {
+        "有状态区": true,
+        "文字": "我 → pipeline.tester · 已发出（未确认）",
+        "状态": "unconfirmed",
+        "类": "tk-sendrow wait",
+        "有毫秒": false,
+        "有重试": false
+      },
+      "②_平台说投成": {
+        "有状态区": true,
+        "文字": "我 → pipeline.tester · 已送达 1370ms",
+        "状态": "sent",
+        "类": "tk-sendrow ok",
+        "有毫秒": true,
+        "有重试": false
+      },
+      "③_失败带原因": {
+        "有状态区": true,
+        "文字": "我 → pipeline.tester · 没送达：还没连接重试",
+        "状态": "failed",
+        "类": "tk-sendrow bad",
+        "有毫秒": false,
+        "有重试": true
+      },
+      "④_广播失败": {
+        "有状态区": true,
+        "文字": "我 → 全体（广播） · 没送达：还没连接重试",
+        "状态": "failed",
+        "类": "tk-sendrow bad",
+        "有毫秒": false,
+        "有重试": true
+      },
+      "⑤_广播results": {
+        "文字": "我 → 全体（广播） · 1/2 已送达 1400ms· pipeline.author ✓ 1400ms· pipeline.renderer ✗ 没会话重试",
+        "状态": "partial",
+        "逐条数": 2
+      },
+      "⑥_旧桥形状": {
+        "文字": "我 → pipeline.tester · 已发出（未确认）",
+        "状态": "unconfirmed",
+        "没被当成已送达": true
+      },
+      "⑦_报错": {
+        "条数": 0,
+        "明细": []
+      }
+    }
+  }
+}

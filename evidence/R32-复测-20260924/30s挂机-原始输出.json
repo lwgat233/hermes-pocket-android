@@ -1,0 +1,93 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R32-复测-死调用清理": {
+    "check": {
+      "baseline": {
+        "since": 2,
+        "errs": [],
+        "errCount": 0,
+        "bubs": 12,
+        "hims": 6,
+        "himWithTapWho": 6,
+        "sheet": false,
+        "sends": []
+      },
+      "hold15": {
+        "since": 8,
+        "errs": [],
+        "errCount": 0,
+        "bubs": 12,
+        "hims": 6,
+        "himWithTapWho": 6,
+        "sheet": false,
+        "sends": []
+      },
+      "hold30": {
+        "since": 14,
+        "errs": [],
+        "errCount": 0,
+        "bubs": 12,
+        "hims": 6,
+        "himWithTapWho": 6,
+        "sheet": false,
+        "sends": []
+      },
+      "poll": {
+        "since30s": 14,
+        "expectApprox": 12,
+        "avgMs": 2143
+      },
+      "newBubble": {
+        "text": "pipeline.author → 我R",
+        "tapwho": "1",
+        "x": 204,
+        "y": 1372,
+        "css": {
+          "x": 12,
+          "y": 414,
+          "w": 124,
+          "h": 72
+        }
+      },
+      "tapNewBubble": {
+        "open": false,
+        "全名": null
+      },
+      "tapTitle": {
+        "open": true
+      },
+      "sendA": {
+        "since": 16,
+        "errs": [],
+        "errCount": 0,
+        "bubs": 12,
+        "hims": 6,
+        "himWithTapWho": 6,
+        "sheet": false,
+        "sends": []
+      },
+      "sendB": {
+        "since": 16,
+        "errs": [],
+        "errCount": 0,
+        "bubs": 12,
+        "hims": 6,
+        "himWithTapWho": 6,
+        "sheet": false,
+        "sends": []
+      },
+      "group": {
+        "sinceDelta": 2,
+        "errs": [],
+        "errCount": 0,
+        "stream": true,
+        "bubs": 1
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      },
+      "finalErrs": 0
+    }
+  }
+}

@@ -1,0 +1,680 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-5-复测-回车发送修正": {
+    "check": {
+      "A_ime_enter_immediate": {
+        "before": {
+          "say": 0,
+          "shout": 0,
+          "ans": 0,
+          "sayArgs": [],
+          "shoutArgs": [],
+          "ansArgs": [],
+          "bubs": 2,
+          "stream": 0,
+          "vals": {
+            "sayin": [
+              "R41-B-imeR41b-ime1",
+              "R41-B-ime"
+            ],
+            "shoutin": null,
+            "askin": null
+          },
+          "ev": [
+            {
+              "tag": "sayin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "sayin",
+              "type": "keyup",
+              "key": "m",
+              "kc": 77,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "keydown",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "sayin",
+              "type": "keyup",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "keydown",
+              "key": "1",
+              "kc": 49,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "sayin",
+              "type": "keyup",
+              "key": "1",
+              "kc": 49,
+              "shift": false,
+              "comp": true,
+              "it": null
+            }
+          ],
+          "toasts": [],
+          "sends": []
+        },
+        "after": {
+          "say": 1,
+          "shout": 0,
+          "ans": 0,
+          "sayArgs": [
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1",
+              "kind": "private",
+              "by": "me"
+            }
+          ],
+          "shoutArgs": [],
+          "ansArgs": [],
+          "bubs": 1,
+          "stream": 0,
+          "vals": {
+            "sayin": [
+              "R41-B-imeR41b-ime1"
+            ],
+            "shoutin": null,
+            "askin": null
+          },
+          "ev": [
+            {
+              "tag": "sayin",
+              "type": "keyup",
+              "key": "m",
+              "kc": 77,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "keydown",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "sayin",
+              "type": "keyup",
+              "key": "e",
+              "kc": 69,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "keydown",
+              "key": "1",
+              "kc": 49,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "sayin",
+              "type": "keyup",
+              "key": "1",
+              "kc": 49,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "sayin",
+              "type": "keydown",
+              "key": "Enter",
+              "kc": 13,
+              "shift": false,
+              "comp": true,
+              "it": null
+            }
+          ],
+          "toasts": [],
+          "sends": [
+            "我 → 功能创造者 · 已送达 1234ms"
+          ]
+        }
+      },
+      "B_ime_enter_after_1800ms": {
+        "before": {
+          "say": 1,
+          "shout": 0,
+          "ans": 0,
+          "sayArgs": [
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1",
+              "kind": "private",
+              "by": "me"
+            }
+          ],
+          "shoutArgs": [],
+          "ansArgs": [],
+          "bubs": 1,
+          "stream": 0,
+          "vals": {
+            "sayin": [
+              "R41-B-imeR41b-ime1R41b-ime2"
+            ],
+            "shoutin": null,
+            "askin": null
+          },
+          "ev": [],
+          "toasts": [],
+          "sends": [
+            "我 → 功能创造者 · 已送达 1234ms"
+          ]
+        },
+        "after": {
+          "say": 2,
+          "shout": 0,
+          "ans": 0,
+          "sayArgs": [
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1",
+              "kind": "private",
+              "by": "me"
+            },
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1R41b-ime2",
+              "kind": "private",
+              "by": "me"
+            }
+          ],
+          "shoutArgs": [],
+          "ansArgs": [],
+          "bubs": 1,
+          "stream": 0,
+          "vals": {
+            "sayin": [
+              "R41-B-imeR41b-ime1R41b-ime2"
+            ],
+            "shoutin": null,
+            "askin": null
+          },
+          "ev": [],
+          "toasts": [],
+          "sends": [
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms"
+          ]
+        }
+      },
+      "C_triple_enter": {
+        "say": 2,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1",
+            "kind": "private",
+            "by": "me"
+          },
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1R41b-ime2",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubs": 1,
+        "stream": 0,
+        "vals": {
+          "sayin": [
+            "R41b-burst"
+          ],
+          "shoutin": null,
+          "askin": null
+        },
+        "ev": [],
+        "toasts": [],
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 功能创造者 · 已送达 1234ms"
+        ]
+      },
+      "D_enter_gap_600ms": {
+        "say": 2,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1",
+            "kind": "private",
+            "by": "me"
+          },
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1R41b-ime2",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubs": 1,
+        "stream": 0,
+        "vals": {
+          "sayin": [
+            "R41b-gap"
+          ],
+          "shoutin": null,
+          "askin": null
+        },
+        "ev": [],
+        "toasts": [],
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 功能创造者 · 已送达 1234ms"
+        ]
+      },
+      "E_shift_enter": {
+        "say": 2,
+        "shout": 0,
+        "ans": 0,
+        "sayArgs": [
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1",
+            "kind": "private",
+            "by": "me"
+          },
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1R41b-ime2",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "shoutArgs": [],
+        "ansArgs": [],
+        "bubs": 1,
+        "stream": 0,
+        "vals": {
+          "sayin": [
+            "R41b-shift"
+          ],
+          "shoutin": null,
+          "askin": null
+        },
+        "ev": [],
+        "toasts": [],
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 功能创造者 · 已送达 1234ms"
+        ]
+      },
+      "F_group_ime_enter": {
+        "before": {
+          "say": 2,
+          "shout": 0,
+          "ans": 0,
+          "sayArgs": [
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1",
+              "kind": "private",
+              "by": "me"
+            },
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1R41b-ime2",
+              "kind": "private",
+              "by": "me"
+            }
+          ],
+          "shoutArgs": [],
+          "ansArgs": [],
+          "bubs": 1,
+          "stream": 0,
+          "vals": {
+            "sayin": [
+              "R41b-shift"
+            ],
+            "shoutin": "R41b-group",
+            "askin": null
+          },
+          "ev": [
+            {
+              "tag": "shoutin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "shoutin",
+              "type": "keyup",
+              "key": "o",
+              "kc": 79,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "keydown",
+              "key": "u",
+              "kc": 85,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "shoutin",
+              "type": "keyup",
+              "key": "u",
+              "kc": 85,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "keydown",
+              "key": "p",
+              "kc": 80,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "shoutin",
+              "type": "keyup",
+              "key": "p",
+              "kc": 80,
+              "shift": false,
+              "comp": true,
+              "it": null
+            }
+          ],
+          "toasts": [],
+          "sends": [
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms"
+          ]
+        },
+        "after": {
+          "say": 2,
+          "shout": 1,
+          "ans": 0,
+          "sayArgs": [
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1",
+              "kind": "private",
+              "by": "me"
+            },
+            {
+              "role": "pipeline.author",
+              "body": "R41-B-imeR41b-ime1R41b-ime2",
+              "kind": "private",
+              "by": "me"
+            }
+          ],
+          "shoutArgs": [
+            {
+              "body": "R41b-group",
+              "by": "me"
+            }
+          ],
+          "ansArgs": [],
+          "bubs": 1,
+          "stream": 0,
+          "vals": {
+            "sayin": [
+              "R41b-shift"
+            ],
+            "shoutin": null,
+            "askin": null
+          },
+          "ev": [
+            {
+              "tag": "shoutin",
+              "type": "keyup",
+              "key": "o",
+              "kc": 79,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "keydown",
+              "key": "u",
+              "kc": 85,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "shoutin",
+              "type": "keyup",
+              "key": "u",
+              "kc": 85,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "keydown",
+              "key": "p",
+              "kc": 80,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "beforeinput",
+              "key": null,
+              "kc": null,
+              "shift": false,
+              "comp": false,
+              "it": "insertText"
+            },
+            {
+              "tag": "shoutin",
+              "type": "keyup",
+              "key": "p",
+              "kc": 80,
+              "shift": false,
+              "comp": true,
+              "it": null
+            },
+            {
+              "tag": "shoutin",
+              "type": "keydown",
+              "key": "Enter",
+              "kc": 13,
+              "shift": false,
+              "comp": true,
+              "it": null
+            }
+          ],
+          "toasts": [],
+          "sends": [
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 全体（广播） · 1/1 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 功能创造者 · 已送达 1234ms",
+            "我 → 全体（广播） · 1/1 已送达 1234ms"
+          ]
+        }
+      },
+      "G_ask_enter": {
+        "box": {
+          "x": 452,
+          "y": 1113,
+          "askId": "42"
+        },
+        "say": 2,
+        "shout": 1,
+        "ans": 1,
+        "sayArgs": [
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1",
+            "kind": "private",
+            "by": "me"
+          },
+          {
+            "role": "pipeline.author",
+            "body": "R41-B-imeR41b-ime1R41b-ime2",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "shoutArgs": [
+          {
+            "body": "R41b-group",
+            "by": "me"
+          }
+        ],
+        "ansArgs": [
+          {
+            "id": "42",
+            "text": "R41b-授权答复"
+          }
+        ],
+        "bubs": 0,
+        "stream": 0,
+        "vals": {
+          "sayin": [],
+          "shoutin": null,
+          "askin": null
+        },
+        "ev": [
+          {
+            "tag": "askin",
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": false,
+            "it": null
+          }
+        ],
+        "toasts": [
+          "答复已回给 pipeline.author"
+        ],
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 全体（广播） · 1/1 已送达 1234ms",
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 功能创造者 · 已送达 1234ms",
+          "我 → 全体（广播） · 1/1 已送达 1234ms"
+        ]
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

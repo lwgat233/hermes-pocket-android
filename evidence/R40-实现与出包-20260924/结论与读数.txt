@@ -1,0 +1,62 @@
+R-40 第 2 步「界面改动与出包」—— 会话编号（#id） 结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R40-会话编号-20260924.apk
+
+== 本次我改了什么（**两个文件**：assets/ui/talk.js + assets/ui/panels.js，纯前端）==
+1) **编号映射（前端不造号）**：新增 sessList / winName / sessInfo / sessLabel / idTag（放在原 sess() 处）——
+   号码只取 `talk.sessions[].id`；找号按 `s.role === full_name`，多条取 alive=true（都 false 取 last_used 最大）；
+   **按 tmux 全名去重**（同 tmux 只留 alive 那条）；容器 roles / hermes 不成行；取不到 ⇒ 不显号（「未起会话」）。
+   · 顺手删掉旧的 `sess()` 合成名（只有 2 个调用点，已一并换掉）。
+   · 窗口名＝tmux 冒号后半段；**不是「会话:窗口」形态的**（如 #4 `qqbot:3FDE0CB3…`）⇒ 显示本人定的叫法
+     「本人-女仆通道」。判据只认「是不是可读窗口名」，**没有写死任何 id / 角色名 / tmux 值**。
+2) **角色卡副行**（talk.js 原 519）→ `sessLabel()`：`#6 · owner-me`、`#4 · 本人-女仆通道`；
+   没会话的角色保持 `<全名> · 未起会话`（不显号）。
+3) **信息窗「会话」行**（talk.js 原 824）→ 同一份 `sessLabel()`（与卡片**同号同人**）；「全名」行未动。
+4) **⑤会话页**（panels.js renderSessions）：主数据源 `tmux.list` → **`talk.sessions`（人/通道）**，
+   `tmux.list` 只用来 join「在不在跑 / 窗口数」；行 title＝`#<id> <身份>`（身份＝平台 title 去掉括号解释，
+   例「经理」「测试者」「可爱女仆」）、sub 保留 tmux 活读数；分组＝①在跑 ②没在跑 ③临时对话（kind=solo）；
+   `alive=false` 标「（已废）」；容器 roles / hermes 不成行；一条都没有 ⇒ 「还没起过会话…」。
+5) **弹窗 sessionSheet**：显示 `#<id> 身份（角色会话/普通会话）· <tmux>`（已废标一次，不重复）；
+   动作目标按「人」给：角色行 `name = 角色全名`（删除走 sessionDel 的**角色分支**，只杀他那个窗口），
+   临时对话仍是 tmux 会话名（与原来一致）。
+6) **附带缺陷③**：paintHistory 原来读 `r.roles`（顶层只有 scenes/channels ⇒ 恒空、「在线/没在线」永不出现、
+   known 恒空还会同一人列两条）⇒ 改成 **scenes 展平**（与 refreshRoles 一致）；
+   另：`paintHistory` 与角色卡两处的会话列表也加上了 `#<id>`（`#2 临时对话` 等）。
+7) **不新增网络请求**：用的是同一个 op `talk.sessions`（R-26 的 HP.Cache 里已缓存，命中即不发请求）；
+   缓存策略未动。**一处必要的补**：R-26 落盘是**节流写**，刚取回那一刻读盘还是空的 ⇒ 会话信息在内存里再留一份
+   （SESS_MEM），并把这次 `talk.sessions` 取数放在 **refreshRoles 里（画卡片之前）**，否则首屏会先显一屏「未起会话」。
+没碰：群聊 paintStream、R-31/R-36 状态机、R-26 缓存策略、R-25 省电、R-37 的 tapWho、talk.capture 终端开关。
+
+== 判据读数（本地测试台，数据喂**真 fixtures**：sessions-json / roles-json / tmux-list；原始 JSON 见同目录）==
+① 卡片副行：`#6 · owner-me` ✓ · `#4 · 本人-女仆通道 · 被停` ✓ · `research.investigator · 未起会话 · 不在线`（**不显号**）✓
+   全页再无 `role-*` 合成名 ✓
+② 信息窗（owner.me）会话行＝`#6 · owner-me`（与卡片同号同人）✓；没会话的角色（research.investigator）
+   会话行＝`research.investigator · 未起会话`，**整个窗里没有任何 #数字** ✓
+③ 频道页「上次聊过」：分组＝在线（3）/ 没在线（2）/ 历史（1）——**缺陷③ 修好（以前在线/没在线恒空）**；
+   行首带号 5 条：#6 经理 / #5 测试者 / #10 功能创造者 / #4 可爱女仆(…) / #2 临时对话 ✓
+④ ⑤会话页（6 行，全带号）：`#5 测试者` `#6 经理` `#10 功能创造者` `#4 可爱女仆（已废）` `#3 测试者（已废）` `#2 临时对话（已废）`
+   · 容器行 0 条（roles / hermes 不成行）✓
+   · 同 tmux 重复那条（#99 老快照）**没出现** ✓；同 role 不同 tmux 的两条**都在**（#5 在跑 + #3 已废）✓
+   · 分组：在跑（3）/ 没在跑（2）/ 临时对话（1）✓；sub 保留 tmux 活读数（`窗口 6 · tmux roles:pipeline-tester · 建了 23 分钟`）✓
+⑤ 弹窗：`#6 经理（角色会话）　· roles:owner-me` ✓ / `#4 可爱女仆（已废）（角色会话）　· qqbot:3FDE0B` ✓
+⑥ 报错：pageerror + console.error **0 条** ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R40-会话编号-20260924.apk（5063995 字节，22:15 出包）
+整包 sha256：a33eb74992a74accf7eb76a23123b8a9f4c73d89ba09e79c09469f99674d2c10
+包内 assets/build-info.json：testVersion=unified-20260924-221506 · builtAt=2026-09-24 22:15 CST · featureId=R-40
+本次改动文件 sha256（**包内 == 源树，逐字节**）：
+  ui/talk.js   33584856575602435fdb6a16a22ae540a53afa969c1bf46ad7ce70419754c7aa
+  ui/panels.js e399bd38ffa0c5e97f8db0a7036c70c5a5da6bdbf413fe3c9186e76ee70f1b12
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树）
+
+== 要请经理判的两处（都按数据驱动处理，不是写死）==
+1) 女仆 #4 的显示：会话页/弹窗用**平台身份**「可爱女仆（…）」（真值 title），卡片副行用窗口名的兜底文案
+   「本人-女仆通道」（因为 tmux=qqbot:3FDE… 不是「会话:窗口」形态）。你在派活里举的例子是
+   `#4 女仆（本人通道）`；我按「平台数据里是什么就显示什么」+ 作者 ⑤ 的「本人-女仆通道」口径做的。
+   若你要统一成「女仆（本人通道）」，说一声我改（一行）。
+2) 会话页弹窗的动作目标：行从「tmux 容器」换成了「人」，所以「切过去」发的是 `/resume <角色全名>`
+   （原来是 `/resume roles`），「删除」走角色分支只杀他那个窗口（原来会杀整个 tmux 会话）。
+   我认为这是换数据源后必然的（也更安全），但**属行为变化**，请 tester 复测时按这条看。
+
+== 没验的（未验 ≠ 通过）==
+真机点按/滚动/真数据下的编号一致性归 tester 第 3 步；板块＝主块 ⑤会话页 + ⑧频道页，跨块 ①单聊（信息窗同源）。

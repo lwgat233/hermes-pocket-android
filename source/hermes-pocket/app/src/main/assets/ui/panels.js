@@ -739,13 +739,15 @@
           : '';
       };
       paintStore(A().bool('storageReport', false));
-      el.querySelectorAll('[data-store]').forEach((b) => b.addEventListener('click', () => {
-        if (b.dataset.store === 'detail') paintStore(true);
-        else {
-          const c = HP.Cache.cleanup({ days: 7, budgetBytes: 2 * 1024 * 1024 });
-          paintStore(true);
-          A().toast('清掉 ' + c.removed + ' 个键，释放 ' + kb(c.freed));
-        }
+      el.querySelectorAll('[data-store]').forEach((b) => b.addEventListener('click', async () => {
+        if (b.dataset.store === 'detail') { paintStore(true); return; }
+        /* R-35：清理前先弹确认（用界面现成的确认框），提示里写清将清掉几个键 / 多少 KB */
+        const plan = HP.Cache.plan({ days: 7, budgetBytes: 2 * 1024 * 1024 });
+        const ok = await A().confirm('清理本地缓存？\n\n将清掉 ' + plan.count + ' 个键（约 ' + kb(plan.freed) + '）。\n规则：7 天没用过的先删，再把总量压到 2MB 以内。', '清理');
+        if (!ok) return;                       /* 取消＝什么都不做 */
+        const c = HP.Cache.cleanup({ days: 7, budgetBytes: 2 * 1024 * 1024 });
+        paintStore(true);
+        A().toast('清掉 ' + c.removed + ' 个键，释放 ' + kb(c.freed));
       }));
       /* 原生侧（filesDir 里的文件 / spill 清单）：只读 op `app.storage` 还没有 → 如实写「暂不可用」，
        * 不编数字。原生加了这个口，这里自动就有读数。 */
@@ -785,7 +787,11 @@
       box.style.cssText = 'background:#141821;border-radius:16px;padding:16px;width:86%;max-width:420px';
       const t = document.createElement('div');
       t.className = 'tk-title';
-      t.textContent = s.name;
+      t.setAttribute('data-testid', 'sess-sheet-title');
+      /* R-40：弹窗里同样显示 #id 与身份（号码只认平台 id；拿不到就不显号） */
+      t.textContent = (s.id ? '#' + s.id + ' ' : '') + (s.label || s.name) + (s.role ? '（角色会话）' : '（普通会话）') +
+        (s.tmux ? '　· ' + s.tmux : '') +
+        (s.chan ? '　· QQ 通道' : (s.alive === false && String(s.label || '').indexOf('已废') < 0 ? '　· 已废' : ''));
       box.appendChild(t);
       const mk = (label, tid, fn, danger) => {
         const b = document.createElement('button');
@@ -831,29 +837,95 @@
       }
       const S = HP.Sessions;
       el.textContent = '';
+      /* R-40：**主数据源换成 talk.sessions（人/通道）**；tmux.list 只用来 join「在不在跑 / 窗口数」。
+       * 去重按 tmux 全名（同 tmux 只留 alive 那条）；容器会话 roles / hermes 不成行；
+       * 身份＝平台给的角色名（title 去掉括号里的解释）；号码只认平台 id（**前端不造号**）。 */
+      let sess = [];
+      try {
+        const r = await A().rpc('talk.sessions');
+        sess = ((r || {}).sessions) || [];
+        HP.Cache.set('sessions', r || { sessions: [] }, { throttle: 1000 });   /* 与 talk.js 共用同一个键 */
+      } catch (e) {
+        const c = HP.Cache.get('sessions', null);
+        sess = ((c || {}).sessions) || [];
+      }
+      const CONTAINERS = { roles: 1, hermes: 1 };
+      /* R-40 修正②：通道目标（有冒号但窗口段不是可读窗口名，如 qqbot:3FDE0CB3…）不参与「已废」判定、标「QQ 通道」、恒在线；
+       * 裸 tmux 名（role-pipeline-tester / solo-…）不是通道 ⇒ 照旧按 alive 判「已废」 */
+      const winForm = (tmux) => /^[^:]+:[A-Za-z][A-Za-z0-9_-]*$/.test(String(tmux || ''));
+      const chanForm = (tmux) => { const v = String(tmux || ''); return v.indexOf(':') > 0 && !winForm(v); };
+      const isChan = (s) => !!s && chanForm(s.tmux);
+      /* R-40 修正①③：身份 —— 临时对话＝固定；通道＝固定标签（不取平台 title/name）；
+       * 角色＝平台 title 去括号；**roles 没到位 ⇒ 只显「（加载中）」**，不把平台 name 当身份 */
+      const ident = (s) => {
+        if (s.kind === 'solo') return '临时对话';
+        if (isChan(s)) return '女仆（本人通道）';
+        const rl = ((HP.Talk && HP.Talk.roles) || []).find((x) => x.full_name === s.role);
+        if (rl) {
+          const t = String(rl.title || '').split(/[（(]/)[0];
+          if (t) return t;
+        }
+        return ((HP.Talk && HP.Talk.roles) || []).length ? (s.role || '（加载中）') : '（加载中）';
+      };
+      const byTmux = {};
+      (S.list || []).forEach((t) => { byTmux[t.name] = t; });
+      const seenTmux = {};
+      const people = (sess || []).filter((s) => {
+        if (!s || !s.tmux || CONTAINERS[s.tmux]) return false;
+        if (seenTmux[s.tmux]) return false;            /* 同 tmux 只出一条 */
+        seenTmux[s.tmux] = 1;
+        return true;
+      });
+      /* R-40 修正③：roles 没到位就先拉一次（退化态「（加载中）」只在这时短暂出现，拉到即随本次渲染替换成 #id 身份） */
+      if (!(((HP.Talk || {}).roles) || []).length) { try { await HP.Talk.refreshRoles(); } catch (e) { /* 拉不到才留退化态 */ } }
+      const live = (s) => (isChan(s) ? true : !!s.alive);          /* 口径②：通道目标恒在线 */
+      const rowOf = (s) => {
+        const cont = String(s.tmux).split(':')[0];
+        const t = byTmux[cont] || {};
+        const chan = isChan(s);
+        const head = '#' + s.id + ' ' + ident(s) + (live(s) ? '' : '（已废）');
+        const sub = (chan ? 'QQ 通道 · ' : '') + (t.windows !== undefined ? '窗口 ' + t.windows + ' · ' : '') + 'tmux ' + s.tmux +
+          (t.ageSec !== undefined ? ' · 建了 ' + this._ago(t.ageSec) : '');
+        return HP.UI.row({
+          title: head,
+          sub: sub,
+          right: chan ? 'QQ 通道' : (live(s) ? (t.attached ? 'attach 中' : '在跑') : '没在跑'),
+          testid: 'session-' + s.id,
+          cls: (String((S.pick() || '')) === cont) ? 'row-on' : '',
+          onTap: () => {
+            /* R-40：弹窗的目标按「人」给 —— 角色行用角色全名（删＝只杀他那个窗口，走 sessionDel 的角色分支），
+             * 临时对话仍是 tmux 会话名（与原来一样）。显示用 label（#id 身份），动作仍用 name。 */
+            HP.Panels.sessionSheet(Object.assign({}, s, {
+              name: s.role || s.tmux,
+              chan: chan,
+              label: ident(s) + (live(s) ? '' : '（已废）')
+            }));
+          }
+        });
+      };
+      const running = people.filter((s) => s.kind !== 'solo' && live(s));
+      const stopped = people.filter((s) => s.kind !== 'solo' && !live(s));
+      const solo = people.filter((s) => s.kind === 'solo');
+      const online = A().state === 'connected' ? '已连接' : (A().state || '未知');
       const head = document.createElement('div');
       head.className = 'card';
-      const online = A().state === 'connected' ? '已连接' : (A().state || '未知');
-      head.appendChild(HP.UI.status('在线：' + online + ' · 远端 tmux：' + (S.list.length ? S.list.length + ' 个会话' : '没有会话') +
+      head.appendChild(HP.UI.status('在线：' + online + ' · 人/通道 ' + people.length + ' 行（tmux 容器 ' + (S.list.length || 0) + ' 个）' +
         (S.err ? '（' + S.err + '）' : '')));
-      const cur = S.pick();
-      head.appendChild(HP.UI.status(cur ? '当前选中：' + cur : (S.list.length ? '' : '连上后没会话会自己建一个')));
       const rf = document.createElement('button');
       rf.className = 'btn';
       rf.textContent = '刷新';
       rf.addEventListener('click', () => this.renderSessions(true));
       head.appendChild(rf);
       el.appendChild(head);
-
-      const rows = S.list.map((s) => HP.UI.row({
-        title: s.name,
-        sub: '窗口 ' + s.windows + ' · 建了 ' + this._ago(s.ageSec) + (s.idleSec !== undefined ? ' · 最后活动 ' + this._ago(s.idleSec) + '前' : ''),
-        right: s.attached ? 'attach 中' : '空闲',
-        testid: 'session-' + s.name,
-        cls: s.name === cur ? 'row-on' : '',
-        onTap: () => { HP.Panels.sessionSheet(s); }
-      }));
-      el.appendChild(HP.UI.list(rows, HP.Sessions.err ? '远端没有 tmux 会话（' + HP.Sessions.err + '）' : '远端还没有 tmux 会话 —— 启动流程会自动建一个'));
+      [[('在跑'), running], [('没在跑'), stopped], [('临时对话'), solo]].forEach(([label, arr]) => {
+        if (!arr.length) return;
+        const t2 = document.createElement('div');
+        t2.className = 'sub ui-status';
+        t2.textContent = label + '（' + arr.length + '）';
+        el.appendChild(t2);
+        el.appendChild(HP.UI.list(arr.map(rowOf)));
+      });
+      if (!people.length) el.appendChild(HP.UI.list([], '还没起过会话 —— 连上后这里会列出「人」和通道（容器 roles / hermes 不算人，不列）'));
     },
 
     /** 秒 → 人话（1 分钟内说"不到 1 分钟"） */

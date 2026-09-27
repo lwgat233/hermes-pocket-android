@@ -1,0 +1,160 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R38-复测-滚到底再判": {
+    "check": {
+      "beforeScroll": {
+        "scroll": {
+          "scrollTop": 0,
+          "scrollHeight": 863,
+          "clientHeight": 507,
+          "max": 356
+        },
+        "four": {
+          "panelBodyBottom": 594,
+          "composerTop": 594,
+          "innerHeight": 778,
+          "vvHeight": 778,
+          "vvOffsetTop": 0,
+          "vvScale": 1
+        },
+        "cards": 5,
+        "lastCard": {
+          "px": {
+            "x": 12,
+            "y": 588,
+            "w": 369,
+            "h": 63,
+            "bottom": 651
+          },
+          "dp": {
+            "x": 12,
+            "y": 588.4,
+            "w": 369.1,
+            "h": 62.7
+          },
+          "inViewport": true,
+          "hitSelf": false,
+          "hitWhat": "TEXTAREA.",
+          "overlapWithComposer": 57,
+          "device": {
+            "x": 540,
+            "y": 1839
+          }
+        },
+        "gogroup": {
+          "px": {
+            "x": 12,
+            "y": 882,
+            "w": 87,
+            "h": 44,
+            "bottom": 926
+          },
+          "dp": {
+            "x": 12,
+            "y": 881.8,
+            "w": 87.5,
+            "h": 44
+          },
+          "inViewport": false,
+          "hitSelf": false,
+          "hitWhat": null,
+          "overlapWithComposer": 0,
+          "device": {
+            "x": 153,
+            "y": 2620
+          }
+        },
+        "lastChildBottom": 0,
+        "gapToComposer": 594,
+        "view": "channel",
+        "sheet": false
+      },
+      "afterScrollToBottom": {
+        "scroll": {
+          "scrollTop": 356,
+          "scrollHeight": 863,
+          "clientHeight": 507,
+          "max": 356
+        },
+        "four": {
+          "panelBodyBottom": 594,
+          "composerTop": 594,
+          "innerHeight": 778,
+          "vvHeight": 778,
+          "vvOffsetTop": 0,
+          "vvScale": 1
+        },
+        "cards": 5,
+        "lastCard": {
+          "px": {
+            "x": 12,
+            "y": 232,
+            "w": 369,
+            "h": 63,
+            "bottom": 295
+          },
+          "dp": {
+            "x": 12,
+            "y": 232.4,
+            "w": 369.1,
+            "h": 62.7
+          },
+          "inViewport": true,
+          "hitSelf": true,
+          "hitWhat": "SPAN.name",
+          "overlapWithComposer": 0,
+          "device": {
+            "x": 540,
+            "y": 861
+          }
+        },
+        "gogroup": {
+          "px": {
+            "x": 12,
+            "y": 526,
+            "w": 87,
+            "h": 44,
+            "bottom": 570
+          },
+          "dp": {
+            "x": 12,
+            "y": 525.8,
+            "w": 87.5,
+            "h": 44
+          },
+          "inViewport": true,
+          "hitSelf": true,
+          "hitWhat": "BUTTON.tk-act",
+          "overlapWithComposer": 0,
+          "device": {
+            "x": 153,
+            "y": 1641
+          }
+        },
+        "lastChildBottom": 0,
+        "gapToComposer": 594,
+        "view": "channel",
+        "sheet": false
+      },
+      "scrollIntoView": {
+        "y": 232,
+        "bottom": 295,
+        "hitWhat": "SPAN.name",
+        "hitSelf": true
+      },
+      "tapLastCard": {
+        "open": true,
+        "全名": "home.maid"
+      },
+      "tapGogroup": {
+        "viewBefore": "channel",
+        "viewAfter": "channel",
+        "titleAfter": "服务端：还没搭建 —— 点右边「搭服务端」"
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

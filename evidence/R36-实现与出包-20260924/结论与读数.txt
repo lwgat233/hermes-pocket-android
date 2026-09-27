@@ -1,0 +1,52 @@
+R-36 第 2 步「界面改动与出包」—— 送达口径（假成功修掉）结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R36-送达口径-20260924.apk
+
+== 本次我改了什么（两处文件：A 界面、B/C 原生；D 与 R-31 的东西都没碰）==
+A. source/hermes-pocket/app/src/main/assets/ui/talk.js
+   · send() 的「非广播」分支改成三段：
+       有 delivered=true  → 已送达 ◯◯ms（照旧）
+       有 delivered=false → 没送达：<原因>（照旧）
+       **回执里没有 delivered 字段** → 新增中性态 `state='unconfirmed'`、文案「**已发出（未确认）**」、
+         `ms=null`（**不写毫秒**）、不给重试（消息可能已经发出去了，重发会重复）
+   · sendStateText() 加 unconfirmed 一支（不写毫秒）；fillSends() 把 unconfirmed 归到中性色（**不是 ok 绿**）
+   · R-31 的 3s「还在发」/8s「超时」/重试、`.hp-dialog`、命中区：**一字未改**
+B. source/hermes-pocket/app/src/main/java/dev/hermes/pocket/Bridge.kt（talk.shout，745-771）
+   · 以前 `ok(id, {broadcast:true, raw: r.getOrNull() ?: {}})` —— **「还没连接」这类异常被吞掉**，界面只拿到空 raw；
+     现在：失败 → `ok=false, delivered=false, error=<原因>, raw={}`；
+     成功 → 补 `delivered = results 全 true`（没有 results 时给 JSON null＝未确认）
+C. Bridge.kt（talk.say，772-793）
+   · `delivered` 从「命令没抛错」（`r.isSuccess`）改成**只认平台 raw 里的 delivered 字段**：
+     有 → 用它；没有 → `null`（喂给界面就是「已发出（未确认）」）。异常同样回 `ok=false,error`
+D. 广播带 `raw.results` 的分支：**没动**（那支本来就对：连主机时「1/2 已送达 1490ms」+ 逐角色 ✓/✗）
+tools/ui-harness/t-r36-receipt.mjs（新增探针，按改后 Bridge 该回的形状喂回执）
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r36-receipt-原始输出.json）==
+① 桥回 `delivered:null`（平台 raw 没这个字段）→ 「我 → 测试者 · **已发出（未确认）**」、state=unconfirmed、
+   行色 wait（不是 ok 绿）、**没有毫秒**、没有重试 ✓
+② 平台说投成（raw.delivered=true）→ 「已送达 **1370ms**」（照旧）✓
+③ 失败带原因（`ok=false, delivered=false, error:'还没连接'`）→ 「没送达：**还没连接**」+ 重试 ✓
+④ **负向用例：不接主机广播**（talk.shout 回 `ok=false,error:'还没连接'`）→ 「没送达：**还没连接**」+ 重试 ✓
+   （改前这条会被吞掉、被当成功）
+⑤ 广播带 results（D 那支）→ 「1/2 已送达 1400ms」+ 两条逐条（author ✓ / renderer ✗ 没会话）✓
+⑥ 兜底：回执**整条没有 delivered 字段**（旧桥形状）→ 也不当成功 → 「已发出（未确认）」✓
+⑦ 报错：pageerror / console.error **0** 条 ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R36-送达口径-20260924.apk（5063955 字节，20:42 出包）
+整包 sha256：4703cdd8b4741879085b96d04de10e67a7b312ee1c2af13a32883539acaf4e5b
+包内 assets/build-info.json：testVersion=unified-20260924-204122 · builtAt=2026-09-24 20:41 CST · featureId=R-36
+本次改动文件 sha256：
+  ui/talk.js      855ff7a0510ed2bff6ef623efb236c9e30d82bb119942e243e799e24c0516901（包内 == 源树，逐字节）
+  Bridge.kt       1fe6dd9b162cfb0b288936a68a7fa01c6c12a0cec62d58505ed64d43a8dcdf5c（源树 sha；
+                  Kotlin 编译进 classes.dex，**不能按包内字节比** —— 编译通过＝`BUILD SUCCESSFUL in 47s`）
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树也对得上）
+
+== 别人同期在改什么 ==
+author 已交定位（evidence/R36-定位-20260924/）、没留未提交代码；出包时整树对账 PASS。
+我前几轮（R26/R31/R27/R25/R33/R34/R35）的改动仍在树里未提交，git 我没动。
+
+== 没验的（未验 ≠ 通过）==
+· Kotlin 那半的真机行为（不接主机时 talk.shout/talk.say 真回 ok=false+原因）与真机真点：tester 第 3 步；
+  板块＝②群聊 + 跨块①单聊（同一套发送状态机）。本地台只证了「按改后该回的形状喂进去，界面表现对」。
+· 反过来的风险也记一句：如果平台上某次 say 真的没有 delivered 字段（老版本 talk.py），
+  界面现在会显示「已发出（未确认）」而不是「已送达」—— 这是**故意**的（宁可不说成功）。

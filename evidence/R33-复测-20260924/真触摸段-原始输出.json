@@ -1,0 +1,125 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R33-复测-真触摸段": {
+    "check": {
+      "detailBefore": {
+        "len": 230,
+        "head": "本地占用：9 个键 · 21KB 原生侧：暂不可用（等原生加只读口 app.storage） 看明细 清理 数字是真读数"
+      },
+      "detailTap": {
+        "x": 166,
+        "y": 1014,
+        "css": {
+          "x": 25,
+          "y": 298,
+          "w": 71,
+          "h": 44
+        },
+        "tap": "adb shell input tap 166 1014"
+      },
+      "detailAfter": {
+        "len": 374,
+        "hasKeyKB": true,
+        "sample": "本地占用：9 个键 · 21KB 原生侧：暂不可用（等原生加只读口 app.storage） thread.pipeline.tester 7.8KB · thread.probe 7.8KB · probe.keep2 2.4KB（300"
+      },
+      "cleanTap": {
+        "x": 365,
+        "y": 1223,
+        "css": {
+          "x": 104,
+          "y": 373,
+          "w": 57,
+          "h": 44
+        },
+        "tap": "adb shell input tap 365 1223"
+      },
+      "cleanAfter": {
+        "confirmSeen": false,
+        "confirmMsg": null,
+        "modalTexts": [],
+        "confirmButtons": [],
+        "restored": true
+      },
+      "delivBefore": {
+        "open": false,
+        "block": false
+      },
+      "delivTap": {
+        "x": 139,
+        "y": 745,
+        "css": {
+          "x": 12,
+          "y": 199,
+          "w": 77,
+          "h": 44
+        },
+        "tap": "adb shell input tap 139 745"
+      },
+      "delivAfter": {
+        "open": true,
+        "blockExists": true,
+        "blockText": "读不到台账：还没连接",
+        "blockH": 23
+      },
+      "whoBefore": "本人说",
+      "whoTap": {
+        "x": 959,
+        "y": 624,
+        "css": {
+          "x": 317,
+          "y": 155,
+          "w": 64,
+          "h": 44
+        },
+        "tap": "adb shell input tap 959 624"
+      },
+      "whoAfter": {
+        "text": "经理说",
+        "asWho": "owner.me"
+      },
+      "inputTap": {
+        "x": 353,
+        "y": 624,
+        "css": {
+          "x": 12,
+          "y": 155,
+          "w": 233,
+          "h": 44
+        },
+        "tap": "adb shell input tap 353 624"
+      },
+      "inputFocus": {
+        "tag": "INPUT",
+        "id": "tk-shoutin",
+        "isShout": true
+      },
+      "inputValue": "R33shout",
+      "shoutTap": {
+        "x": 771,
+        "y": 896,
+        "css": {
+          "x": 253,
+          "y": 155,
+          "w": 56,
+          "h": 44
+        },
+        "tap": "adb shell input tap 771 896"
+      },
+      "shoutAfter": {
+        "sendRows": [],
+        "toast": [
+          "连不上服务端：显示本地保存的那份"
+        ],
+        "inputValueAfter": "R33shout"
+      },
+      "groupChrome": {
+        "count": 3,
+        "labels": [
+          "广播",
+          "经理说",
+          "收起台账"
+        ]
+      }
+    }
+  }
+}

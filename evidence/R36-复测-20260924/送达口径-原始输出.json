@@ -1,0 +1,165 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R36-复测-送达口径": {
+    "check": {
+      "calibration": {
+        "before": "本人说",
+        "after": "经理说",
+        "changed": true
+      },
+      "noHostShout": {
+        "found": true,
+        "rows": [
+          {
+            "state": "failed",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 没送达：还没连接",
+            "subs": [],
+            "retry": true
+          }
+        ],
+        "raw": "我 → 全体（广播） · 没送达：还没连接重试",
+        "hasDeliveredWord": false,
+        "hasMsDigits": false,
+        "toasts": []
+      },
+      "platformShout": {
+        "found": true,
+        "rows": [
+          {
+            "state": "failed",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 没送达：还没连接",
+            "subs": [],
+            "retry": true
+          },
+          {
+            "state": "partial",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 1/2 已送达 8382ms",
+            "subs": [
+              "· pipeline.tester ✓ 8382ms",
+              "· pipeline.author ✗ 阶段没放行"
+            ],
+            "retry": true
+          }
+        ]
+      },
+      "singleUnconfirmed": {
+        "found": true,
+        "rows": [
+          {
+            "state": "failed",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 没送达：还没连接",
+            "subs": [],
+            "retry": true
+          },
+          {
+            "state": "partial",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 1/2 已送达 8382ms",
+            "subs": [
+              "· pipeline.tester ✓ 8382ms",
+              "· pipeline.author ✗ 阶段没放行"
+            ],
+            "retry": true
+          },
+          {
+            "state": "unconfirmed",
+            "cls": "wait",
+            "text": "我 → 功能创造者 · 已发出（未确认）",
+            "subs": [],
+            "retry": false
+          }
+        ]
+      },
+      "singleFailed": {
+        "found": true,
+        "rows": [
+          {
+            "state": "failed",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 没送达：还没连接",
+            "subs": [],
+            "retry": true
+          },
+          {
+            "state": "partial",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 1/2 已送达 8382ms",
+            "subs": [
+              "· pipeline.tester ✓ 8382ms",
+              "· pipeline.author ✗ 阶段没放行"
+            ],
+            "retry": true
+          },
+          {
+            "state": "unconfirmed",
+            "cls": "wait",
+            "text": "我 → 功能创造者 · 已发出（未确认）",
+            "subs": [],
+            "retry": false
+          },
+          {
+            "state": "failed",
+            "cls": "bad",
+            "text": "我 → 功能创造者 · 没送达：阶段没放行",
+            "subs": [],
+            "retry": true
+          }
+        ]
+      },
+      "singleDelivered": {
+        "found": true,
+        "rows": [
+          {
+            "state": "partial",
+            "cls": "bad",
+            "text": "我 → 全体（广播） · 1/2 已送达 8382ms",
+            "subs": [
+              "· pipeline.tester ✓ 8382ms",
+              "· pipeline.author ✗ 阶段没放行"
+            ],
+            "retry": true
+          },
+          {
+            "state": "unconfirmed",
+            "cls": "wait",
+            "text": "我 → 功能创造者 · 已发出（未确认）",
+            "subs": [],
+            "retry": false
+          },
+          {
+            "state": "failed",
+            "cls": "bad",
+            "text": "我 → 功能创造者 · 没送达：阶段没放行",
+            "subs": [],
+            "retry": true
+          },
+          {
+            "state": "sent",
+            "cls": "ok",
+            "text": "我 → 功能创造者 · 已送达 ≈1ms",
+            "subs": [],
+            "retry": false
+          }
+        ]
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2,
+        "sendsBox": {
+          "y": 333,
+          "h": 268
+        },
+        "viewportH": 778
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:173:77",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:1023:31",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:1024:31"
+  ]
+}

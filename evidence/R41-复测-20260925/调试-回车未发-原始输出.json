@@ -1,0 +1,50 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-调试-回车为什么没发": {
+    "check": {
+      "元素": {
+        "count": 2,
+        "tips": [
+          {
+            "id": "tk-sayin",
+            "h": 44,
+            "val": "R41sayR41burstR41gapR41shift",
+            "hasAh": "send",
+            "parent": "tk-askline"
+          },
+          {
+            "id": "tk-sayin",
+            "h": 44,
+            "val": "R41sayR41burstR41gapR41shift",
+            "hasAh": "send",
+            "parent": "tk-askline"
+          }
+        ]
+      },
+      "focus0": {
+        "id": "tk-sayin",
+        "cls": "tk-askin",
+        "ah": "send"
+      },
+      "before": {
+        "focusVal": "R41sayR41burstR41gaDBG41pR41shift",
+        "focusId": "tk-sayin",
+        "all": [
+          "R41sayR41burstR41gaDBG41pR41shift",
+          "R41sayR41burstR41gapR41shift"
+        ]
+      },
+      "after": {
+        "say": [],
+        "toasts": [
+          "已同步：1 个角色 · 0 条等你授权 · 0 个频道"
+        ],
+        "all": [
+          "R41sayR41burstR41gaDBG41pR41shift",
+          "R41sayR41burstR41gapR41shift"
+        ],
+        "sends": []
+      }
+    }
+  }
+}

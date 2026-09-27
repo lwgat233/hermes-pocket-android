@@ -1,0 +1,43 @@
+R-35「界面改动与出包：清理键加确认」 结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R35-清理确认-20260924.apk
+
+== 本次我改了什么（两处，除确认外没动别的行为）==
+source/hermes-pocket/app/src/main/assets/ui/panels.js（设置页「本地占用」卡的「清理」键）
+  · 点「清理」**先弹确认**：用界面**现成的确认框**（`HP.App.confirm`，.hp-dialog + [data-y]确定 / [data-n]取消），
+    不是自己画的、也不靠 window.confirm；提示文案：
+      「清理本地缓存？\n\n将清掉 N 个键（约 X KB）。\n规则：7 天没用过的先删，再把总量压到 2MB 以内。」
+  · **取消 = 什么都不做**（直接 return，键数不变、不弹 toast）；**确定 = 执行**，之后**原 toast 照旧**
+    （`清掉 N 个键，释放 X KB`）。
+source/hermes-pocket/app/src/main/assets/ui/cache.js（只为拿到「将清掉几个键/多少 KB」这个数）
+  · 把清理规则抽成**只算不删**的 `plan(opts)`，`cleanup()` 改成按 plan 执行 —— 规则只有一处（界面不复述规则），
+    **落盘/上限/节流/护栏的行为一字未改**（set/get/report/flush 都没动）。
+  · 说明：没有动 R-26 的落盘层行为，只是加了一个只读的"预览"入口。
+tools/ui-harness/t-r35-cleanconfirm.mjs（新增探针：造 3 个 30 天没用的键 + 1 个今天的，走真点击）
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r35-cleanconfirm-原始输出.json）==
+① 点之前：库里 4 个键，预计会清 3 个 / 约 3KB。
+② 点「清理」→ **确认框真出现**（有「清理」与「取消」两个键），提示原文含「将清掉 3 个键（约 2.6KB）」+「KB」；
+   **此刻还没执行**（toast 里没有「清掉…」）✓
+③ 点「取消」→ 确认框关闭、键数 **4 → 4 不变**、没有执行 toast ✓
+④ 再点「清理」→ 点「确定」→ 键数 **4 → 1 真清了**，原 toast「清掉 3 个键，释放 2.6KB」照旧 ✓
+⑤ 干净态（没有可清的）：确认框照样弹，文案写「将清掉 **0 个键**（约 0.0KB）」✓
+⑥ 不回归：点「看明细」**不弹确认**（照旧直接算一次）；「本地占用」那行还在；报错 pageerror/console.error **0** 条 ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R35-清理确认-20260924.apk（5063340 字节，20:35 出包）
+整包 sha256：4de22562ec4fb7758330884404191eebd2460c7947685846c60103dfd92b47d8
+包内 assets/build-info.json：testVersion=unified-20260924-203507 · builtAt=2026-09-24 20:35 CST · featureId=R-35
+本次改动文件 sha256（包内 == 源树，逐字节）：
+  ui/panels.js  b513dcaf17a230643d6bebfccaf2948d608490c7138c3a34a2137f61b49fbe67
+  ui/cache.js   15cc0922778083f1f71ddac373a08593e3b6a92a96d256c1d009cc4d97f025f8
+复核：stamp-build.py --verify <apk> → PASS（这一版整树也对得上）
+
+== 别人同期在改什么 ==
+author 已交定位、没留未提交代码；出包时整树对账 PASS。我前几轮（R26/R31/R27/R25/R33/R34）的改动
+仍在树里未提交，git 我没动。
+
+== 没验的（未验 ≠ 通过）==
+· 真机真点（adb shell input tap 落在「清理」上 → 弹窗真出现 / 点确定真清）：tester 第 2 步做；
+  判据他可以从 DOM 取：`.hp-dialog [data-y]` / `[data-n]`，或看 `#toast` 文案。
+· 若 tester 的脚本按「window.confirm 调用次数 ≥1」判：本实现走的是界面自己的确认框，
+  **不会**有 window.confirm 调用 —— 请按「确认框真出现 + 取消/确定行为」判，这条已在报告里写明。

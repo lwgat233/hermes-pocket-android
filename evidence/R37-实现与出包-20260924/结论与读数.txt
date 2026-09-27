@@ -1,0 +1,40 @@
+R-37 第 2 步「界面改动与出包」—— 单聊点气泡/抬头开信息窗 结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R37-单聊开窗-20260924.apk
+
+== 本次我改了什么（**只动 assets/ui/talk.js 一个文件**）==
+· 新增 `tapWho(el, full)`（talk.js 1138-1160 附近）：给元素挂 `data-from` + **只挂一个 click**；
+  `touchstart` 用 `{passive:true}` 只**记一下手指坐标**，click 时若位移 >8px 就当滚动、不开窗（8px 守卫）；
+  **不注册 touchmove、不 preventDefault、不碰滚动**。
+· A：`paintRole()` 的抬头 `.tk-title` 挂 `tapWho` —— 主入口（点抬头开这个角色的信息窗）。
+· B：`paintChat()` 里**他说的**气泡（`him`）挂；**我说的**（`me`）不挂；两处都带 `data-from = r.full_name`。
+· C：`live` 追加的那批（也走 him 分支）同样挂。
+· 没碰别的：群聊 `paintStream()` 那套原样保留；R-32 的 `pullRoleOutput` 没动；`.tk-bub` 样式与钉底逻辑没动。
+tools/ui-harness/t-r37-tapwho.mjs（新增探针：真渲染 + 真事件形状：touchstart + MouseEvent('click')）
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r37-tapwho-原始输出.json）==
+① 点**抬头** → 信息窗开，全名行 `全名 pipeline.tester`（挂上了 tapWho）✓
+② 点**他的气泡** → 信息窗开，且该气泡 `data-from=pipeline.tester` ✓
+③ 点**我的气泡** → **不挂 tapWho、点了不开窗**（我的气泡数 1，没被误挂）✓
+④ 点 **live 追加**的那条 → 信息窗开（him 气泡共 2 条：1 条记录 + 1 条 live）✓
+⑤ **8px 守卫**：touchstart 后滑动 20px 再 click → **不开窗**；只移动 3px 的点击 → 开窗 ✓
+⑥ 「没碰滚动」的自查（读 `tapWho` 源码）：无 `touchmove`、无 `preventDefault`、只有 `addEventListener('click'`、
+   `touchstart` 带 `passive:true` ✓
+⑦ 群聊那套没动：`#tk-stream` 还在、群聊气泡**没有**被误挂 `data-tapwho` ✓
+⑧ 报错：pageerror / console.error **0** 条 ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R37-单聊开窗-20260924.apk（5063894 字节，20:45 出包）
+整包 sha256：1d727e3a1b6b3e338e584033772f56505171073dd853ad12b49d97f64eb40a7c
+包内 assets/build-info.json：testVersion=unified-20260924-204517 · builtAt=2026-09-24 20:45 CST · featureId=R-37
+本次改动文件 sha256（包内 == 源树，逐字节）：
+  ui/talk.js  2841fc78662532900519209cbe422caec305653a6f75b64cb7d90bc4cb0935ac
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树也对得上）
+
+== 别人同期在改什么 ==
+author 已交定位（evidence/R37-定位-20260924/）、没留未提交代码；出包时整树对账 PASS。
+我前几轮（R26/R31/R27/R25/R33/R34/R35/R36）的改动仍在树里未提交，git 我没动。
+
+== 没验的（未验 ≠ 通过）==
+· 真机真触摸（手指在气泡上滑一下不该开窗、点一下该开窗）与 8px 在真机上的手感：tester 第 3 步；
+  板块＝主块①单聊 + 跨块②群聊（同一套 bubbleEl/openRoleSheet）。
+· 本地台派的是 `touchstart + MouseEvent('click')`（真机 tap 的形状），不是真手指——等效但不等同。

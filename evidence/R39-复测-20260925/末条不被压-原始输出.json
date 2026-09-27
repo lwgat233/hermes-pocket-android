@@ -1,0 +1,154 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R39-复测-末条不被压": {
+    "check": {
+      "beforeInnerScroll": {
+        "外层bodyScrollTop": 0,
+        "inner": {
+          "scrollTop": 4495,
+          "scrollHeight": 4868,
+          "clientHeight": 374,
+          "max": 4494,
+          "paddingBottom": "68px",
+          "id": "tk-chat"
+        },
+        "vars": {
+          "saylineH": "60px",
+          "safeB": "0px"
+        },
+        "bubCount": 60,
+        "lastBub": {
+          "top": 426,
+          "bottom": 498,
+          "h": 72,
+          "x": 257,
+          "w": 124
+        },
+        "sayline": {
+          "top": 510,
+          "bottom": 570,
+          "h": 60,
+          "x": 12,
+          "w": 369
+        },
+        "overlap": 0,
+        "gap": 12,
+        "sayinCount": 2,
+        "visibleSendsRows": {
+          "boxes": 0,
+          "visibleRows": 0
+        }
+      },
+      "afterInnerScroll": {
+        "外层bodyScrollTop": 0,
+        "inner": {
+          "scrollTop": 4495,
+          "scrollHeight": 4868,
+          "clientHeight": 374,
+          "max": 4494,
+          "paddingBottom": "68px",
+          "id": "tk-chat"
+        },
+        "vars": {
+          "saylineH": "60px",
+          "safeB": "0px"
+        },
+        "bubCount": 60,
+        "lastBub": {
+          "top": 426,
+          "bottom": 498,
+          "h": 72,
+          "x": 257,
+          "w": 124
+        },
+        "sayline": {
+          "top": 510,
+          "bottom": 570,
+          "h": 60,
+          "x": 12,
+          "w": 369
+        },
+        "overlap": 0,
+        "gap": 12,
+        "sayinCount": 2,
+        "visibleSendsRows": {
+          "boxes": 0,
+          "visibleRows": 0
+        }
+      },
+      "scrollIntoView": {
+        "cls": "tk-bub me",
+        "rect": {
+          "top": 426,
+          "bottom": 498
+        },
+        "hitWhat": "DIV.",
+        "hitIsSelfOrChild": true,
+        "scrollerMax": 4494,
+        "scrollTop": 4495
+      },
+      "lastBubDevice": {
+        "x": 877,
+        "y": 1405,
+        "css": {
+          "top": 426,
+          "bottom": 498
+        }
+      },
+      "tapLastBubble": {
+        "sheet": false,
+        "全名": null
+      },
+      "enterChain": {
+        "pre": 60,
+        "post": 60,
+        "mine": 30,
+        "sayCalls": 0,
+        "sayArgs": [],
+        "rows": []
+      },
+      "group": {
+        "streamPaddingBottom": "0px",
+        "streamId": "tk-stream",
+        "hasTkChatClass": true,
+        "bubs": 1,
+        "lastBub": {
+          "top": 140,
+          "bottom": 212
+        },
+        "composerTop": 594,
+        "overlapWithComposer": 0,
+        "paddingBottomOfIdSelector": "68px"
+      },
+      "channel": {
+        "cardSub": "pipeline.author · 未起会话",
+        "cardDevice": {
+          "x": 198,
+          "y": 1035
+        },
+        "caretHit": {
+          "w": 44,
+          "h": 61,
+          "hitWhat": "SPAN.tk-carethit"
+        },
+        "caretDevice": {
+          "x": 985,
+          "y": 1035
+        },
+        "view": "channel"
+      },
+      "channelAfterCaretTap": {
+        "sheet": true,
+        "view": "channel"
+      },
+      "channelAfterNameTap": {
+        "view": "role",
+        "sayin": true
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

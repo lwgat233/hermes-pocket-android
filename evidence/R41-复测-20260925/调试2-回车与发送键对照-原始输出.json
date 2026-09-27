@@ -1,0 +1,217 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-调试2-哪个元素收到键/处理器有没有跑": {
+    "check": {
+      "st1": {
+        "focus": "0",
+        "vals": [
+          "R41sayR41burstR41gaDBG2DBG41pR41shift",
+          "R41sayR41burstR41gaDBG41pR41shift"
+        ]
+      },
+      "afterEnter": {
+        "ev": [
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keydown",
+            "key": "Shift",
+            "kc": 16,
+            "shift": true,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keydown",
+            "key": "G",
+            "kc": 71,
+            "shift": true,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText",
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "G",
+            "kc": 71,
+            "shift": true,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keydown",
+            "key": "2",
+            "kc": 50,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText",
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "2",
+            "kc": 50,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertLineBreak",
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          }
+        ],
+        "say": [],
+        "sendCalls": 0,
+        "toasts": [
+          "已同步：1 个角色 · 0 条等你授权 · 0 个频道"
+        ],
+        "vals": [
+          "R41sayR41burstR41gaDBG2DBG41pR41shift",
+          "R41sayR41burstR41gaDBG41pR41shift"
+        ],
+        "focusIdx": "0"
+      },
+      "afterButton": {
+        "say": [],
+        "sendCalls": 0,
+        "toasts": [
+          "已同步：1 个角色 · 0 条等你授权 · 0 个频道"
+        ],
+        "evTail": [
+          {
+            "i": 0,
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText",
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "G",
+            "kc": 71,
+            "shift": true,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "Shift",
+            "kc": 16,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keydown",
+            "key": "3",
+            "kc": 51,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "beforeinput",
+            "key": null,
+            "kc": null,
+            "shift": false,
+            "comp": false,
+            "it": "insertText",
+            "def": false
+          },
+          {
+            "i": 0,
+            "type": "keyup",
+            "key": "3",
+            "kc": 51,
+            "shift": false,
+            "comp": true,
+            "it": null,
+            "def": false
+          }
+        ]
+      }
+    }
+  }
+}

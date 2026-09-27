@@ -1,0 +1,74 @@
+# R-40 复测结论（pipeline.tester · 设备真机真触摸 · 2026-09-25）
+
+对象：`apk/测试版/hermes-pocket-R40-会话编号-20260924.apk`
+整包 sha256 = a33eb74992a74accf7eb76a23123b8a9f4c73d89ba09e79c09469f99674d2c10（与派活单一致）
+包内 `assets/ui/talk.js` sha256 前 16 位 = **3358485657560243**、`assets/ui/panels.js` = **e399bd38ffa0c5e9**
+包内 build-info：testVersion=unified-20260924-221506 / builtAt=2026-09-24 22:15 CST / featureId=R-40
+设备：emulator-5554 / Android 14 / AVD hpk34 · 装包 Success · WebView [0,136][1080,2274] · 无 ANR · 无 IME
+数据：**全部用作者存的平台真回包** `evidence/R40-定位-20260924/fixtures/{roles-json,sessions-json,tmux-list-raw}.{json,txt}`
+（talk.roles / talk.sessions / tmux.list 三个 op 原样喂进去）；判定全走产品代码。
+
+**本次测了 3 块**：主块 ⑤ 会话页 ＋ 主块 ⑧ 频道页 ＋ 跨块 ① 聊天页-单聊（信息窗同源）。
+**跨测理由**：编号映射只有一处（`talk.js:147-175` 的 `sessList/winName/sessInfo/sessLabel/idTag`），
+**角色卡副行 / 信息窗「会话」行 / 会话页**三处共用——只测一块看不出"同号同人"。
+
+## 1) ⑤ 会话页（平台真回包 → 真机渲染）
+· 头部状态：「在线：已连接 · 人/通道 **8 行**（tmux 容器 2 个）」
+· **分组三个都真出现**（缺陷③ 的复核点）：**在跑（5）／没在跑（1）／临时对话（2）**
+· 8 行全部 `#<id> <身份>`，DOM 原文（节选）：
+  ```
+  #5 测试者            窗口 6 · tmux roles:pipeline-tester    · 建了 11 小时   在跑
+  #8 渲染者            窗口 6 · tmux roles:pipeline-renderer  · 建了 11 小时   在跑
+  #10 功能创造者       窗口 6 · tmux roles:pipeline-author    · 建了 11 小时   在跑
+  #6 经理              窗口 6 · tmux roles:owner-me           · 建了 11 小时   在跑
+  #11 调查者           窗口 6 · tmux roles:research-investigator · 建了 11 小时 在跑
+  #4 可爱女仆（已废）   tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844        没在跑
+  #7 临时对话（已废）   tmux solo-solo1790090392                          没在跑
+  #2 临时对话（已废）   tmux solo-solo1790081404                          没在跑
+  ```
+· **容器不成行 + 同 tmux 去重**（stub 变体实测）：另造 `#99 tmux=roles` 容器假行 + `#12 tmux=roles:pipeline-tester`（与 #5 同 tmux）
+  → 渲染后**行数仍是 8**，两者都没成行 ✓
+· 点一条（真触摸 `#5` 行）→ 弹窗标题 **「#5 测试者（角色会话） · roles:pipeline-tester」** ⇒ 一眼能说出是谁 ✓
+
+## 2) ⑧ 频道页 ↔ 信息窗 ↔ 会话页：同号同人
+（`sessLabel(full)` 一处出；频道页取到号时格式 `#<id> · <真实窗口名>`）
+| 人 | 频道页卡片副行 | 信息窗「会话」行 | 会话页行 |
+|---|---|---|---|
+| pipeline.tester | **#5 · pipeline-tester** | **#5 · pipeline-tester** | **#5 测试者** |
+| pipeline.author | **#10 · pipeline-author** | **#10 · pipeline-author** | **#10 功能创造者** |
+| home.maid | **#4 · 本人-女仆通道** | **#4 · 本人-女仆通道** | **#4 可爱女仆（已废）** |
+| pipeline.auditor（没会话，另造） | **pipeline.auditor · 未起会话** | **pipeline.auditor · 未起会话** | 无行（本来就没会话） |
+⇒ 同一个人三处**同一个号** ✓；**没会话的角色显「未起会话」且不显号** ✓（前端不造号）
+· 信息窗键序仍是 全名/会话/状态/欠回复/标签/接入频道（R-34 那套没被动）✓
+
+## 3) 会话页弹窗动作（真触摸；**不真杀**）
+· **「切过去」** → `HP.App.send` 收到 **`/resume pipeline.tester\r`**（角色名，不是容器名）✓
+· **「删除这个会话」** → `confirm("删掉「pipeline.tester」这个会话？")` → 调 **`talk.sessionDel {name: "pipeline.tester"}`**（**按人**）✓
+· 说明：`talk.sessionDel` 我只**拦在 rpc 层记录参数、不转发** —— 真杀会打断正在干活的角色窗口，而且本轮不接主机本来就走不通；
+  动作前后各抄一次真 `tmux list-windows -t roles`：
+  ```
+  前：0 bash %38 / 1 research-investigator %39 / 2 owner-me %40 / 3 pipeline-author %41 / 4 pipeline-renderer %42 / 5 pipeline-tester %43
+  后：0 bash %38 / 1 research-investigator %39 / 2 owner-me %40 / 3 pipeline-author %41 / 4 pipeline-renderer %42 / 5 pipeline-tester %43
+  ```
+  两者**逐字节一致** ⇒ 机器上没有任何窗口被这条动作影响（**"真杀"那一步＝未验**）。
+
+## 4) 未达派活口径的一条（女仆 #4）
+· 派活写的期望：**`#4 女仆（本人通道）`**（身份标签，不拿平台 name 覆盖身份；窗口名部分照平台原样）
+· 真机实测：
+  - 会话页行 = **`#4 可爱女仆（已废）`** —— 身份取的是平台 **role title 去掉括号**（`可爱女仆`）+ 平台回包 `alive=false` 加的「（已废）」
+  - 频道页卡片副行 / 信息窗「会话」行 = **`#4 · 本人-女仆通道`** —— 这一段是 `winName()` 给的（窗口名位置），**没有「女仆」字样**
+⇒ 没有出现派活里写的「女仆（本人通道）」这个身份标签。是改文案/改口径（要不要给通道角色一个专门的身份标签）由经理定，我如实报读数。
+
+## 5) 另一条读数（加载顺序影响显示）
+· **先开会话页、角色数据还没到位**时，身份退化成**平台 name**：行显示 `#5 pipeline.tester`（`ident()` 回退到 `s.name`）；
+· 先在频道页把 `talk.roles` 拉到位再进会话页 → 显示 **`#5 测试者`**。
+（真机上两种顺序都可能出现，取决于用户先点哪个板块；要不要强制先拉 roles 由经理定。）
+
+## 6) 常驻按键 / 遮挡
+`#keybar` 16 键、`#composer` 2 键（既有）；会话页弹窗三个键（切过去/删除/取消）宽度 100%、可点。全程 **0 未捕获异常**。
+
+## 未验（不接主机，未验 ≠ 通过）
+真"删"落到机器上（见 §3 说明）；真机连主机后的 `talk.sessions` 实时刷新；点「切」后远端真进 `/resume` 的效果。
+
+证据：会话编号与身份-原始输出.json（会话页/容器去重/卡片/信息窗/弹窗动作/tmux 前后）·
+     会话页-角色先到位-原始输出.json（分组 + 8 行原文 + 加载顺序对比）

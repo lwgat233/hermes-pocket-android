@@ -1,0 +1,79 @@
+{
+  "name": "R-34 验收：角色卡一行「接入频道：qqbot」（空的不显示、卡片不撑高）+ 信息窗「接入频道/未接」+ 顶层注册表不串",
+  "result": {
+    "check": {
+      "①_角色卡": {
+        "卡片数": 5,
+        "各卡": {
+          "pipeline.author": {
+            "高": 80,
+            "接入频道那行": "接入频道：qqbot",
+            "用的类": "sub",
+            "标签行还在吗": false,
+            "整卡文字": "功能创造者 › pipeline.author · role-pipeline-author 接入频道：qqbot"
+          },
+          "pipeline.renderer": {
+            "高": 60,
+            "接入频道那行": null,
+            "用的类": null,
+            "标签行还在吗": false,
+            "整卡文字": "渲染者 › pipeline.renderer · role-pipeline-renderer"
+          },
+          "pipeline.tester": {
+            "高": 61,
+            "接入频道那行": null,
+            "用的类": null,
+            "标签行还在吗": false,
+            "整卡文字": "测试者 2 › pipeline.tester · role-pipeline-tester · 不在线"
+          },
+          "owner.me": {
+            "高": 60,
+            "接入频道那行": null,
+            "用的类": null,
+            "标签行还在吗": false,
+            "整卡文字": "经理 › owner.me · role-owner-me"
+          },
+          "home.maid": {
+            "高": 61,
+            "接入频道那行": null,
+            "用的类": null,
+            "标签行还在吗": false,
+            "整卡文字": "女仆 › home.maid · role-home-maid · 被停"
+          }
+        },
+        "无频道卡的高": 60,
+        "有频道卡的高": 80,
+        "无频道的卡高都一致": false,
+        "没有卡被撑到两行": true
+      },
+      "②_信息窗": {
+        "有频道_接入频道那行": "接入频道 qqbot",
+        "有频道_旧的能接入还在吗": false,
+        "没频道_接入频道那行": "接入频道 未接",
+        "没频道_出现未接": true,
+        "没频道_出现旧的无": false
+      },
+      "③_不串": {
+        "顶层注册表": [
+          "qqbot",
+          "wechat"
+        ],
+        "频道区标题": "频道（2）▸",
+        "频道区内容": null,
+        "author卡片那行": "接入频道：qqbot",
+        "maid卡片有没有接入频道行": false,
+        "卡片没被顶层注册表污染": true
+      },
+      "④_折叠区": {
+        "标题在": true,
+        "点之前display": null,
+        "点之后display": "block",
+        "折叠有反应": true
+      },
+      "⑤_报错": {
+        "条数": 0,
+        "明细": []
+      }
+    }
+  }
+}

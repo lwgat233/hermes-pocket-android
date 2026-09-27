@@ -1,0 +1,55 @@
+hermes-pocket 总包（2026-09-24 收尾）—— 四样交付 + 轮次清单
+角色 pipeline.renderer · 零代码改动（只出包 + 清单）· 源树＝当前工作区
+
+== ① 产物 ==
+路径：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-汇总-20260924.apk
+字节数：5063875
+sha256：9dea5a51236d67718f6cfc33da359c11059e6f6bff93c6dac150a4d2c65cd59c
+出包时刻：2026-09-24 21:37:45
+命名说明：用 `--name 汇总`（build.sh 自己补 -YYYYMMDD）→ 得到你举的那种一眼是总包的名字
+`hermes-pocket-汇总-20260924.apk`；若照派活原文传 `--name 汇总-20260924`，会变成 `…-20260924-20260924`，故按例子命名。
+
+== ② 包内 assets/build-info.json ==
+testVersion  unified-20260924-213730
+featureId    汇总-20260924
+feature      汇总：2026-09-24 今日全部收尾改动（含 R25/R26/R27/R29/R31~R37）
+note         总包（不是单轮）：已含 R25/R26/R27/R29/R31/R32/R33/R34/R35/R36/R37；不含 R28/R30/R38/R39，原因见 evidence/汇总-20260924/清单-轮次对照.txt
+builtAt      2026-09-24 21:37 CST
+
+== ③ stamp-build.py --verify 原文（节选，末行是结论）==
+  ✓ assets/ui/vendor/xterm.js
+     源  1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+     包内1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+PASS 包内 ↔ 源树 对账
+（完整输出 200+ 行，逐文件「源 vs 包内」两列 sha 全同；本文件只贴末段，全量可用同一条命令复算。）
+
+== ④ 清单：逐条对照（以源码实测为准）==
+已含（11 条；括号里是源码里的标记与命中数，命令同「出包前核一遍」那组 grep）：
+· R-25 省电档（轮询纳入省电 + 三档设置）— talk.js `POLL_SAVE_MS`×2、panels.js `talkPollSave`×1
+· R-26 本地存储（HP.Cache：占用读数/上限/节流/清理/满配额护栏）— ui/cache.js 在
+· R-27 网络页统计（留存与按天聚合 + netProbe 设置）— ui/netstats.js 在
+· R-29 群聊钉底（含作者 R29-4 裁旧判底修复 9f5abf0）— talk.js `pinBottom`×5
+· R-31 发送迟滞与反馈（状态机 + 3s/8s + 重试 + sendTiming）— talk.js `sendStateText`×2
+· R-32 死调用清理 — talk.js 里 `pullRoleOutput` 只剩 3 处**注释**，剥离注释后活引用 0（R32 探针已证）
+· R-33 触控 44dp — talk.css `min-height: 44px`×3（另 style.css `.btn` 1 处）
+· R-34 接入频道 — talk.js `接入频道`×3（角色卡一行 + 信息窗键名/空值）
+· R-35 清理确认 — panels.js `将清掉`×2（.hp-dialog 二次确认）
+· R-36 送达口径 — talk.js `unconfirmed`×3、Bridge.kt `raw.has("delivered")`×1
+· R-37 单聊开窗 — talk.js `tapWho`×4（8px 守卫）
+不含（4 条，原因如实写）：
+· R-28 聊天历史入口 / 翻旧 —— 本轮只做到「定位」（evidence/R28-定位-20260923/），第 2/3 步 ended；
+  源树里 0 处实现痕迹（grep 历史入口/翻旧 无命中）
+· R-30 消息落本地 / 文案 —— 只做到「定位」（evidence/R30-定位-20260923/），等本人口径；源树 0 处实现痕迹
+· R-38 列表末尾遮挡 —— 定位结论是**判定非缺陷**（滚到底重叠 0px、可点），**无需改代码**；
+  真机那四个数（判定用）仍待 tester 补
+· R-39 单聊末条气泡被 sticky 输入条压住 —— 今天新开单、**未做**；源码里 talk.js 那条 `position: sticky`
+  输入条原样保留（它就是问题所在，`sticky`×1 是既有代码不是修复）
+未验项照写（未验 ≠ 通过）：
+· 5 条不接主机项（点角色→信息窗 / 气泡 / 删会话 / 切会话 / 开左栏收起会话键）
+· R-29 / R-31 真触摸项、R-27 定时探测的耗电、R-30 设备真断网
+· 说明：本轮**没重跑任何测试**（按口径），上面清单只按源码标记与已有证据目录核对
+
+== 顺带 ==
+· 源树里没有发现「不该在的东西」：46 个改动/新增文件全部对应到上面 11 轮的改动（我的 R25/R26/R27/R31/R32/R33/R34/R35/R36/R37 未提交在树里，
+  R-29 由作者提交 9f5abf0）。我没有删任何东西。
+· 各轮证据目录都在 evidence/ 下（R25…R38 的 定位/实现与出包/复测 三类，共 **37** 个目录）。

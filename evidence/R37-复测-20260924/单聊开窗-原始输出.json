@@ -1,0 +1,253 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R37-复测-单聊开窗": {
+    "check": {
+      "calibration": {
+        "before": "本人说",
+        "after": "经理说"
+      },
+      "chat": {
+        "titleText": "pipeline.author　不在线",
+        "titleDevice": {
+          "x": 540,
+          "y": 624,
+          "css": {
+            "x": 14,
+            "y": 169,
+            "w": 365,
+            "h": 17
+          }
+        },
+        "bubCount": 60,
+        "meCount": 30,
+        "himCount": 30,
+        "himDevice": {
+          "x": 204,
+          "y": 1372,
+          "css": {
+            "x": 12,
+            "y": 414,
+            "w": 124,
+            "h": 72
+          }
+        },
+        "himDevice2": {
+          "x": 204,
+          "y": 492,
+          "css": {
+            "x": 12,
+            "y": 94,
+            "w": 124,
+            "h": 72
+          }
+        },
+        "meDevice": {
+          "x": 877,
+          "y": 1591,
+          "css": {
+            "x": 257,
+            "y": 494,
+            "w": 124,
+            "h": 72
+          }
+        },
+        "scroller": {
+          "id": "tk-chat",
+          "cls": "tk-chat",
+          "scrollTop": 4427,
+          "scrollHeight": 4800,
+          "clientHeight": 374
+        },
+        "tapwhoCount": 32
+      },
+      "tapTitle": {
+        "open": true,
+        "rows": [
+          {
+            "k": "全名",
+            "v": "pipeline.author"
+          },
+          {
+            "k": "会话",
+            "v": "role-pipeline-author"
+          },
+          {
+            "k": "状态",
+            "v": "在线"
+          },
+          {
+            "k": "欠回复",
+            "v": "0"
+          },
+          {
+            "k": "标签",
+            "v": "（无）"
+          },
+          {
+            "k": "接入频道",
+            "v": "qqbot"
+          }
+        ]
+      },
+      "tapHim": {
+        "open": true,
+        "rows": [
+          {
+            "k": "全名",
+            "v": "pipeline.author"
+          },
+          {
+            "k": "会话",
+            "v": "role-pipeline-author"
+          },
+          {
+            "k": "状态",
+            "v": "在线"
+          },
+          {
+            "k": "欠回复",
+            "v": "0"
+          },
+          {
+            "k": "标签",
+            "v": "（无）"
+          },
+          {
+            "k": "接入频道",
+            "v": "qqbot"
+          }
+        ]
+      },
+      "tapMe": {
+        "open": false
+      },
+      "blankPoint": {
+        "x": 728,
+        "y": 1263,
+        "css": {
+          "x": 265,
+          "y": 410
+        }
+      },
+      "tapBlank": {
+        "open": false
+      },
+      "swipe70": {
+        "sheet": {
+          "open": false
+        },
+        "scrollTopBefore": 4427,
+        "scrollTopAfter": 4427
+      },
+      "swipe20": {
+        "sheet": {
+          "open": false
+        },
+        "scrollTopBefore": 4427,
+        "scrollTopAfter": 4427
+      },
+      "tapAfterSwipe": {
+        "open": false
+      },
+      "swipeAfterTap": {
+        "sheet": {
+          "open": false
+        },
+        "scrollTopBefore": 4427,
+        "scrollTopAfter": 4427
+      },
+      "group": {
+        "total": 63,
+        "him": 32,
+        "me": 31,
+        "himDevice": {
+          "x": 245,
+          "y": 1060,
+          "css": {
+            "x": 12,
+            "y": 300,
+            "w": 154,
+            "h": 72
+          }
+        },
+        "meDevice": {
+          "x": 803,
+          "y": 840,
+          "css": {
+            "x": 204,
+            "y": 220,
+            "w": 178,
+            "h": 72
+          }
+        }
+      },
+      "groupTapHim": {
+        "open": true,
+        "rows": [
+          {
+            "k": "全名",
+            "v": "pipeline.renderer"
+          },
+          {
+            "k": "会话",
+            "v": "role-pipeline-renderer"
+          },
+          {
+            "k": "状态",
+            "v": "不在线"
+          },
+          {
+            "k": "欠回复",
+            "v": "0"
+          },
+          {
+            "k": "标签",
+            "v": "（无）"
+          },
+          {
+            "k": "接入频道",
+            "v": "未接"
+          }
+        ]
+      },
+      "groupTapMe": {
+        "open": false
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      },
+      "r38": {
+        "gogroup": {
+          "px": {
+            "x": 12,
+            "y": 882,
+            "w": 87,
+            "h": 44
+          },
+          "inViewport": false,
+          "hitSelf": false,
+          "hitWhat": null
+        },
+        "homeMaid": {
+          "px": {
+            "x": 12,
+            "y": 588,
+            "w": 369,
+            "h": 63
+          },
+          "hitSelf": false,
+          "hitWhat": "TEXTAREA."
+        },
+        "viewport": {
+          "w": 393,
+          "h": 778
+        }
+      }
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at Object.paintChat (https://appassets.androidplatform.net/ui/talk.js:1065:12)",
+    "未捕获异常: TypeError: this.pullRoleOutput is not a function\n    at https://appassets.androidplatform.net/ui/talk.js:173:77"
+  ]
+}

@@ -1,0 +1,42 @@
+R-45 第 2 步「界面改动与出包」—— Shift+Enter 不再被误发 结论与读数
+角色 pipeline.renderer · 2026-09-26 · 构件 hermes-pocket-R45-Shift回车不误发-20260926.apk
+依据：派活 #1446（作者定位 #1442；经理口径＝A/B 合并，候选 C 否决）
+
+== 祸根（经理独立核过源码，我复核一致）==
+`bindEnterSend` 的 `keyup` 那行写的是 `shiftDown = !!(e && e.shiftKey);` ——
+遇到「**Shift 先松、Enter 后松**」时，Shift 的 keyup（以及随后的 Enter keyup）都带 `shiftKey=false`，
+把 Shift 状态**覆盖回假** ⇒ `go()` 放行 ⇒ Shift+Enter 被当普通回车发出去。
+
+== 本次改了什么（**只动 assets/ui/talk.js 的 `bindEnterSend`**）==
+① `let ... shiftDown = false` → **时间戳闩 `shiftAt = 0`**；
+② `shifted()` → **`(shiftAt && now() - shiftAt < 400)`**（`now()` 沿用既有的 `performance.now()` / `Date.now()` 写法）；
+③ `keydown` 开头：**`if (e.key === 'Shift' || e.shiftKey === true) shiftAt = now();`**
+   —— 必须含 `e.key === 'Shift'`（真机 Shift 的 keydown 可能带 `shiftKey=false`，只认 `e.shiftKey` 会漏）；
+④ `keyup`（祸根行）→ **只记 true、绝不清零**：`if (e && e.shiftKey) shiftAt = now(); if (isEnter(e)) go(e);`
+⑤ `beforeinput` 兜底**没改**（走同一个 `shifted()`，自动受益）。
+**没碰**：R-41 链（含组字 1.5s 兜底复位、keyCode 229 那条）· R-31 防连点 · R-36 状态机 · R-39 的 `padding-bottom`/`--sayline-h` · R-42 右缘热区 · 投递侧与 `Bridge.kt`。
+
+== 七用例读数（本地测试台真事件；原始 JSON 同目录 t-r45-shift-原始输出.json）==
+| # | 用例 | 读数 | 期望 |
+|---|---|---|---|
+| ① | 普通回车（三路全触发） | **发 1 条** | 1 ✓ |
+| ② | **祸根形状**：Shift kd → Enter kd(shiftKey=true) → Shift ku(false) → Enter ku(false) + beforeinput | **发 0 条**（文字仍在） | 0 ✓ |
+| ③ | Shift+Enter 完整形状（Shift ku 在最后） | **发 0 条**（文字仍在） | 0 ✓ |
+| ④ | 只给 beforeinput | **发 1 条** | 1 ✓ |
+| ⑤ | **输入法提交形状：只给 keyup(13)**（R-41 救回的那条） | **发 1 条** | 1 ✓ |
+| ⑥ | 同一次按键三条路一起触发（含重复 beforeinput/keyup） | **发 1 条** | 1 ✓ |
+| ⑦ | 连按两次（间隔 600ms） | **发 2 条** | 2 ✓ |
+| ⑧ | Shift+Enter 之后紧接着普通回车（间隔 600ms，闩过期） | Shift 那下 **0 条**；随后回车累计 **1 条** | 1 ✓ |
+pageerror + console.error **0 条** ✓
+（说明：⑧ 的"紧接着"我用 600ms 间隔——闩是 400ms 过期，这个间隔下才等于"没粘滞"；400ms 内的普通回车会被闩挡，这是口径②给的语义。）
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R45-Shift回车不误发-20260926.apk（5091338 字节）
+整包 sha256：c9615844b5defcb05cfcc73e2fa882f0d52700640a18a5631d9e0102dc181fbc
+包内 assets/build-info.json：testVersion=unified-20260926-175117 · builtAt=2026-09-26 17:51 CST · featureId=R-45
+本次改动文件 sha256（**包内 == 源树，逐字节**）：
+  ui/talk.js  7cbe502b129a536ccbf2c8b65952c34573aaeea3b9178dd5c42996e426b569ca
+复核：`stamp-build.py --verify <apk>` → **PASS 包内 ↔ 源树 对账（整树）**
+
+== 没验的（未验 ≠ 通过）==
+真机实体键盘复验归 tester 第 3 步（Shift+Enter 不误发、普通回车能发、输入法回车能发）。

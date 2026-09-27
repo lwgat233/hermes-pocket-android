@@ -1,0 +1,222 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R40-复测-会话编号与身份": {
+    "check": {
+      "sessions1": {
+        "headText": "在线：已连接 · 人/通道 8 行（tmux 容器 2 个）刷新",
+        "rowCount": 8,
+        "rows": [
+          {
+            "testid": "session-5",
+            "title": "#5 pipeline.tester窗口 6 · tmux roles:pipeline-tester · 建了 11 ",
+            "full": "#5 pipeline.tester窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-8",
+            "title": "#8 pipeline.renderer窗口 6 · tmux roles:pipeline-renderer · 建了",
+            "full": "#8 pipeline.renderer窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-10",
+            "title": "#10 pipeline.author窗口 6 · tmux roles:pipeline-author · 建了 11",
+            "full": "#10 pipeline.author窗口 6 · tmux roles:pipeline-author · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-6",
+            "title": "#6 owner.me窗口 6 · tmux roles:owner-me · 建了 11 小时在跑",
+            "full": "#6 owner.me窗口 6 · tmux roles:owner-me · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-11",
+            "title": "#11 research.investigator窗口 6 · tmux roles:research-investig",
+            "full": "#11 research.investigator窗口 6 · tmux roles:research-investigator · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-4",
+            "title": "#4 可爱女仆（奈奈）（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在",
+            "full": "#4 可爱女仆（奈奈）（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在跑"
+          },
+          {
+            "testid": "session-7",
+            "title": "#7 临时对话（已废）tmux solo-solo1790090392没在跑",
+            "full": "#7 临时对话（已废）tmux solo-solo1790090392没在跑"
+          },
+          {
+            "testid": "session-2",
+            "title": "#2 临时对话（已废）tmux solo-solo1790081404没在跑",
+            "full": "#2 临时对话（已废）tmux solo-solo1790081404没在跑"
+          }
+        ],
+        "groups": [],
+        "dom": "在线：已连接 · 人/通道 8 行（tmux 容器 2 个）刷新在跑（5）#5 pipeline.tester窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑#8 pipeline.renderer窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑#10 pipeline.author窗口 6 · tmux roles:pipeline-author · 建了 11 小时在跑#6 owner.me窗口 6 · tmux roles:owner-me · 建了 11 小时在跑#11 research.investigator窗口 6 · tmux roles:research-investigator · 建了 11 小时在跑没在跑（1）#4 可爱女仆（奈奈）（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在跑临时对话（2）#7 临时对话（已废）tmux solo-solo1790090392没在跑#2 临时对话（已废）tmux solo-solo1790081404没在跑"
+      },
+      "sessions2_容器与重复": {
+        "headText": "在线：已连接 · 人/通道 8 行（tmux 容器 2 个）刷新",
+        "rowCount": 8,
+        "rows": [
+          {
+            "testid": "session-5",
+            "title": "#5 pipeline.tester窗口 6 · tmux roles:pipeline-tester · 建了 11 ",
+            "full": "#5 pipeline.tester窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-8",
+            "title": "#8 pipeline.renderer窗口 6 · tmux roles:pipeline-renderer · 建了",
+            "full": "#8 pipeline.renderer窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-10",
+            "title": "#10 pipeline.author窗口 6 · tmux roles:pipeline-author · 建了 11",
+            "full": "#10 pipeline.author窗口 6 · tmux roles:pipeline-author · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-6",
+            "title": "#6 owner.me窗口 6 · tmux roles:owner-me · 建了 11 小时在跑",
+            "full": "#6 owner.me窗口 6 · tmux roles:owner-me · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-11",
+            "title": "#11 research.investigator窗口 6 · tmux roles:research-investig",
+            "full": "#11 research.investigator窗口 6 · tmux roles:research-investigator · 建了 11 小时在跑"
+          },
+          {
+            "testid": "session-4",
+            "title": "#4 可爱女仆（奈奈）（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在",
+            "full": "#4 可爱女仆（奈奈）（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在跑"
+          },
+          {
+            "testid": "session-7",
+            "title": "#7 临时对话（已废）tmux solo-solo1790090392没在跑",
+            "full": "#7 临时对话（已废）tmux solo-solo1790090392没在跑"
+          },
+          {
+            "testid": "session-2",
+            "title": "#2 临时对话（已废）tmux solo-solo1790081404没在跑",
+            "full": "#2 临时对话（已废）tmux solo-solo1790081404没在跑"
+          }
+        ],
+        "groups": [],
+        "dom": "在线：已连接 · 人/通道 8 行（tmux 容器 2 个）刷新在跑（5）#5 pipeline.tester窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑#8 pipeline.renderer窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑#10 pipeline.author窗口 6 · tmux roles:pipeline-author · 建了 11 小时在跑#6 owner.me窗口 6 · tmux roles:owner-me · 建了 11 小时在跑#11 research.investigator窗口 6 · tmux roles:research-investigator · 建了 11 小时在跑没在跑（1）#4 可爱女仆（奈奈）（已废）tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844没在跑临时对话（2）#7 临时对话（已废）tmux solo-solo1790090392没在跑#2 临时对话（已废）tmux solo-solo1790081404没在跑"
+      },
+      "channel": {
+        "cards": [
+          {
+            "role": "home.maid",
+            "sub": "#4 · 本人-女仆通道"
+          },
+          {
+            "role": "pipeline.auditor",
+            "sub": "pipeline.auditor · 未起会话"
+          },
+          {
+            "role": "owner.me",
+            "sub": "#6 · owner-me"
+          },
+          {
+            "role": "pipeline.auditor",
+            "sub": "pipeline.auditor · 未起会话"
+          },
+          {
+            "role": "pipeline.author",
+            "sub": "#10 · pipeline-author"
+          },
+          {
+            "role": "pipeline.renderer",
+            "sub": "#8 · pipeline-renderer"
+          },
+          {
+            "role": "pipeline.tester",
+            "sub": "#5 · pipeline-tester"
+          },
+          {
+            "role": "pipeline.auditor",
+            "sub": "pipeline.auditor · 未起会话"
+          },
+          {
+            "role": "research.investigator",
+            "sub": "#11 · research-investigator"
+          },
+          {
+            "role": "pipeline.auditor",
+            "sub": "pipeline.auditor · 未起会话"
+          }
+        ],
+        "dom": "实时含私信 🔒服务端：还没搭建 —— 点右边「搭服务端」搭服务端跟谁说home可爱女仆（个人助手：管生活，把要紧的话中转给我）218›#4 · 本人-女仆通道接入频道：qqbot审计者›pipeline.auditor · 未起会话owner经理（管流程/派活/判报告；不是本人）160›#6 · owner-me审计者›pipeline.auditor · 未起会话pipeline功能创造者22›#10 · pipeline-author渲染者24›#8 · pipeline-renderer测试者23›#5 · pipeline-tester审计者›pipeline.auditor · 未起会话research调查者（调研与功能分析，不改代码）6›#11 · research-investigator审计者›pipeline.auditor · 未起会话＋ 新角色建频道（1）▸🗣 全"
+      },
+      "sheets": [
+        {
+          "full": "pipeline.tester",
+          "sessRow": "#5 · pipeline-tester",
+          "keys": [
+            "全名",
+            "会话",
+            "状态",
+            "欠回复",
+            "标签",
+            "接入频道"
+          ]
+        },
+        {
+          "full": "pipeline.author",
+          "sessRow": "#10 · pipeline-author",
+          "keys": [
+            "全名",
+            "会话",
+            "状态",
+            "欠回复",
+            "标签",
+            "接入频道"
+          ]
+        },
+        {
+          "full": "home.maid",
+          "sessRow": "#4 · 本人-女仆通道",
+          "keys": [
+            "全名",
+            "会话",
+            "状态",
+            "欠回复",
+            "标签",
+            "接入频道"
+          ]
+        },
+        {
+          "full": "pipeline.auditor",
+          "sessRow": "pipeline.auditor · 未起会话",
+          "keys": [
+            "全名",
+            "会话",
+            "状态",
+            "欠回复",
+            "标签",
+            "接入频道"
+          ]
+        }
+      ],
+      "tmuxBefore": "0 bash %38\n1 research-investigator %39\n2 owner-me %40\n3 pipeline-author %41\n4 pipeline-renderer %42\n5 pipeline-tester %43\n",
+      "testerRow": {
+        "x": 540,
+        "y": 833,
+        "text": "#5 测试者窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑"
+      },
+      "sheetText": "#5 测试者（角色会话） · roles:pipeline-tester切过去（在终端里恢复这个会话）删除这个会话取消",
+      "afterSwitch": {
+        "sent": [
+          "/resume pipeline.tester\r"
+        ],
+        "toasts": []
+      },
+      "afterDelete": {
+        "del": [
+          {
+            "name": "pipeline.tester"
+          }
+        ],
+        "confirms": [
+          "删掉「pipeline.tester」这个会话？"
+        ]
+      },
+      "tmuxAfter": "0 bash %38\n1 research-investigator %39\n2 owner-me %40\n3 pipeline-author %41\n4 pipeline-renderer %42\n5 pipeline-tester %43\n"
+    }
+  }
+}

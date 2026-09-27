@@ -1,0 +1,118 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R43-复测-平台新回执形状": {
+    "check": {
+      "A_single_true": [
+        {
+          "state": "sent",
+          "cls": "ok",
+          "text": "我 → 功能创造者 · 已送达 3329ms",
+          "subs": [],
+          "retry": false
+        }
+      ],
+      "B_single_null": [
+        {
+          "state": "unconfirmed",
+          "cls": "wait",
+          "text": "我 → 功能创造者 · 已发出（未确认）",
+          "subs": [],
+          "retry": false
+        }
+      ],
+      "C_single_false": [
+        {
+          "state": "failed",
+          "cls": "bad",
+          "text": "我 → 功能创造者 · 没送达：阶段没放行",
+          "subs": [],
+          "retry": true
+        }
+      ],
+      "D_group_partial": [
+        {
+          "state": "partial",
+          "cls": "bad",
+          "text": "我 → 全体（广播） · 1/2 已送达 3368ms",
+          "subs": [
+            "· pipeline.author ✓ 3368ms",
+            "· pipeline.renderer ✗ 阶段没放行"
+          ],
+          "retry": true
+        },
+        {
+          "state": "partial",
+          "cls": "bad",
+          "text": "我 → 全体（广播） · 1/2 已送达 3368ms",
+          "subs": [
+            "· pipeline.author ✓ 3368ms",
+            "· pipeline.renderer ✗ 阶段没放行"
+          ],
+          "retry": true
+        }
+      ],
+      "E_group_all": [
+        {
+          "state": "sent",
+          "cls": "ok",
+          "text": "我 → 全体（广播） · 2/2 已送达 3402ms",
+          "subs": [
+            "· pipeline.author ✓ 3368ms",
+            "· pipeline.renderer ✓ 3402ms"
+          ],
+          "retry": false
+        },
+        {
+          "state": "sent",
+          "cls": "ok",
+          "text": "我 → 全体（广播） · 2/2 已送达 3402ms",
+          "subs": [
+            "· pipeline.author ✓ 3368ms",
+            "· pipeline.renderer ✓ 3402ms"
+          ],
+          "retry": false
+        }
+      ],
+      "F_slow_1s": [
+        {
+          "state": "sending",
+          "cls": "wait",
+          "text": "我 → 全体（广播） · 发送中… 1.0s",
+          "subs": [],
+          "retry": false
+        }
+      ],
+      "F_slow_3_4s": [
+        {
+          "state": "waiting",
+          "cls": "wait",
+          "text": "我 → 全体（广播） · 还在发… 3.0s",
+          "subs": [],
+          "retry": true
+        }
+      ],
+      "F_slow_6s": [
+        {
+          "state": "waiting",
+          "cls": "wait",
+          "text": "我 → 全体（广播） · 还在发… 6.0s",
+          "subs": [],
+          "retry": true
+        }
+      ],
+      "F_slow_8_6s": [
+        {
+          "state": "timeout",
+          "cls": "bad",
+          "text": "我 → 全体（广播） · 没送达：超时（8 秒没回执）",
+          "subs": [],
+          "retry": true
+        }
+      ],
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

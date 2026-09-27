@@ -1,0 +1,59 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R32-复测-发送终态（第二修正）": {
+    "check": {
+      "a": {
+        "armed": {
+          "keysTotal": 2,
+          "topIsHit": true,
+          "hitWhat": "BUTTON#tk-sayok",
+          "siblingInp": "R32e-send",
+          "device": {
+            "x": 970,
+            "y": 1619
+          }
+        },
+        "after": {
+          "rows": [
+            {
+              "state": "sent",
+              "text": "我 → 功能创造者 · 已送达 1234ms"
+            }
+          ],
+          "sayCalls": 1,
+          "toasts": [
+            "已同步：1 个角色 · 0 条等你授权 · 1 个频道"
+          ]
+        }
+      },
+      "b": {
+        "armed": {
+          "keysTotal": 1,
+          "topIsHit": true,
+          "hitWhat": "BUTTON#tk-sayok",
+          "siblingInp": "R32e-send",
+          "device": {
+            "x": 970,
+            "y": 1619
+          }
+        },
+        "after": {
+          "rows": [
+            {
+              "state": "sent",
+              "text": "我 → 功能创造者 · 已送达 1234ms"
+            },
+            {
+              "state": "unconfirmed",
+              "text": "我 → 功能创造者 · 已发出（未确认）"
+            }
+          ],
+          "sayCalls": 2,
+          "toasts": [
+            "已同步：1 个角色 · 0 条等你授权 · 1 个频道"
+          ]
+        }
+      }
+    }
+  }
+}

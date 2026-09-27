@@ -1,0 +1,39 @@
+R-33 第 2 步「界面改动与出包」—— 触控目标 ≥44dp 结论与读数
+角色 pipeline.renderer · 2026-09-24 · 构件 hermes-pocket-R33-触控44dp-20260924.apk
+
+== 本次我改了什么（只动 CSS，4 条；宽度与排版方向没碰）==
+source/hermes-pocket/app/src/main/assets/ui/style.css
+  · 262  .btn … min-height: 42px → 44px（设置页「看明细 / 清理」）
+source/hermes-pocket/app/src/main/assets/ui/talk.css
+  · 3    .tk-chip 追加 min-height:44px; display:inline-flex; align-items:center; justify-content:center
+         （「投递台账」等 11 处复用；居中是为了不让 44px 的框里文字偏上）
+  · 42   .tk-askin 追加 min-height:44px（同一行的广播键/身份键被 stretch 一起到 44）
+  · 46   .tk-act 追加 min-height:44px（加固）
+tools/ui-harness/t-r33-touch.mjs（新增验收探针：真页面量高度 + elementFromPoint 上下沿 + 换行/溢出）
+**间距没动**（8px/8px/0px 现状保留）——「相邻间距也拉到≥44dp」按经理口径另请本人定，本轮不碰排版。
+
+== 判据读数（本地测试台，原始 JSON 见同目录 t-r33-touch-原始输出.json）==
+六处（我另量了单聊同款 4 处，共 10 处）全部 **44px**，上沿 / 下沿 / 中心 elementFromPoint **都命中自己**，
+文案没被裁（scrollWidth ≤ clientWidth），行容器没折行（容器高 44 = 子元素最高 44），文档无横向溢出（412/412）：
+  · 设置页·看明细(.btn) 44 · 清理(.btn) 44
+  · 群聊·投递台账(.tk-chip) 44 · 广播(.tk-act) 44 · 身份(.tk-chip) 44 · 输入框(.tk-askin) 44
+  · 单聊·发送(.tk-act) 44 · 身份(.tk-chip) 44 · 输入框(.tk-askin) 44 · 返回(.tk-chip) 44
+间距：输入行 gap=8px、群聊行 gap=8px（与改动前一致）；报错：pageerror / console.error **0** 条。
+（作者定位里的 42/42/38/38/38/32 → 44×6 与本地台读数一致。）
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R33-触控44dp-20260924.apk（5063327 字节，20:27 出包）
+整包 sha256：70247df9136486c6e32b8d5de9cd4fd0b89a8cbd27795d0374a9811b456a3dbd
+包内 assets/build-info.json：testVersion=unified-20260924-202730 · builtAt=2026-09-24 20:27 CST · featureId=R-33
+本次改动文件 sha256（包内 == 源树，逐字节）：
+  ui/style.css  b93e890fc212ea9aa7e79de0471feb253e65d7d82733960e30fcc470a5d57a7c
+  ui/talk.css   9465273c805a9bb5c13a8ddb29c587e63e31f1c85643247a432faf61d92c42ea
+复核：stamp-build.py --verify <apk> → PASS（这一版整树也对得上）
+
+== 别人同期在改什么 ==
+author 已交 R-33 定位（evidence/R33-定位-20260924/）、**没留未提交代码**；出包时整树对账 PASS，
+说明除我这两处 CSS 外源树是干净的（我前几轮的 R26/R31/R27/R25 改动仍在树里未提交，git 我没动）。
+
+== 没验的（未验 ≠ 通过）==
+· 真机真触摸（手指按上去的感受、44dp 在真机密度下是否真的够）：本地台是按 CSS 像素量的，真点归 tester 第 3 步。
+· 相邻间距是否也要 ≥44dp：按经理口径去请示本人，本轮不动。

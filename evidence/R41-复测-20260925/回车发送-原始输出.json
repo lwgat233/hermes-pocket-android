@@ -1,0 +1,1415 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-复测-回车发送": {
+    "check": {
+      "single_beforeEnter": {
+        "ev": [
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "1",
+            "keyCode": 49,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "s",
+            "keyCode": 83,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "s",
+            "keyCode": 83,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "a",
+            "keyCode": 65,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "a",
+            "keyCode": 65,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "y",
+            "keyCode": 89,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41say"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "y",
+            "keyCode": 89,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41say"
+          }
+        ],
+        "evCount": 27,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 0,
+        "vals": {
+          "sayin": "R41say",
+          "shoutin": null,
+          "askin": "R41say"
+        }
+      },
+      "kbProbe": {
+        "found": [],
+        "kbVisible": false
+      },
+      "single_keyevent66": {
+        "ev": [
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "s",
+            "keyCode": 83,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "a",
+            "keyCode": 65,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41s"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "a",
+            "keyCode": 65,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "y",
+            "keyCode": 89,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sa"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41say"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "y",
+            "keyCode": 89,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41say"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41say"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41say"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41say"
+          }
+        ],
+        "evCount": 30,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 0,
+        "vals": {
+          "sayin": "R41say",
+          "shoutin": null,
+          "askin": "R41say"
+        }
+      },
+      "single_burst3": {
+        "ev": [
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          }
+        ],
+        "evCount": 86,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 0,
+        "vals": {
+          "sayin": "R41sayR41burst",
+          "shoutin": null,
+          "askin": "R41sayR41burst"
+        }
+      },
+      "single_gap600": {
+        "ev": [
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "p",
+            "keyCode": 80,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "p",
+            "keyCode": 80,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          }
+        ],
+        "evCount": 64,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 0,
+        "vals": {
+          "sayin": "R41sayR41burstR41gap",
+          "shoutin": null,
+          "askin": "R41sayR41burstR41gap"
+        }
+      },
+      "beforeShift": {
+        "ev": [
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "f",
+            "keyCode": 70,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "f",
+            "keyCode": 70,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          }
+        ],
+        "evCount": 68,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 0,
+        "vals": {
+          "sayin": "R41sayR41burstR41gapR41shift",
+          "shoutin": null,
+          "askin": "R41sayR41burstR41gapR41shift"
+        }
+      },
+      "single_shiftEnter": {
+        "ev": [
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Shift",
+            "keyCode": 16,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Shift",
+            "keyCode": 16,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": true,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": true,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Shift",
+            "keyCode": 16,
+            "shiftKey": true,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Shift",
+            "keyCode": 16,
+            "shiftKey": true,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          },
+          {
+            "tag": "sayin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sayR41bur"
+          }
+        ],
+        "evCount": 78,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 0,
+        "vals": {
+          "sayin": "R41sayR41burstR41gapR41shift",
+          "shoutin": null,
+          "askin": "R41sayR41burstR41gapR41shift"
+        }
+      },
+      "group_beforeEnter": {
+        "ev": [
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sh"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "h",
+            "keyCode": 72,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sh"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "o",
+            "keyCode": 79,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sh"
+          },
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sh"
+          },
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "o",
+            "keyCode": 79,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "u",
+            "keyCode": 85,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "u",
+            "keyCode": 85,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41shout"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shout"
+          }
+        ],
+        "evCount": 35,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 1,
+        "vals": {
+          "sayin": "R41sayR41burstR41gapR41shift",
+          "shoutin": "R41shout",
+          "askin": "R41sayR41burstR41gapR41shift"
+        }
+      },
+      "group_keyevent66": {
+        "ev": [
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sh"
+          },
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "o",
+            "keyCode": 79,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "u",
+            "keyCode": 85,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41sho"
+          },
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "u",
+            "keyCode": 85,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41shou"
+          },
+          {
+            "tag": "shoutin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41shout"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "t",
+            "keyCode": 84,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shout"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shout"
+          },
+          {
+            "tag": "shoutin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41shout"
+          },
+          {
+            "tag": "shoutin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41shout"
+          }
+        ],
+        "evCount": 38,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 2,
+        "streamBubbles": 1,
+        "vals": {
+          "sayin": "R41sayR41burstR41gapR41shift",
+          "shoutin": "R41shout",
+          "askin": "R41sayR41burstR41gapR41shift"
+        }
+      },
+      "askBox": {
+        "x": 452,
+        "y": 1113,
+        "askId": "42"
+      },
+      "ask_afterEnter": {
+        "ev": [
+          {
+            "tag": "askin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41answ"
+          },
+          {
+            "tag": "askin",
+            "type": "compositionstart",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": null,
+            "v": "R41answ"
+          },
+          {
+            "tag": "askin",
+            "type": "keyup",
+            "key": "w",
+            "keyCode": 87,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answ"
+          },
+          {
+            "tag": "askin",
+            "type": "keydown",
+            "key": "e",
+            "keyCode": 69,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answ"
+          },
+          {
+            "tag": "askin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41answ"
+          },
+          {
+            "tag": "askin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41answe"
+          },
+          {
+            "tag": "askin",
+            "type": "keyup",
+            "key": "e",
+            "keyCode": 69,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answe"
+          },
+          {
+            "tag": "askin",
+            "type": "keydown",
+            "key": "r",
+            "keyCode": 82,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answe"
+          },
+          {
+            "tag": "askin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41answe"
+          },
+          {
+            "tag": "askin",
+            "type": "input",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertText",
+            "v": "R41answer"
+          },
+          {
+            "tag": "askin",
+            "type": "keyup",
+            "key": "r",
+            "keyCode": 82,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answer"
+          },
+          {
+            "tag": "askin",
+            "type": "keydown",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answer"
+          },
+          {
+            "tag": "askin",
+            "type": "beforeinput",
+            "key": null,
+            "keyCode": null,
+            "shiftKey": false,
+            "isComposing": false,
+            "inputType": "insertLineBreak",
+            "v": "R41answer"
+          },
+          {
+            "tag": "askin",
+            "type": "keyup",
+            "key": "Enter",
+            "keyCode": 13,
+            "shiftKey": false,
+            "isComposing": true,
+            "inputType": null,
+            "v": "R41answer"
+          }
+        ],
+        "evCount": 42,
+        "say": [],
+        "shout": [],
+        "ans": [],
+        "bubbles": 0,
+        "streamBubbles": 1,
+        "vals": {
+          "sayin": null,
+          "shoutin": "R41shout",
+          "askin": "R41answer"
+        }
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

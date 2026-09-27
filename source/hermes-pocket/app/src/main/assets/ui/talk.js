@@ -133,8 +133,121 @@
     }
   };
 
-  /* monospace 的会话名：跟服务端 tmux_session() 一致 */
-  const sess = (full) => 'role-' + String(full || '').replace(/\./g, '-');
+  /* R-40：会话编号（**前端不造号**）—— 号码只认 talk.sessions[].id（R-26 的 HP.Cache 里已有，不新增请求）
+   * · 找号：s.role === full_name 的那条；多条取 alive=true，都 false 取 last_used 最大
+   * · 去重：按 **tmux 全名**（同一个 tmux 只留 alive 那条；**绝不按 role** —— QQ 通道是本体、App 入口是第二入口）
+   * · 容器会话（roles / hermes）是盒子不是人 ⇒ 不成行
+   * · 窗口名＝tmux 冒号后半段；不是「会话:窗口」形态的（如 qqbot:3FDE0CB3…）⇒ 用本人定的叫法「本人-女仆通道」
+   * · 一条都没有 ⇒ **不显号**（显「未起会话」），绝不造号 */
+  const CONTAINERS = { roles: 1, hermes: 1 };
+  /* R-26 的落盘是**节流写**（set 带 throttle ⇒ 隔一会儿才进 localStorage），刚取回的那一刻读盘是空的；
+   * 所以这里再留一份**内存**的（首屏就能显号，不用等节流落盘） */
+  let SESS_MEM = null;
+  const noteSessions = (r) => { if (r && r.sessions) SESS_MEM = r; };
+  const sessList = () => {
+    const c = SESS_MEM || CACHE.get('sessions', null);
+    const byTmux = {};
+    (((c || {}).sessions) || []).forEach((s) => {
+      if (!s) return;
+      const t = String(s.tmux || '');
+      if (!t || CONTAINERS[t]) return;
+      if (!byTmux[t] || (s.alive && !byTmux[t].alive)) byTmux[t] = s;
+    });
+    return Object.keys(byTmux).map((k) => byTmux[k]);
+  };
+  /* R-40 修正：**通道目标**（tmux 不是「会话:窗口」形态，如 qqbot:3FDE0CB3…）——
+   * 身份用本人定的**固定标签**（不取平台 title/name），不参与「已废」判定、恒在线。 */
+  const winForm = (tmux) => /^[^:]+:[A-Za-z][A-Za-z0-9_-]*$/.test(String(tmux || ''));
+  /* 通道目标＝**有冒号但窗口段不是可读窗口名**（qqbot:3FDE0CB3… 这种机器串）；
+   * 裸 tmux 名（role-pipeline-tester / solo-…）不是通道，照旧按 alive 判「已废」 */
+  const chanForm = (tmux) => { const s = String(tmux || ''); return s.indexOf(':') > 0 && !winForm(s); };
+  const isChan = (s) => !!s && chanForm(s.tmux);
+  const CHAN_IDENT = '女仆（本人通道）';
+  const winName = (s) => {
+    if (isChan(s)) return CHAN_IDENT;
+    const w = String((s && s.tmux) || '').split(':')[1] || '';
+    return w || CHAN_IDENT;
+  };
+  const sessInfo = (full) => {
+    const mine = sessList().filter((s) => s.role === full);
+    if (!mine.length) return null;
+    const pick = mine.filter((s) => s.alive)[0] ||
+      mine.slice().sort((a, b) => (b.last_used || 0) - (a.last_used || 0))[0];
+    return { id: pick.id, win: winName(pick), alive: !!pick.alive, tmux: pick.tmux, s: pick };
+  };
+  /* 角色卡副行 / 信息窗「会话」行共用同一份映射（同号同人） */
+  const sessLabel = (full) => {
+    const i = sessInfo(full);
+    return i ? ('#' + i.id + ' · ' + i.win) : (String(full || '') + ' · 未起会话');
+  };
+  /* 会话列表那两处只要个前缀；取不到号返回空串（不造号） */
+  const idTag = (full) => { const i = sessInfo(full); return i ? ('#' + i.id + ' ') : ''; };
+
+  /* ---- R-41：单行输入框的「回车发送」（三条兜底 + 一把闸）-----------------
+   * 为什么要有兜底：有些输入法**只给 beforeinput/keyup、不给 keydown**（"按回车没反应"的机制就在这里）。
+   * · `enterkeyhint=send`：软键盘右下角显示「发送」
+   * · 三条路：keydown(Enter)（主）→ keyup(13) / beforeinput(insertLineBreak|insertParagraph)（兜底）
+   * · **一把闸**：同一次回车（三条路同时触发）只发 1 条 —— 400ms 时间窗；
+   *   但**新来一个 keydown 就把窗口清零** ⇒ 用户连按两次是真按键，照样发两条（不吞第二次）。
+   * · **Shift+Enter 一律不发送**（A 案：单行框本来也不支持换行）；
+   * · **组字中不抢先发**（compositionend 之前不发送，Enter 交给输入法确认候选）。
+   */
+  const bindEnterSend = (inp, fire) => {
+    if (!inp) return inp;
+    inp.setAttribute('enterkeyhint', 'send');
+    let sentAt = 0, composing = false, compTimer = null, shiftAt = 0;
+    const isEnter = (e) => !!(e && (e.key === 'Enter' || e.keyCode === 13));
+    const now = () => ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now());
+    /* R-41 修正①：**只拦 `keyCode === 229`**（那才是真正的 IME 合成中间态）；
+     * `isComposing === true` 不再单独拦 —— Gboard 的 Enter 是 `isComposing=true` + `keyCode=13`，
+     * 那正是"确认/上屏并发送"，就是本人要的行为（真机 R41-3 定位：老守卫把整条路吞了）。 */
+    const imeMid = (e) => !!(e && e.keyCode === 229);
+    /* R-45：Shift 改成**时间戳闩**（原来 `shiftDown` 布尔会被 keyup 的清零覆盖 —— 见下 keyup 的注释）。
+     * 判据＝"最近 400ms 内按过 Shift"，闩会自己过期（不粘滞）。 */
+    const shifted = () => !!(shiftAt && now() - shiftAt < 400);
+    const go = (e) => {
+      if (imeMid(e)) return;                              /* 合成中间态：交给输入法，不发 */
+      if (shifted()) return;                              /* Shift+Enter：不发送 */
+      const t = now();
+      if (t - sentAt < 400) return;                       /* 同一次回车的三条路：只发 1 条 */
+      sentAt = t;
+      fire(inp);
+    };
+    inp.addEventListener('keydown', (e) => {
+      /* R-45：Shift 的 keydown 在真机上可能带 `shiftKey=false` ⇒ **必须同时认 `e.key === 'Shift'`** */
+      if (e && (e.key === 'Shift' || e.shiftKey === true)) shiftAt = now();
+      if (!isEnter(e)) return;
+      if (imeMid(e)) return;                              /* 中间态：不拦也不发 */
+      if (shifted()) { e.preventDefault(); return; }       /* Shift+Enter：不发送（单行框也不换行） */
+      sentAt = 0;                                          /* 真按键 ⇒ 重置窗口（连按两次要发两条） */
+      go(e);
+    });
+    inp.addEventListener('keyup', (e) => {
+      /* R-45（祸根行）：**只记 true、绝不用 keyup 清零**。
+       * 原来写 `shiftDown = e.shiftKey`，遇到「Shift 先松、Enter 后松」时那一下 keyup 带 `shiftKey=false`，
+       * 把 Shift 状态覆盖回假 ⇒ 后面的 Enter 被当普通回车发出去。 */
+      if (e && e.shiftKey) shiftAt = now();
+      if (isEnter(e)) go(e);
+    });
+    inp.addEventListener('beforeinput', (e) => {
+      const ty = e && e.inputType;
+      if (ty === 'insertLineBreak' || ty === 'insertParagraph') go(e);
+    });
+    /* R-41 修正②：组字态**必须有兜底退出**（不许再出现"永久 composing"）——
+     * `compositionstart` 后 1.5s 无条件复位；`compositionend` 照旧立即复位；谁先到算谁。
+     * 注意：composing 现在**只做状态记录**，不再拿它拦 Enter（口径①）。 */
+    inp.addEventListener('compositionstart', () => {
+      composing = true;
+      if (compTimer) clearTimeout(compTimer);
+      compTimer = setTimeout(() => { composing = false; compTimer = null; }, 1500);
+    }, { passive: true });
+    inp.addEventListener('compositionend', () => {
+      composing = false;
+      if (compTimer) { clearTimeout(compTimer); compTimer = null; }
+    }, { passive: true });
+    inp.__enterState = () => ({ composing: composing, sentAt: sentAt, timer: !!compTimer });   /* 探针/排查读数 */
+    return inp;
+  };
 
   const Talk = {
     roles: [], msgs: [], last: 0, view: 'channel', sel: null, busy: false, timer: null,
@@ -170,7 +283,8 @@
       this.timer = setInterval(() => {
         if (this._powerSave) this._pollInSave = (this._pollInSave || 0) + 1;
         this.tick().catch(() => { });
-        if (this.view === 'role' && this.style === 'chat' && this.sel) this.pullRoleOutput(this.sel);
+        /* R-32：这里原来还有一句 this.pullRoleOutput(this.sel) —— 那个方法**从来没定义过**，
+         * 每 2.5s 抛一条 unhandled rejection（实测 30s 12 条）。按作者口径**删调用、不补定义**。 */
       }, ms);
     },
     stopPoll() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
@@ -199,6 +313,9 @@
       this.channels = (r && r.channels) || {};
       this.roles = [];
       scenes.forEach((s) => (s.roles || []).forEach((x) => { x.scene = s.scene; this.roles.push(x); }));
+      /* R-40：编号要用的 talk.sessions 也在这一步取（同一个 op、命中 R-26 缓存就不发请求）；
+       * 放在画卡片之前 ⇒ 首屏卡片副行/信息窗就能显 #id，而不是先显一屏「未起会话」 */
+      try { noteSessions(await rpcCache('talk.sessions', {}, 'sessions')); } catch (e) { /* 离线：卡片显「未起会话」 */ }
     },
 
     /* 每次"登录进来"（进频道页）刷新校验：角色 / 等你授权 / 频道接入表 */
@@ -455,7 +572,7 @@
         await this.send('全体', 'broadcast', text);
       };
       gok.addEventListener('click', gfire);
-      gin.addEventListener('keydown', (e) => { if (e.key === 'Enter') gfire(); });
+      bindEnterSend(gin, gfire);                      /* R-41：回车发送（三条兜底 + 400ms 闸） */
       gline.appendChild(gin);
       gline.appendChild(gok);
       const wc2 = document.createElement('button');
@@ -515,19 +632,28 @@
         '<span class="tk-caret">›</span>';
       const sub = document.createElement('div');
       sub.className = 'sub';
-      sub.textContent = r.full_name + ' · ' + sess(r.full_name) + (r.online ? '' : (r.state === 'paused' ? ' · 被停' : ' · 不在线'));
+      sub.textContent = sessLabel(r.full_name) + (r.online ? '' : (r.state === 'paused' ? ' · 被停' : ' · 不在线'));
       b.appendChild(row1);
       b.appendChild(sub);
-      const tags = document.createElement('div');
-      tags.className = 'tags';
-      (r.channels || []).forEach((c) => {
-        const t = document.createElement('span');
-        t.className = 'tk-tag';
-        t.textContent = c;
-        tags.appendChild(t);
-      });
-      if (tags.childNodes.length) b.appendChild(tags);
-      b.addEventListener('click', () => this.openRoleSheet(r.full_name));
+      /* R-42：信息窗入口挪到**卡片右侧的箭头热区**（≥44dp，照 R-33 硬线）——
+       * 热区是卡片右缘一条 44px 宽、整卡高的透明块（不占排版、不撑高卡片）；箭头符号还是 row1 里那个 › */
+      b.style.position = 'relative';
+      const caretHit = document.createElement('span');
+      caretHit.className = 'tk-carethit';
+      caretHit.setAttribute('data-testid', 'talk-rolecaret');
+      caretHit.setAttribute('role', 'button');
+      caretHit.addEventListener('click', (e) => { e.stopPropagation(); this.openRoleSheet(r.full_name); });
+      b.appendChild(caretHit);
+      /* 接入频道：复用 .sub 一行（不新增 CSS）；channels=[] 的角色这条不显示，卡片保持 60dp */
+      const chans = (r.channels || []);
+      if (chans.length) {
+        const ch = document.createElement('div');
+        ch.className = 'sub';
+        ch.setAttribute('data-testid', 'talk-rolechans');
+        ch.textContent = '接入频道：' + chans.join('、');
+        b.appendChild(ch);
+      }
+      b.addEventListener('click', () => this.openRole(r.full_name));   /* R-42：卡片单击＝一步进单聊 */
       return b;
     },
 
@@ -550,15 +676,19 @@
       const ok = document.createElement('button');
       ok.className = 'tk-act';
       ok.textContent = '答复';
-      ok.addEventListener('click', async () => {
+      /* R-41：这个框原来连 Enter 都没挂 —— 把发送抽成 reply()，给「答复」键与回车共用（同一套兜底口径） */
+      const reply = async () => {
         const text = (inp.value || '').trim();
         if (!text) { HP.App.toast('先说点什么'); return; }
         try {
           await rpc('talk.answer', { id: String(k.id), text: text });
+          inp.value = '';                              /* R-41：发完清空（配合 400ms 闸防重复） */
           HP.App.toast('答复已回给 ' + k.from);
           this.render();
         } catch (e) { HP.App.toast('答复失败：' + e.message); }
-      });
+      };
+      ok.addEventListener('click', reply);
+      bindEnterSend(inp, reply);
       line.appendChild(inp); line.appendChild(ok);
       row.appendChild(head); row.appendChild(what); row.appendChild(line);
       return row;
@@ -704,13 +834,16 @@
     /* 会话列表：分成 在线 / 没在线 / 历史 三组（点一下弹选择窗，不直接切） */
     async paintHistory(el) {
       el.textContent = '';
-      let sess = [], roles = [];
-      try { sess = (((await rpcCache('talk.sessions', {}, 'sessions')) || {}).sessions) || []; } catch (e) { /* 离线也能看 */ }
-      try { roles = (((await rpcCache('talk.roles', {}, 'roles')) || {}).roles) || []; } catch (e) { /* 同上 */ }
-      const CONTAINER = 'roles';   /* 装角色窗口的容器会话：不是给人切的目标 */
-      const sessOfRole = {};
-      sess = (sess || []).filter((s) => s && s.name !== CONTAINER);
-      sess.forEach((s) => { if (s.role) sessOfRole[s.role] = s; });
+      let roles = [];
+      try { noteSessions(await rpcCache('talk.sessions', {}, 'sessions')); } catch (e) { /* 离线也能看：下面读缓存那份 */ }
+      try {
+        const rr = await rpcCache('talk.roles', {}, 'roles');
+        /* R-40 缺陷③：talk.roles 顶层只有 scenes/channels（**没有 roles**），原来读 r.roles ⇒ 恒空、
+         * 「在线/没在线」两个分组永不出现、known 恒空还会把同一人列两条 ⇒ 改成 scenes 展平（同 refreshRoles） */
+        ((rr && rr.scenes) || []).forEach((sc) => ((sc && sc.roles) || []).forEach((x) => roles.push(x)));
+      } catch (e) { /* 同上 */ }
+      if (!roles.length) roles = this.roles || [];
+      const sess = sessList();                  /* 已按 tmux 全名去重、已剔容器 */
       roles.forEach((r) => { HP_TALK_SEEN[r.full_name] = 1; });
 
       const addGroup = (label, rows) => {
@@ -726,8 +859,8 @@
           b.style.width = '100%';
           b.style.textAlign = 'left';
           b.style.margin = '4px 0';
-          b.textContent = row.name + (row.sub ? '　· ' + row.sub : '');
-          b.addEventListener('click', () => this.openSessionSheet({ name: row.name, role: row.role }));
+          b.textContent = (row.label || row.name) + (row.sub ? '　· ' + row.sub : '');
+          b.addEventListener('click', () => this.openSessionSheet({ name: row.name, role: row.role, id: row.id }));
           el.appendChild(b);
         });
       };
@@ -735,11 +868,13 @@
       /* ① 在线：会话真在跑 */
       const online = roles.filter((r) => r.online).map((r) => ({
         name: (r.title || r.name), role: r.full_name,
+        label: idTag(r.full_name) + (r.title || r.name),      /* R-40：行首 #<id> */
         sub: '在跑' + (r.pending ? ' · 欠 ' + r.pending : ''),
       }));
-      /* ② 没在线：角色在，会话没起 */
+      /* ② 没在线：角色在，会话没起（取不到号 ⇒ 不显号） */
       const offline = roles.filter((r) => !r.online).map((r) => ({
         name: (r.title || r.name), role: r.full_name,
+        label: idTag(r.full_name) + (r.title || r.name),
         sub: r.state === 'paused' ? '被停' : '没起会话',
       }));
       /* ③ 历史：见过但现在不在角色表里的（角色删了/会话结束了） */
@@ -762,9 +897,8 @@
         });
       } catch (e) { /* 扫不到就不显示这一块 */ }
       sess.forEach((s) => {
-        if (s.role && known[s.role]) return;
         if (s.role) return;
-        histRows.push({ name: s.name, role: null, sub: '普通会话' });
+        histRows.push({ label: '#' + s.id + ' 临时对话', name: s.tmux || s.name, role: null, id: s.id, sub: '普通会话' });
       });
 
       addGroup('在线', online);
@@ -820,10 +954,10 @@
         '<span class="tk-sheetx" id="tk-sheetx">✕</span>';
       head.querySelector('#tk-sheetx').addEventListener('click', () => this.closeSheet());
       card.appendChild(head);
-      [['全名', r.full_name], ['会话', sess(r.full_name)],
+      [['全名', r.full_name], ['会话', sessLabel(r.full_name)],
        ['状态', r.state === 'paused' ? '被停' : (r.online ? '在线' : '不在线')],
        ['欠回复', String(r.pending || 0)], ['标签', r.tags || '（无）'],
-       ['能接入', (r.channels || []).join('、') || '（无）']].forEach((kv) => {
+       ['接入频道', (r.channels || []).join('、') || '未接']].forEach((kv) => {
         const d = document.createElement('div');
         d.className = 'tk-sheetrow';
         d.innerHTML = '<span class="tk-k">' + esc(kv[0]) + '</span><span class="tk-v">' + esc(kv[1]) + '</span>';
@@ -935,6 +1069,7 @@
       head.className = 'tk-title';
       head.textContent = (r.title || r.name) + '\u3000' + (r.state === 'paused' ? '被停' : (r.online ? '在线' : '不在线')) +
         (r.pending ? ' · 欠 ' + r.pending : '');
+      this.tapWho(head, r.full_name);          /* R-37 A：抬头是主入口（点一下就开信息窗） */
       el.appendChild(head);
 
       if (this.style === 'chat') {
@@ -1020,14 +1155,25 @@
         inp.value = '';
         CACHE.set('draft.' + full, '');
         await this.send(full, this.kind || 'private', text);
-        setTimeout(() => this.pullRoleOutput(r), 2500);
-        setTimeout(() => this.pullRoleOutput(r), 6000);
+        /* R-32：这里原来有两个 setTimeout 调 this.pullRoleOutput(r)（+2.5s / +6s）—— 该方法没有定义，
+         * 到点必抛。按作者口径删掉（发送状态由 R-31/R-36 的状态机负责）。 */
       };
       ok.addEventListener('click', fire);
-      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') fire(); });
+      bindEnterSend(inp, fire);                       /* R-41：回车发送（三条兜底 + 400ms 闸） */
       line.appendChild(inp);
       line.appendChild(ok);
       el.appendChild(line);
+      /* R-39（乙案）：把粘性条高量一次写进 :root 的 `--sayline-h`，内层滚动容器 `#tk-chat` 的 `padding-bottom`
+       * 跟着它走（`calc(var(--sayline-h) + var(--safe-b) + 8px)`）—— 字号/安全区一变也不会失配，不写死数字。
+       * 共用规则（经理口径，SPEC §10）：凡「粘性/固定底部条」，上方滚动内容必须留 `calc(条高 + var(--safe-b))` 的底部内边距。 */
+      const noteH = () => {
+        try {
+          const h = Math.round(line.getBoundingClientRect().height);
+          if (h > 0) document.documentElement.style.setProperty('--sayline-h', h + 'px');
+        } catch (e) { /* 量不到就用 CSS 里的默认值 */ }
+      };
+      noteH();
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(noteH);   /* 布局稳定后再量一次 */
     },
 
     /* 聊天气泡：我说的靠右蓝、他说的靠左灰；他说的话从会话里捞（不再靠屏幕抠字以外的猜测） */
@@ -1043,23 +1189,21 @@
         const th = await rpcCache('talk.thread', { role: r.full_name, limit: 100 }, 'thread.' + r.full_name);
         items = (th && th.items) || [];
       } catch (e) { /* 拉不到记录也要能看他的话 */ }
-      const live = ((this.live || {})[r.full_name] || []);
-      if (!items.length && !live.length) { box.textContent = '（还没聊过）'; this.pinBottom(box, { force: true }); return; }
+      /* R-32：原来这里还有一段 `const live = ((this.live || {})[r.full_name] || [])` 的「live 追加」分支 ——
+       * this.live 是**布尔开关**（141/166/187/250/275 都按开关用），所以那段永远走不到（死代码）。
+       * 按作者口径删掉（R-37 挂在那段里的 tapWho 也随之一并没了，已在报告里写明）。 */
+      if (!items.length) { box.textContent = '（还没聊过）'; this.pinBottom(box, { force: true }); return; }
       items.forEach((m) => {
         const me = m.who === 'me';
         const head = me ? ('我 → ' + (r.title || r.full_name)) : ((r.title || r.full_name) + ' → 我');
         const bu = bubbleEl({ mine: me, head: head, text: m.body, time: hhmm(m.at) });
         bu.className = 'tk-bub ' + (me ? 'me' : 'him');
-        box.appendChild(bu);
-      });
-      live.forEach((tx) => {
-        const bu = bubbleEl({ mine: false, head: (r.title || r.full_name) + ' → 我', text: tx, time: '' });
-        bu.className = 'tk-bub him';
+        if (!me) this.tapWho(bu, r.full_name);   /* R-37 B：他说的气泡点了也开信息窗（我说的不挂） */
         box.appendChild(bu);
       });
       if (wasNear) this.pinBottom(box, { force: true });
       else { box.scrollTop = prevTop; box._pinned = false; box._lastHeight = box.scrollHeight; this.paintBackChip(box); }
-      this.pullRoleOutput(r);
+      /* R-32：这里原来还有一句 this.pullRoleOutput(r)（每次重画都抛）。按作者口径删掉。 */
     },
 
     /* ---- 发送状态（R-31）：每条消息给状态，不再只闪一行 toast -------------------
@@ -1080,6 +1224,7 @@
       const who = this.sendWho(s) + (s.kind === 'broadcast' ? '（广播）' : '');
       if (s.state === 'sending') return who + ' · 发送中…' + (this.timing() ? ' ' + this.secs(s.t0) + 's' : '');
       if (s.state === 'waiting') return who + ' · 还在发…' + (this.timing() ? ' ' + this.secs(s.t0) + 's' : '');
+      if (s.state === 'unconfirmed') return who + ' · 已发出（未确认）';   /* R-36 A：中性态，不写毫秒 */
       if (s.state === 'sent' || s.state === 'partial') {
         const head = s.parts && s.parts.length
           ? (s.parts.filter((p) => p.ok).length + '/' + s.parts.length + ' 已送达')
@@ -1094,7 +1239,8 @@
       box.textContent = '';
       this.sends.slice(-4).forEach((s) => {
         const row = document.createElement('div');
-        const cls = (s.state === 'sent') ? 'ok' : ((s.state === 'sending' || s.state === 'waiting') ? 'wait' : 'bad');
+        const cls = (s.state === 'sent') ? 'ok'
+          : ((s.state === 'sending' || s.state === 'waiting' || s.state === 'unconfirmed') ? 'wait' : 'bad');   /* unconfirmed＝中性态，别归进 ok 绿 */
         row.className = 'tk-sendrow ' + cls;
         row.setAttribute('data-testid', 'talk-sendrow');
         row.setAttribute('data-state', s.state);
@@ -1133,6 +1279,31 @@
       const box = document.getElementById('tk-sends');
       if (box) this.fillSends(box);
     },
+    /* R-37：点一下就开信息窗（单聊抬头 + 他说的气泡）——
+     * **只挂 click**；touchstart 记一下手指位置，click 时若位移 >8px 就当滚动、不开窗。
+     * 不注册 touchmove、不 preventDefault、不碰滚动（滚动交给浏览器与既有的钉底逻辑）。 */
+    tapWho(el, full) {
+      if (!el || !full) return el;
+      el.setAttribute('data-from', full);
+      el.setAttribute('data-tapwho', '1');
+      let x0 = null, y0 = null;
+      el.addEventListener('touchstart', (e) => {
+        const t = (e.touches && e.touches[0]) || null;
+        if (t) { x0 = t.clientX; y0 = t.clientY; }
+      }, { passive: true });
+      el.addEventListener('click', (e) => {
+        /* 真机上一次点击是 MouseEvent（没有 changedTouches），坐标取 clientX/Y；
+         * 若浏览器给了 changedTouches 就优先用它。位移 >8px 就当滚动。 */
+        const t = (e.changedTouches && e.changedTouches[0]) || null;
+        const cx = (t && t.clientX != null) ? t.clientX : e.clientX;
+        const cy = (t && t.clientY != null) ? t.clientY : e.clientY;
+        if (x0 != null && cx != null && (Math.abs(cx - x0) > 8 || Math.abs(cy - y0) > 8)) return;
+        e.stopPropagation();
+        this.openRoleSheet(full);
+      });
+      return el;
+    },
+
     stopSendTicker() { if (this._sendTick) { clearInterval(this._sendTick); this._sendTick = null; } },
     startSendTicker() {
       if (this._sendTick || this._powerSave) return;    /* 省电期间不刷发送状态（R-25） */
@@ -1190,12 +1361,21 @@
             s.note = s.parts.filter((p) => !p.ok).map((p) => p.role + '：' + (p.note || '没投成')).join('；');
           }
         } else {
-          const ok = (bridged === null) ? true : !!bridged;
           const ms = (r && r.ms != null) ? r.ms : (raw.ms != null ? raw.ms : null);
-          s.ms = (ms != null) ? ms : Math.round(performance.now() - s.t0);
-          s.msApprox = (ms == null);                       /* 回执没给耗时：退回界面往返毫秒，前面加 ≈ */
-          s.state = ok ? 'sent' : 'failed';
-          if (!ok) s.note = raw.error || (r && r.error) || '桥说这条没投成';
+          if (bridged === null) {
+            /* R-36 A：回执里**没有 delivered 字段** —— 不算成功、也不说失败，走中性态「已发出（未确认）」；
+             * 不写毫秒（ms=null），也不给重试（消息可能已经发出去了，重发会重复）。 */
+            s.state = 'unconfirmed';
+            s.ms = null;
+            s.msApprox = false;
+            s.note = raw.error || (r && r.error) || '';
+          } else {
+            const ok = !!bridged;
+            s.ms = (ms != null) ? ms : Math.round(performance.now() - s.t0);
+            s.msApprox = (ms == null);                     /* 回执没给耗时：退回界面往返毫秒，前面加 ≈ */
+            s.state = ok ? 'sent' : 'failed';
+            if (!ok) s.note = raw.error || (r && r.error) || '桥说这条没投成';
+          }
         }
       } catch (e) {
         clearTimeout(t3); clearTimeout(t8);
@@ -1221,7 +1401,7 @@
       el.textContent = '';
       const head = document.createElement('div');
       head.className = 'tk-title';
-      head.textContent = s.name + (s.role ? '（角色会话）' : '（普通会话）');
+      head.textContent = (s.id ? '#' + s.id + ' ' : '') + s.name + (s.role ? '（角色会话）' : '（普通会话）');
       el.appendChild(head);
       const mk = (label, tid, fn, danger) => {
         const b2 = document.createElement('button');

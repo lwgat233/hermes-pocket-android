@@ -1,0 +1,49 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R33-复测-追问段": {
+    "check": {
+      "clean": {
+        "tap": true,
+        "confirmCalls": 0,
+        "confirmMsgs": [],
+        "toasts": [
+          "清掉 0 个键，释放 0.0KB"
+        ],
+        "keysBefore": 9,
+        "keysAfter": 9,
+        "kbBefore": 21.1,
+        "kbAfter": 21.1,
+        "cardHead": "本地占用：9 个键 · 21KB 原生侧：暂不可用（等原生加只读口 app.storage） thread.pipeline.tester ",
+        "restored": true
+      },
+      "beforeShout": {
+        "value": "R33shout",
+        "rows": 0,
+        "kbFocus": "tk-shoutin"
+      },
+      "afterShout": {
+        "rows": [
+          {
+            "state": "sent",
+            "text": "我 → 全体（广播） · 已送达 ≈29ms"
+          }
+        ],
+        "valueAfter": "",
+        "sendsLen": 1,
+        "lastSend": {
+          "state": "sent",
+          "note": ""
+        }
+      },
+      "chrome": {
+        "count": 3,
+        "labels": [
+          "广播",
+          "经理说",
+          "收起台账"
+        ],
+        "overlaps": []
+      }
+    }
+  }
+}

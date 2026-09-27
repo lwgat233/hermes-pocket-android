@@ -1,0 +1,80 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R42-补测-chrow 行高与发送后气泡": {
+    "check": {
+      "chrow": {
+        "count": 1,
+        "rows": [
+          {
+            "px": {
+              "x": 14,
+              "y": 892,
+              "w": 365,
+              "h": 44
+            },
+            "dp": {
+              "w": 365.1,
+              "h": 44
+            },
+            "text": "qqbothome.maid"
+          }
+        ],
+        "caretHit": {
+          "px": {
+            "x": 336,
+            "y": 297,
+            "w": 44,
+            "h": 81
+          },
+          "dp": {
+            "w": 44,
+            "h": 80.7
+          },
+          "text": ""
+        },
+        "chOpen": true
+      },
+      "bubblePoll": {
+        "pre": {
+          "view": "role",
+          "bubs": 1
+        },
+        "poll": [
+          {
+            "t": 600,
+            "bubs": 2,
+            "mine": 1,
+            "rows": [
+              "我 → 经理（管流程/派活/判报告；不是本人） · 已送达 1234ms"
+            ]
+          },
+          {
+            "t": 1500,
+            "bubs": 2,
+            "mine": 1,
+            "rows": [
+              "我 → 经理（管流程/派活/判报告；不是本人） · 已送达 1234ms"
+            ]
+          },
+          {
+            "t": 3000,
+            "bubs": 2,
+            "mine": 1,
+            "rows": [
+              "我 → 经理（管流程/派活/判报告；不是本人） · 已送达 1234ms"
+            ]
+          },
+          {
+            "t": 4500,
+            "bubs": 2,
+            "mine": 1,
+            "rows": [
+              "我 → 经理（管流程/派活/判报告；不是本人） · 已送达 1234ms"
+            ]
+          }
+        ],
+        "say": 1
+      }
+    }
+  }
+}

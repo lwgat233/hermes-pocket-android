@@ -1,0 +1,28 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R40-5-退化态（清缓存后 roles 拿不到）": {
+    "check": {
+      "清缓存": {
+        "rolesBefore": 0,
+        "rolesAfterClear": 0
+      },
+      "退化态": {
+        "rolesLen": 0,
+        "rowCount": 8,
+        "first3": [
+          "#4 女仆（本人通道）QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844QQ 通道",
+          "#5 （加载中）窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑",
+          "#8 （加载中）窗口 6 · tmux roles:pipeline-renderer · 建了 11 小时在跑"
+        ],
+        "含加载中": true,
+        "把平台name当身份": false,
+        "女仆行": "#4 女仆（本人通道）QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844QQ 通道"
+      },
+      "roles到位后": {
+        "rowCount": 8,
+        "tester行": "#5 测试者窗口 6 · tmux roles:pipeline-tester · 建了 11 小时在跑",
+        "含加载中": false
+      }
+    }
+  }
+}

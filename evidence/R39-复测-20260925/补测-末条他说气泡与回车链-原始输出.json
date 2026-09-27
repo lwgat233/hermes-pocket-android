@@ -1,0 +1,57 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R39-补测-末条「他说的」气泡真触摸 + 回车链": {
+    "check": {
+      "himLast": {
+        "lastCls": "tk-bub him",
+        "lastText": "pipeline.author → 我R39b-",
+        "himRect": {
+          "top": 426,
+          "bottom": 498,
+          "h": 72
+        },
+        "saylineTop": 510,
+        "overlap": 0,
+        "hitWhat": "DIV.",
+        "hitSelf": true,
+        "inner": {
+          "scrollTop": 4655,
+          "max": 4654
+        },
+        "device": {
+          "x": 289,
+          "y": 1405
+        }
+      },
+      "afterTapHimLast": {
+        "sheet": true,
+        "全名": "pipeline.author"
+      },
+      "sayInput": {
+        "count": 2,
+        "visibleIndex": 0,
+        "device": {
+          "x": 452,
+          "y": 1619
+        },
+        "preBubs": 62
+      },
+      "focused": {
+        "activeId": "tk-sayin",
+        "activeVal": "",
+        "isVisibleOne": false
+      },
+      "afterEnter": {
+        "sayCalls": 0,
+        "args": [],
+        "bubs": 62,
+        "mine": 30,
+        "rows": [],
+        "vals": [
+          "R39b-回车复核",
+          ""
+        ]
+      }
+    }
+  }
+}

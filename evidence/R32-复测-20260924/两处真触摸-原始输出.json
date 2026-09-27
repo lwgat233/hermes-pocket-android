@@ -1,0 +1,59 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R32-复测-两处真触摸隔离": {
+    "check": {
+      "himCount": 3,
+      "himHit": {
+        "css": {
+          "x": 12,
+          "y": 414,
+          "w": 124,
+          "h": 72
+        },
+        "device": {
+          "x": 203,
+          "y": 1373
+        },
+        "hitWhat": "DIV.",
+        "hitIsSelf": true,
+        "tapwho": "1"
+      },
+      "sheet250": true,
+      "sheet650": true,
+      "sheet1250": true,
+      "sayHit": {
+        "css": {
+          "x": 325,
+          "y": 518,
+          "w": 56,
+          "h": 44
+        },
+        "device": {
+          "x": 970,
+          "y": 1620
+        },
+        "hitWhat": "BUTTON.tk-act",
+        "hitIsSelf": false,
+        "tapwho": null
+      },
+      "sayInHit": {
+        "css": {
+          "x": 12,
+          "y": 518,
+          "w": 305,
+          "h": 44
+        },
+        "device": {
+          "x": 453,
+          "y": 1620
+        },
+        "hitWhat": "INPUT.tk-askin",
+        "hitIsSelf": false,
+        "tapwho": null
+      },
+      "sends400": [],
+      "sends1300": [],
+      "errs": 0
+    }
+  }
+}

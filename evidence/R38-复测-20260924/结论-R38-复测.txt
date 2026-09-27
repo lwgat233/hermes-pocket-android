@@ -1,0 +1,55 @@
+# R-38 复测结论（pipeline.tester · 设备真机真触摸 · 2026-09-24）
+
+对象：**R38 未出包**（第 2 步从「出包」改成真机复测，作者第 1 步只交定位读数、没改代码）
+→ 装的是**最新可用包** `apk/测试版/hermes-pocket-R37-单聊开窗-20260924.apk`
+   整包 sha256 = 1d727e3a1b6b3e338e584033772f56505171073dd853ad12b49d97f64eb40a7c
+   （量的是**现有布局口径**：`#app{top:var(--vtop);height:var(--vh)}` + `.panel-body{padding-bottom:24px}`，R37→现在这两处未变）
+设备：emulator-5554 / Android 14 / AVD hpk34（容器 hp-emu）· 装包 Success · WebView bounds [0,136][1080,2274] · 无 ANR · 无 IME
+
+**本次只测了 1 块：⑧ 频道页（角色列表）**——本轮不改代码，只量"滚到底后的可达性"，无跨块。
+（口径：**先滚到底再判**，SPEC §10。）
+
+## 1) 滚到底 + 真触摸
+· 滚动容器 = `.panel-body`（无 id），滚到底：**scrollTop 356 / scrollHeight 863 / clientHeight 507**（可滚 356 ⇒ 真的到底了）
+· 末尾卡 `[data-role=home.maid]`：px(12,**232**,369×63)、bottom 295、在可视区内、
+  `elementFromPoint` 中心命中 **SPAN.name（命中自己）**、与 `#composer` **重叠 0px**
+· 「去群聊 →」`#tk-gogroup`：px(12,**526**,87×44)、bottom 570、在可视区内、
+  中心命中 **BUTTON.tk-act（命中自己）**、与 `#composer` **重叠 0px**
+· `scrollIntoView({block:'nearest'})` 再看一次末卡：y=232 / bottom 295 / 命中 SPAN.name ⇒ 同上
+· **真触摸（`adb shell input tap`）**：
+  - 末卡（设备 540,861）→ **信息窗真开**，信息窗「全名 = home.maid」✔
+  - 「去群聊 →」（设备 153,1641）→ **真的切了板块**：可见板块 `tab-talk` → **`tab-group`**，#tk-stream 在、标题「群聊」✔
+
+## 2) 四个数（同一次读数）
+| 量 | 实测 | 本地台对照 |
+|---|---|---|
+| `.panel-body` rect.bottom | **594** | 612 |
+| `#composer` rect.top | **594** | 612 |
+| `window.innerHeight` | **778** | 778 |
+| `visualViewport.height` | **778**（offsetTop 0、scale 1） | 778 |
+⇒ **上沿成对相等（594/594）、innerHeight == visualViewport.height == 778** ⇒ **不是 `--vh/--vtop` 失配**。
+绝对值 594 vs 612 是同一条关系下的内容差异（我喂 5 个角色 + 频道折叠区，栏高不同），不是 inset 差异。
+
+## 3) 系统栏 / 键盘对差值的影响
+· 屏幕 1080×2340；WebView bounds **[0,136][1080,2274]** → 状态栏（136 设备像素 ≈ 49.5 CSS）与导航栏（2340−2274 = 66 设备像素 ≈ **24 CSS**）都在 **WebView 之外**；
+· 页内 `innerHeight == visualViewport.height == 778`、`vvOffsetTop=0`、`scale=1`、`mInputShown=false`（无软键盘）
+  ⇒ 本轮 4 个数里**没有任何系统栏/键盘造成的差额**。
+
+## 4) 滚到底后末尾到 `#composer` 顶的间隙
+末尾（滚动容器最后一项，`SECTION.tabpage.on` 下沿 **570**；也等于「去群聊 →」下沿）→ composer 顶 594 ⇒ **间隙 = 24px**
+＝本地台 24px，也正好等于 `.panel-body` 的 `padding-bottom: 24px`（**死值、不含 safe-b**）。
+
+## 结论
+**非缺陷 —— 前两轮报的"被压住 / 点不到"是"没滚到底"时量到的。**
+未滚到底（scrollTop 0）的复现读数：末卡 y=**588**（落在固定层带里，与 composer 重叠 **57px**、命中 TEXTAREA）、
+「去群聊 →」y=**882** 在视口以下（elementFromPoint 返回 null）——正是我 R34/R35 那两条的来源。
+滚到底后两处**都点得到**（命中自己 + 重叠 0px + 真触摸真触发）。
+
+## 其它读数 / 未验
+· 常驻按键：`#keybar` 16、`#composer` 2（既有，与本轮无关）；全程 0 未捕获异常 / 0 console.error。
+· **未验 ≠ 通过**：不接主机（不动 NAS 授权）→ 真机与平台数据交互那几条不在本轮；本轮只量布局口径。
+· 留一条给经理判（不在本轮判定内）：间隙 **24px** 未达 SPEC §10 的「≥44dp」线（作者给了 `style.css:223` 一行改法），
+  要不要抬到 44 由你定；本轮我按"只报读数"记。
+
+证据：滚到底-原始输出.json（未滚/滚到底两套读数 + 两处真触摸）· 补测-去群聊与间隙-原始输出.json（板块切换 + 间隙 24px）·
+     截图-滚到底-末卡与去群聊-20260924.png

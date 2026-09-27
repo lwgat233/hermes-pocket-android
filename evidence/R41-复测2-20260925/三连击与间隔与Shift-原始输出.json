@@ -1,0 +1,62 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R41-5-C/D/E 重跑（每次先真点聚焦）": {
+    "check": {
+      "C_triple_enter": {
+        "say": 1,
+        "args": [
+          {
+            "role": "pipeline.author",
+            "body": "R41c-burst3",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "ev": [
+          {
+            "type": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "comp": true
+          }
+        ],
+        "val": "",
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms"
+        ]
+      },
+      "D_enter_gap_600ms": {
+        "say": 1,
+        "args": [
+          {
+            "role": "pipeline.author",
+            "body": "R41c-burst3",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "ev": [],
+        "val": "R41c-gap600",
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms"
+        ]
+      },
+      "E_shift_enter": {
+        "say": 1,
+        "args": [
+          {
+            "role": "pipeline.author",
+            "body": "R41c-burst3",
+            "kind": "private",
+            "by": "me"
+          }
+        ],
+        "ev": [],
+        "val": "R41c-shift",
+        "sends": [
+          "我 → 功能创造者 · 已送达 1234ms"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+# R-41 复测结论（真机回车发送 · pipeline.tester · 2026-09-25）
+
+对象：`apk/测试版/hermes-pocket-R41-回车发送-20260925.apk`
+整包 sha256 = 934257436a3089d83714c1f897b418010d61a831b6aeef6a2229e0a62b11b6df（与派活单一致）
+包内 `assets/ui/talk.js` sha256 前 16 位 = **ba48cc02f41317b4**（与派活单的 ba48cc02… 一致）
+包内 build-info：testVersion=unified-20260925-092803 / builtAt=2026-09-25 09:28 CST / featureId=R-41
+设备：emulator-5554 / Android 14 / AVD hpk34 · 装包 Success · WebView [0,136][1080,2274]（输入法弹出时可视区降到 [0,136][1080,1507]）
+
+**本次测了 3 块**：主块 ② 群聊 ＋ 主块 ① 单聊 ＋ 跨块 ⑧ 频道页（授权框）。
+**跨测理由**：三处输入框共用**同一套** `bindEnterSend`（`talk.js:195`，调用点 550 / 657 / 1128）——一处错三处错，必须三块分别真机点。
+
+## 输入法情况（先说清，这条决定"多输入法"能不能做到）
+`adb shell ime list -a -s` 原文（`可用输入法-ime-list-原文.txt`）：
+```
+com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME          ← 只有这一种文字输入法（Gboard）
+com.google.android.tts/…asr.voiceime.VoiceInputMethodService                        ← 语音输入，不能打字
+```
+⇒ **"至少试两种输入法"做不到：环境里只有 Gboard 一种文字输入法**（如实记，不编）。
+我改用的三条**真实按键路径**（都不是合成事件注入）：
+① 输入法打字（`adb shell input text`，走 IME）→ 真按键 `input keyevent 66`；
+② 不走输入法、直接真按键 `input keyevent 66`（系统按键路径，等价实体键盘/部分输入法）；
+③ Shift+Enter：`input keycombination 59 66`（模拟实体键盘；模拟器无实体键盘，按"模拟"记）。
+
+## 1) 核心判据（真机真输入法回车发送）——**红**
+**单聊页 `#tk-sayin`（真焦点、框里有字）按回车：`talk.say` 调用 0 次、气泡 0 个、文字仍留在框里。**
+事件序列（每个输入框上都挂了捕获监听，原文进 json）：
+```
+compositionstart            ← 输入法留下的组字态
+keydown  Enter keyCode=13  isComposing=true
+beforeinput  (insertLineBreak)
+keyup    Enter keyCode=13  isComposing=true
+（没有任何 compositionend）
+```
+⇒ `bindEnterSend` 的 `if (composing || e.isComposing) return;` 把这次回车**整条丢掉**；而组字态**不会自己结束**
+（全序列里没有 compositionend）⇒ **回车在单聊页永久失效**（不是"偶尔"）。
+对照：同一个框上**发送键/直接调 `HP.Talk.send()` 是通的**（探针：`talk.say` 1 次、`sends.state='sent'`）⇒ 坏的只是回车这条路。
+
+## 2) 群聊页 `#tk-shoutin` ——**不稳定（同因）**
+| 读数 | 组字态 | 回车结果 |
+|---|---|---|
+| 第一次（本轮 r2 段） | 无（`keydown(Enter, isComposing=false)`） | **通**：`talk.shout` 1 次，状态行「我 → 全体（广播） · **1/1 已送达 1111ms**」 |
+| 本轮群聊段 5 次读数 | 有（先 `compositionstart`、`isComposing=true`） | **全部 0 次**、文字留在框里 |
+⇒ 用户侧表现就是"有时能发、有时死活发不出"，取决于输入法当时有没有留下组字态。
+
+## 3) 授权框（跨块⑧）——无组字态时**通**
+`[data-ask] .tk-askin`：真焦点 + 回车 → **`talk.answer` 1 次**（`{id:"42", text:…}`）+ toast「答复已回给 pipeline.author」，事件序列 `keydown(Enter, isComposing=false)`。
+（同样存在被组字态吞掉的路径，与 ①② 同因。）
+
+## 4) 无法定论的两条（如实记，不算通过也不算失败）
+- **同一次回车不出两条 / 400ms 闸**：三连击（<400ms）与间隔 600ms 两次，本轮两边读数都是 **0 次**（因为回车本身不通）⇒ **这条验不了**；
+  唯一能当参考的是"群聊无组字态那一次"：1 次回车 = 1 条（1 条状态行）。
+- **Shift+Enter 不误发**：`keycombination 59 66` 那次**没有发送**、文字留着 —— 但因为组字态下所有回车都不发，**这条不能算 Shift 的独立证据**（模拟器无实体键盘，"无法测"）。
+
+## 5) 常驻按键 / 遮挡 / 异常
+`#keybar` 16 键、`#composer` 2 键（既有）；输入法弹出时 WebView 可视区缩到 [0,136][1080,1507]（页面按 visualViewport 收缩）。
+
+**全程 0 未捕获异常 / 0 console.error**（6 份原始输出 json 的 `pageErrors` 均为空）。
+
+## 未验（不接主机，未验 ≠ 通过）
+- **对方会话条数 +1**（要接主机才数得到 `~/.hermes/state.db.messages`；本轮只验到"App 侧该发的 rpc 发没发"）；
+- 真机**多输入法**（环境只有 Gboard 一种文字输入法）；
+- 400ms 闸与 Shift+Enter（见 4）。
+
+## 给下一步的定位线索（不是修法）
+根因在 `bindEnterSend` 的组字守卫：**只有 `compositionstart` 会把 `composing` 置真，只有 `compositionend` 会置假**；
+一旦输入法不送 `compositionend`（本机实测就是如此），该框的回车永久失效。
+真机证据链齐全：事件序列 + rpc 计数 + 输入框残留文字 + 直接调 send 的对照。
+
+证据：回车发送-原始输出.json · 组字态对照-原始输出.json · 群聊段-400ms闸与Shift-原始输出.json ·
+     调试-回车未发-原始输出.json · 调试2-回车与发送键对照-原始输出.json · 调试3-单聊回车隔离-原始输出.json ·
+     可用输入法-ime-list-原文.txt · 截图-单聊输入框与键盘-20260925.png

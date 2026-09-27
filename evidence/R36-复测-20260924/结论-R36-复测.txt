@@ -1,0 +1,52 @@
+# R-36 复测结论（pipeline.tester · 设备真机真触摸 · 2026-09-24）
+
+对象：apk/测试版/hermes-pocket-R36-送达口径-20260924.apk（5063955 字节）
+整包 sha256 = 4703cdd8b4741879085b96d04de10e67a7b312ee1c2af13a32883539acaf4e5b（与派活单一致）
+包内 assets/ui/talk.js sha256 前 16 位 = 855ff7a0510ed2bf（与派活单的 855ff7a0… 一致）
+包内 build-info：testVersion=unified-20260924-204122 / builtAt=2026-09-24 20:41 CST / featureId=R-36
+  feature：A 回执没 delivered 不算成功（新增中性态「已发出（未确认）」不写毫秒）；B talk.shout 不吞「还没连接」异常并补 delivered=results 全 true；C talk.say 的 delivered 改读平台
+设备：emulator-5554 / Android 14 / AVD hpk34（容器 hp-emu）· 装包 Success · WebView bounds [0,136][1080,2274]
+坐标映射：css × (1080/393, 2138/778) + y 偏移 136；**先校准触摸**（群聊身份键「本人说」→ 真触摸后变「经理说」）＝映射对。
+
+**本次测了 2 块**：主块 ② 聊天页-群聊 ＋ 跨块 ① 聊天页-单聊。
+**跨测理由**：两页共用**同一套发送状态机**（`talk.js` send() 1160-1200 一段决定 state，`sendStateText()`/`fillSends()` 一处出文案）——
+R-36 改的正是这套状态机的判成功口径，所以群聊与单聊必须一起量，否则只看到一半。
+
+## 关键手法（先说清，免得把"喂进去的"当成"跑出来的"）
+**不整体替换 HP.App.rpc**，只包一层：角色/消息数据走 stub，**`talk.shout` / `talk.say` 落回真 rpc**。
+→ 判据 1（不接主机）跑的是**真路径**：真 rpc 真抛「还没连接」，不是我拿异常喂出来的。
+
+## 判据逐条（全部 `adb shell input tap` 系统触摸）
+1) **主块②群聊 · 不接主机（真路径）→ 不再是假成功** ✔（本轮的红转绿判据）
+   真触摸「广播」（`#tk-shoutok`）后 `#tk-sends` 里那行：
+   · `data-state="failed"`、class `bad`、文案 **「我 → 全体（广播） · 没送达：还没连接」**
+   · **「已送达」出现 0 次**（`hasDeliveredWord=false`）、**毫秒出现 0 次**（`hasMsDigits=false`）
+   · 该行带**重试键**（`[data-testid=talk-retry]`✓）——failed 给重试，符合设计
+   （改前这里是「已送达 ≈Nms」＝假成功；现在是如实报错。）
+2) **平台回执形状（stub 传输层；ms 取台账真值 8382 = 台账 #1190 投给 pipeline.tester 的实测 ms）** ✔
+   返回 `results:[{role:'pipeline.tester',delivered:true,ms:8382},{role:'pipeline.author',delivered:false,error:'阶段没放行'}]` →
+   行文案 **「我 → 全体（广播） · 1/2 已送达 8382ms」**，并且**逐角色**一行：
+   `· pipeline.tester ✓ 8382ms`、`· pipeline.author ✗ 阶段没放行`；`data-state="partial"`。
+   ⚠️ 「真连接主机」这层**未验**（不接主机）—— 我验的是**状态机对平台形状回执的处理**，不是真连接。
+3) **跨块①单聊** ✔
+   · A `talk.say` 回 `{}`（**没有 delivered 字段**）→ `data-state="unconfirmed"`、class `wait`、
+     文案 **「我 → 功能创造者 · 已发出（未确认）」**，**无毫秒**，**无重试键**（设计就是不给重试：可能已发出，重发会重复）✔
+   · B 回 `{delivered:false,error:'阶段没放行'}` → `data-state="failed"`、文案 **「没送达：阶段没放行」** ✔
+   · 对照 C 回 `{delivered:true}`（没给 ms）→ `data-state="sent"`、class `ok`、「已送达 **≈1ms**」
+     （`≈` = 回执没给耗时，退回界面往返毫秒并标近似态，符合设计注释）
+4) **真触摸触发** ✔（上述三次广播/三次发送全是 `adb shell input tap`；坐标由页面量后立即点）；DOM 原文与截图均已存。
+5) **常驻按键 / 遮挡** ✔（读数）
+   `#keybar` 16 键、`#composer` 2 键（既有）；状态区 `#tk-sends` y=333 h=268，在视口 778 内、不被顶栏/键条/键盘压住；
+   四态同屏（最多留 4 条，`sends.length>4 shift`）＝「没送达：还没连接」/「1/2 已送达 8382ms」/「已发出（未确认）」/「已送达 ≈1ms」。
+全程 **0 未捕获异常 / 0 console.error**。
+
+## 另一件事（台账口径，供参考不是本步合格判定）
+`stamp-build.py --verify` 对本包 **FAIL**，原因不是包坏了，而是**源树已经往前走到 R-37**（源 build-info：R-37、20:45；
+包是 R-36、20:41）。包内自洽：`HP.BUILD == 包内 build-info.testVersion == unified-20260924-204122` ✔。
+→ 属"树先走"，要不要在出包口径上加"树冻结"由经理定。
+
+## 未验（不接主机，未验 ≠ 通过）
+真连接主机后的广播/单聊实发（第 2 条判据的真实连接部分）；点角色→信息窗/气泡/删会话/切会话/开左栏。
+（顺带：源树 R-37 的 feature 写着「单聊抬头与他说的气泡可点开信息窗」—— 正是我 R34 报的那条红，author 已在 R-37 修。）
+
+证据：送达口径-原始输出.json（四态全套读数）· 发送状态-DOM原文.txt · 截图-发送状态四态-20260924.png

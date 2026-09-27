@@ -1,0 +1,56 @@
+{
+  "name": "R-41 修正验收：Gboard 组字态也能回车发送 + 229 拦 + 组字态兜底复位",
+  "result": {
+    "check": {
+      "00_群聊输入框": {
+        "在": true,
+        "enterkeyhint": "send"
+      },
+      "01_Gboard形状": {
+        "shout": 1,
+        "发完清空了吗": true,
+        "文字还在吗": "",
+        "组字态": {
+          "composing": true,
+          "sentAt": 1053.4000000357628,
+          "timer": true
+        }
+      },
+      "02_组字态兜底复位": {
+        "复位前": {
+          "composing": true,
+          "sentAt": 0,
+          "timer": true
+        },
+        "复位后": {
+          "composing": false,
+          "sentAt": 0,
+          "timer": false
+        }
+      },
+      "03_229拦与正常能发": {
+        "229发了": 0,
+        "随后正常回车发了": 1
+      },
+      "04_闸与Shift": {
+        "一次回车": 1,
+        "连按两次": 2,
+        "Shift后新增": 0,
+        "Shift文字還在": "Shift 不该发"
+      },
+      "05_单聊": {
+        "enterkeyhint": "send",
+        "Gboard形状": 1,
+        "正常回车": 1
+      },
+      "06_授权框": {
+        "enterkeyhint": "send",
+        "answer": 1
+      },
+      "07_报错": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}

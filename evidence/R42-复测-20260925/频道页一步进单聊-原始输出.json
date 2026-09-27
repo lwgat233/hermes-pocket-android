@@ -1,0 +1,187 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R42-复测-频道页一步进单聊": {
+    "check": {
+      "geometry": {
+        "viewport": {
+          "w": 393,
+          "h": 778
+        },
+        "card": {
+          "px": {
+            "x": 12,
+            "y": 408,
+            "w": 369,
+            "h": 59
+          },
+          "dp": {
+            "w": 369.1,
+            "h": 59.5
+          }
+        },
+        "chrow": null,
+        "caretHit": {
+          "px": {
+            "x": 336,
+            "y": 409,
+            "w": 44,
+            "h": 58
+          },
+          "dp": {
+            "w": 44,
+            "h": 58
+          }
+        },
+        "caretHitDevice": {
+          "x": 985,
+          "y": 1339
+        },
+        "cardNameDevice": {
+          "x": 198,
+          "y": 1339
+        },
+        "hitProbe": {
+          "cornerTL": "SPAN.tk-carethit",
+          "cornerTR": "SPAN.tk-carethit",
+          "cornerBL": "SPAN.tk-carethit",
+          "cornerBR": "SPAN.tk-carethit",
+          "center": "SPAN.tk-carethit"
+        }
+      },
+      "afterCaretTap": {
+        "boardsVisible": [
+          "tab-talk"
+        ],
+        "view": "channel",
+        "tab": "channel",
+        "sheet": true,
+        "sayin": false,
+        "titleText": "服务端：还没搭建 —— 点右边「搭服务端」",
+        "bubs": 0,
+        "sendRows": [],
+        "sayCount": 0,
+        "sayArgs": []
+      },
+      "afterNameTap": {
+        "boardsVisible": [
+          "tab-talk"
+        ],
+        "view": "role",
+        "tab": "channel",
+        "sheet": false,
+        "sayin": true,
+        "titleText": "经理（管流程/派活/判报告；不是本人）　在线 · 欠 174",
+        "bubs": 1,
+        "sendRows": [],
+        "sayCount": 0,
+        "sayArgs": []
+      },
+      "beforeEnter": {
+        "boardsVisible": [
+          "tab-talk"
+        ],
+        "view": "role",
+        "tab": "channel",
+        "sheet": false,
+        "sayin": true,
+        "titleText": "经理（管流程/派活/判报告；不是本人）　在线 · 欠 174",
+        "bubs": 1,
+        "sendRows": [],
+        "sayCount": 0,
+        "sayArgs": []
+      },
+      "afterEnter": {
+        "boardsVisible": [
+          "tab-talk"
+        ],
+        "view": "role",
+        "tab": "channel",
+        "sheet": false,
+        "sayin": true,
+        "titleText": "经理（管流程/派活/判报告；不是本人）　在线 · 欠 174",
+        "bubs": 1,
+        "sendRows": [
+          "我 → 经理（管流程/派活/判报告；不是本人） · 已送达 1234ms"
+        ],
+        "sayCount": 1,
+        "sayArgs": [
+          {
+            "role": "owner.me",
+            "body": "R42-一步进单聊-回车",
+            "kind": "private",
+            "by": "me"
+          }
+        ]
+      },
+      "afterTitleTap": {
+        "boardsVisible": [
+          "tab-talk"
+        ],
+        "view": "role",
+        "tab": "channel",
+        "sheet": true,
+        "sayin": true,
+        "titleText": "经理（管流程/派活/判报告；不是本人）　在线 · 欠 174",
+        "bubs": 1,
+        "sendRows": [
+          "我 → 经理（管流程/派活/判报告；不是本人） · 已送达 1234ms"
+        ],
+        "sayCount": 1,
+        "sayArgs": [
+          {
+            "role": "owner.me",
+            "body": "R42-一步进单聊-回车",
+            "kind": "private",
+            "by": "me"
+          }
+        ]
+      },
+      "display": {
+        "cards": [
+          {
+            "role": "home.maid",
+            "sub": "#4 · 女仆（本人通道）"
+          },
+          {
+            "role": "owner.me",
+            "sub": "#6 · owner-me"
+          },
+          {
+            "role": "pipeline.author",
+            "sub": "#10 · pipeline-author"
+          },
+          {
+            "role": "pipeline.renderer",
+            "sub": "#8 · pipeline-renderer"
+          },
+          {
+            "role": "pipeline.tester",
+            "sub": "#5 · pipeline-tester"
+          },
+          {
+            "role": "research.investigator",
+            "sub": "#11 · research-investigator"
+          }
+        ],
+        "sheets": [
+          {
+            "full": "owner.me",
+            "会话行": "#6 · owner-me"
+          },
+          {
+            "full": "pipeline.tester",
+            "会话行": "#5 · pipeline-tester"
+          },
+          {
+            "full": "home.maid",
+            "会话行": "#4 · 女仆（本人通道）"
+          }
+        ]
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

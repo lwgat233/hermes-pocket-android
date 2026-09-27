@@ -1,0 +1,37 @@
+R-42 第 2 步「界面改动与出包」—— 频道页一步进单聊 结论与读数
+角色 pipeline.renderer · 2026-09-25 · 构件 hermes-pocket-R42-频道页一步进单聊-20260925.apk
+依据：派活 #1354（作者定位 #1346；口径＝只做 ①，②③ 归 R-44 决定书，本轮不许顺手加）
+
+== 本次我改了什么（两个文件）==
+1) `assets/ui/talk.js` · `roleCard()`：
+   · 卡片单击 `openRoleSheet(r.full_name)` → **`openRole(r.full_name)`**（**一步直接进单聊**）；
+   · 信息窗入口挪到**卡片右侧箭头热区**：新增 `<span class="tk-carethit" data-testid="talk-rolecaret">`，
+     挂在卡片右缘（`position:absolute; right:0; top:0; bottom:0; width:44px; min-height:44px`），
+     点它 `e.stopPropagation()` 后 `openRoleSheet(...)`；**箭头符号 `›` 还是 row1 里那个 `.tk-caret`**（视觉没变）。
+2) `assets/ui/talk.css`：新增 `.tk-carethit`（透明热区，不占排版、不撑高卡片）；`.tk-chrow` 加 `align-items:center; min-height:44px`
+   （现状 36px → 44px，照 R-33 硬线）。
+3) **没做**（按口径）：② 「频道（N）」那行的点击/标注（归 R-44 决定书）、③ 频道页自带"跟谁说"输入条（同一份决定书）。
+   **没碰**单聊页（`paintRole` / `#tk-sayline` / 抬头 `.tk-title`）、没碰 R-31/R-36 发送状态机、没碰 R-26 缓存。
+
+== 读数（本地测试台真点；原始 JSON 同目录 t-r42-cardtap-原始输出.json）==
+① **点卡片几步进单聊 = 1 步**：点卡片名称那片（卡片左半边）→ 直接进单聊页（`#tk-sayin` + 发送键 `#tk-sayok` 都在，`talk.thread` 请求 1 次），**信息窗没弹**（`#tk-sheet` 不存在）；改前这一步是"弹信息窗"，要进单聊还得再点一次。
+② **箭头热区**：`44 × 78 px`（宽 44、高＝整卡高；卡高 80px，热区 `absolute` 不撑高卡片）；
+   热区四角 + 中心 5 点用 `elementFromPoint` 复验**全部命中热区自己**（照 R-33 的坑先 `scrollIntoView`），箭头符号 `›` 仍在；≥44dp ✓
+③ **点头部开信息窗仍好使（R-37 回归）**：在单聊页点抬头 `.tk-title` → 信息窗开、6 行、会话行 `#6 · owner-me` ✓
+④ **点箭头开信息窗**：弹窗 6 行、会话行 `#6 · owner-me`、**仍在频道页**（没进单聊）✓
+⑤ **R-40 不受影响**：卡片副行仍 `#6 · owner-me` ✓；**入口改动说明（给 R-40 复测口径）：看信息窗从"点卡片"改成"点卡片右缘箭头（44px 宽热区）"**
+⑥ `.tk-chrow` 高度：2 行均 **44px**（改前 36px）✓
+⑦ pageerror + console.error **0 条** ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R42-频道页一步进单聊-20260925.apk（5090579 字节）
+整包 sha256：92aaeb24639cef392c45216a61eba5772ab3c4be005ba9057a475c529dc24098
+包内 assets/build-info.json：testVersion=unified-20260925-094957 · builtAt=2026-09-25 09:49 CST · featureId=R-42
+本次改动文件 sha256（**包内 == 源树，逐字节**）：
+  ui/talk.js   db4d5de93b495176b5e3fd757fb5e821e22c183c9f66d2b90ba516dbece3d61b
+  ui/talk.css  e1503184e19447b20498313645515c5a852f99160f1532f7d97be430515bd474
+复核：stamp-build.py --verify <apk> → PASS 包内 ↔ 源树 对账（整树）
+
+== 没验的（未验 ≠ 通过）==
+真机复测归 tester 第 3 步；判据＝从频道页**一步**进到能给人发消息（发出后 App 出自己气泡）；
+另按上面 ⑤ 的入口变化复看 R-40 的信息窗读数（箭头打开）。

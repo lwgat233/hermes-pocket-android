@@ -1,0 +1,49 @@
+# R-39 复测结论（末条不被压 · pipeline.tester · 2026-09-25）
+
+对象：`apk/测试版/hermes-pocket-R39-末条不被压-20260925.apk`
+整包 sha256 = a88a6e966a43ba4f0dbbbc62230f7546881ce3e6a11861661c1b36b358a030af · 5,090,985 字节（与派活单一致）
+包内 `assets/ui/talk.js` sha256 前 16 位 = **32a24df71572158a**、`assets/ui/talk.css` = **09d999e278a7e916**（与派活单一致）
+包内 build-info：testVersion=unified-20260925-101410 / builtAt=2026-09-25 10:14 CST / featureId=R-39
+改动面（包内核对）：`talk.css:29` `#tk-chat { padding-bottom: calc(var(--sayline-h,68px) + var(--safe-b,0px) + 8px) }`；
+`talk.js:1156-1162` `paintRole` 量一次粘性条高写进 `:root` 的 `--sayline-h`；**未动外层 `.panel-body`**；群聊流不套 id 选择器。
+设备：emulator-5554 / Android 14 / AVD hpk34 · 装包 Success · 真触摸（`adb shell input tap` / `input keyevent 66` / `input text`）
+
+**本次测了 3 块**：主块 ① 聊天页-单聊（本次改动面）＋ 跨块 ② 聊天页-群聊 ＋ 跨块 ⑧ 频道页。
+**跨测理由**：这一轮改的是**共用滚动容器**上的 padding（选择器从 `.tk-chat` 收窄成 `#tk-chat`）——
+群聊流的容器**有同一个 class 但没有 id**，所以必须实测"群聊流没被多塞空档"；频道页是因为 R-42 刚把入口挪了，得确认没被样式改动带坏。
+
+## 1) 核心判据：**只滚内层**到底 → 点末条气泡 → 能开信息窗 ✔
+· 只滚内层 `#tk-chat`：`scrollTop 4655 / 上限 4654`（真到底，**没碰外层 `.panel-body`**；外层本轮的 scrollTop 一直 0）
+· 末条气泡（`tk-bub him`，「pipeline.author → 我…」）：rect top **426** / bottom **498**
+· 粘性条 `#tk-sayline`：top **510** ⇒ **重叠 0px**、间隙 **12px**
+· `scrollIntoView({block:'nearest'})` 后再测：末条 rect 426..498、`elementFromPoint` 命中 **`DIV.`（hay=气泡自己/子节点 `hitSelf=true`）** ✓
+· **真触摸末条气泡**（设备 289,1405）→ **`#tk-sheet` 真开**，信息窗「全名 = pipeline.author」✓
+（第一次跑的脚本把末条选成了**我自己的气泡**（thread 末项是 `me`），点它不开窗是**预期**（R-37 B 只给非本人气泡挂点击）—— 改成末条＝他说的之后即绿，如实记。）
+
+## 2) 三读数（照抄）
+| # | 量 | 读数 |
+|---|---|---|
+| ① | 末条下沿 vs `#tk-sayline` 上沿 | 498 vs 510 → **重叠 0px**（滚到底前后一致） |
+| ② | `scrollIntoView(nearest)` 后 `elementFromPoint` | 命中 **气泡自己/其子节点**（`hitSelf=true`），不是被粘性条或输入框吃掉 |
+| ③ | `#tk-chat` 的 `padding-bottom` 与 `--sayline-h` | padding-bottom = **68px** ＝ `calc(--sayline-h 60px + --safe-b 0px + 8px)`；`--sayline-h` 实测 **60px**（粘性条实测高也是 60px）⇒ **随条高走，不是写死数字** |
+补充：`--safe-b` = 0px（模拟器无安全区）；群聊流 `#tk-stream` 的 `padding-bottom` = **0px** ✓（它有 `.tk-chat` class、没有 id ⇒ id 选择器不命中，正是渲染者收窄选择器的目的）
+群聊末条气泡 140..212 vs `#composer` top 594 → **重叠 0** ✓
+
+## 3) 回归
+· **跨块②群聊**：`#tk-stream padding-bottom = 0px`；末条不被 `#composer` 压（重叠 0）；气泡正常渲染 ✓
+· **跨块⑧频道页（R-42 入口）**：卡片副行照旧；`.tk-carethit` = **44×61**（`elementFromPoint` 命中 `SPAN.tk-carethit`）；真触摸热区 → **信息窗开且仍在频道页**（`view=channel`）；真触摸卡片名字 → **一步进单聊**（`view=role`、输入框在）✓
+· **R-41 链顺手复核**：真输入法打字（`input text`）后真按键回车 → **`talk.say` 1 次**（body `R39c-ime-enter`）+ 状态行「我 → 功能创造者 · **已送达 3329ms**」+ 界面重画 ✓
+· 常驻按键：`#keybar` **16** 键、`#composer` 2 键；**0 未捕获异常 / 0 console.error**（3 份原始输出 json 的 `pageErrors` 均为空）
+
+## 4) 派活点名的两条读数（如实报）
+· **`document.querySelectorAll("#tk-sayin").length = 2`**（真机；作者本机台读的是"无重复 id"）——
+  首屏是**双份渲染**：气泡 18 = 9 条 ×2、输入框 2 个；任一次重画后恢复单份（重画后气泡 10 条）。
+  **不是本轮样式改动引入**（R32/R41 两轮我都读到过 2 个），影响：`document.querySelector('#tk-sayin')` 取到的是**下面那份**，
+  而**点得着、能打字的是上面那份**（`activeElement` 是文档顺序第 2 个）——
+  自动化/取元素要按"最上面那个"取（我第一版给错那份赋值，就白跑出一遍"回车没反应"的假红）。
+· **数行限定在可见的 `#tk-sends` 容器**：页里有 2 个 `#tk-sends`（其中一个 0 高、不显示），跨容器数行会把 1 条数成 2 条 —— 本次所有行读数都是**只看可见容器**得到的。
+
+## 未验（不接主机，未验 ≠ 通过）
+「对方会话条数 +1」照旧未验（App 的 rpc 到原生传输层就出不了本机；口径参照见 `evidence/R41-复测2-20260925/对方会话条数口径-参照.txt`）。
+
+证据：末条不被压-原始输出.json · 补测-末条他说气泡与回车链-原始输出.json · 补测2-回车链-原始输出.json

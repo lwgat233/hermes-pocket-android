@@ -1,6 +1,6 @@
 /* 频道页（多角色）：样式跟「主机」页保持一致 —— 复用 style.css 里的 .card / .row-item */
 .tk-row { display: flex; gap: 8px; padding: 8px 2px; flex-wrap: wrap; }
-.tk-chip { background: #1b1f27; color: #cfd3dd; border: 1px solid #2a2f3a; border-radius: 999px; padding: 6px 12px; font-size: 13px; }
+.tk-chip { background: #1b1f27; color: #cfd3dd; border: 1px solid #2a2f3a; border-radius: 999px; padding: 6px 12px; font-size: 13px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 .tk-chip.on { background: #2b6cff; color: #fff; border-color: #2b6cff; }
 .tk-backchip { align-self: center; display: block; margin: 6px auto 0; font-size: 12px; }
 .tk-sends { display: flex; flex-direction: column; gap: 4px; margin: 6px 0 2px; }
@@ -22,13 +22,20 @@
 .tk-rolecard.online .tk-dot { background: #46d17a; }        /* 在线＝会话活着且没被停 */
 .tk-rolecard.paused .tk-dot { background: #d1a246; }
 .tk-caret { color: #6b7280; font-size: 15px; }
+/* R-39（乙案）：粘性底部条（#tk-sayline）会压住末条气泡 —— 内层滚动容器留出「条高 + 安全区 + 8px」的底部内边距。
+ * 条高由 paintRole 量一次写进 :root 的 --sayline-h（默认 68px 兜底，字号/安全区变了也不会失配）。
+ * 只作用于**单聊页那个内层容器**（#tk-chat）；群聊流（.tk-chat 但没有 id）里没有粘性条，不给它多加空档。
+ * 共用规则（SPEC §10）：凡「粘性/固定底部条」，上方滚动内容都要留 calc(条高 + var(--safe-b)) 的底部内边距。 */
+#tk-chat { padding-bottom: calc(var(--sayline-h, 68px) + var(--safe-b, 0px) + 8px); }
+/* R-42：卡片右缘的「信息窗」热区（≥44dp，照 R-33 硬线）——透明块，不占排版、不撑高卡片 */
+.tk-carethit { position: absolute; right: 0; top: 0; bottom: 0; width: 44px; min-height: 44px; }
 .tk-badge { margin-left: 8px; background: #2b6cff; color: #fff; border-radius: 999px; padding: 0 6px; font-size: 12px; }
 .tk-tag { font-size: 11px; color: #8ea0ff; background: #2b6cff1a; border-radius: 999px; padding: 1px 7px; }
 
 /* 频道（可折叠） */
 .tk-sec { width: 100%; }
 .tk-exp { padding: 2px 2px 6px; }
-.tk-chrow { display: flex; gap: 10px; padding: 8px 10px; background: #171a21; border: 1px solid #232833;
+.tk-chrow { display: flex; align-items: center; min-height: 44px; gap: 10px; padding: 8px 10px; background: #171a21; border: 1px solid #232833;
   border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
 .tk-chname { color: #e6e8ee; flex: 0 0 auto; font-family: var(--font-mono, monospace); }
 .tk-chwho { color: #8b93a5; flex: 1 1 auto; text-align: right; }
@@ -40,10 +47,10 @@
 .tk-askbody { color: #cfd3dd; font-size: 13px; margin-bottom: 8px; white-space: pre-wrap; }
 .tk-askline { display: flex; gap: 8px; }
 .tk-askin { flex: 1; background: #12141a; color: #e6e8ee; border: 1px solid #2a2f3a;
-  border-radius: 8px; padding: 9px 10px; font-size: 14px; }
+  border-radius: 8px; padding: 9px 10px; font-size: 14px; min-height: 44px; }
 
 .tk-acts { display: flex; gap: 8px; padding: 10px 2px; flex-wrap: wrap; }
-.tk-act { background: #2b6cff; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.tk-act { background: #2b6cff; color: #fff; border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; min-height: 44px; }
 .tk-hist { display: flex; flex-direction: column; gap: 6px; }
 .tk-hist-row { background: #171a21; color: #cfd3dd; border: 1px solid #232833; border-radius: 8px;
   padding: 9px 10px; font-size: 13px; text-align: left; }
