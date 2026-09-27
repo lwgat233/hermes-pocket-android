@@ -1,0 +1,75 @@
+# hermes-pocket 终端回车 第 1 步 · 复测结论（pipeline.tester · 2026-09-27）
+
+对象：`apk/测试版/hermes-pocket-汇总-20260926.apk`（整包 sha256 前 16 = f50cc6b230c06c10 · 5,091,338 字节 · build `unified-20260926-183153` · 零代码改动）
+设备：无头 Android 14（emulator-5554，容器 notifbridge-emu）· **不改一行代码**（本轮只量）
+
+**本次只测了一块：终端页**（主块）。理由：被判面就是终端页那条输入（`#cinput`）与键条「⏎」；
+聊天页三处（`#tk-sayin`/`#tk-shoutin`/`.tk-askin`）本轮**只作对照读数**（`enterkeyhint` / R-41 那套兜底），不重复判它 —— 那三条 R-41/R-45 已验过。
+
+## 取证方式（为什么不是 `capture-pane`）
+本机 tmux 3.3a 下 `capture-pane -p` 对 pane 屏幕**反复读到空白**（新建会话、`cat -A`、`printf MARKER` 都读不到内容），
+⇒ 改用**更硬的一种**：靶子会话里跑逐字节记录程序（`stty -echo -icanon -icrnl` + 逐字节落盘），
+`0x0D` 有没有、有几个**直接看得到**；App 侧全部用 `adb shell input tap / input text / keyevent` 真触摸真按键。
+靶子连接链（也给读数）：App 里建测试主机 → SSH 到**临时 sshd（仅 127.0.0.1:2222、独立 authorized_keys）**→ `bash -l` → 自动 attach 到一次性会话 `a-r47probe`（该会话里就是逐字节记录程序）。
+**没动 NAS 的 `~/.ssh/authorized_keys`：7 条、mtime 2026-09-21 20:41:42，全程未变。**
+
+## 判据（原派活）：逐字节日志原文 `evidence/终端回车-20260927/靶子逐字节日志-原始.log`
+
+| 步骤 | 期望 | 实测（字节） | 结论 |
+|---|---|---|---|
+| 攒着模式打字 + 点「**写入**」 | 只送字符、不带回车 | `R47PROBE1` **9 字节**（0x52/0x34/0x37/0x50/0x52/0x4F/0x42/0x45/0x31），**0 个 0x0D** | ✓ |
+| 点键条「**⏎**」 | 发一个回车 | **恰好 1 个 0x0D** | ✓ |
+| 实时模式点 composer 的「**⏎**」（空框） | 一次回车 = 一个回车（不是 2） | **恰好 1 个 0x0D** | ✓ |
+| 全程 0x0D 合计 | 2（上两步各 1） | **2** | ✓ |
+
+## R-48 现状三量（本人加的，优先级最高）
+
+### ① 软键盘 Enter 到底触发没有 —— **判红**
+- 事件序列（真机 IME 注入 + 页面采集，`R48-软键盘回车-事件序列.json`，180 条）：
+  - 打字：`keydown(key=Y, kc=89, isComposing=true)` → `beforeinput(inputType=insertText, data=Y)` → `input(insertText)` → `keyup(keyup, isComposing=true)`
+  - **回车：只有 `keydown(key=Enter, kc=13, isComposing=true)` + `keyup(Enter, kc=13, isComposing=true)`；`beforeinput` / `input` 一条都没有**
+- 靶子收到：**实时模式下打的字与回车"一共 0 字节"**（框里留着 `Y47IME`，一个字节都没进终端）
+- 攒着模式下软回车：靶子收到 `Z47IME`（6 字节）**0 个 0x0D** ⇒ 只是"写入"，不是"提交"
+- `enterkeyhint`：终端页 `#cinput` = **null（没设）**；聊天页三处由 `talk.js:197` 设 `enterkeyhint='send'`（对照）
+- ⇒ **软键盘上的回车，在这台真机上既发不出 `\r`、也不能提交** ✗
+
+### ② 应用内键条「⏎」是否真发 `\r` —— **✓**（R-24 口径未退化，逐字节见上表）
+
+### ③ 输入法弹出时键位会不会被顶掉 —— **没被顶掉**（`R48-键盘弹出-键位几何.json`）
+键盘弹出：`visualViewport.height` 778 → **499**（键盘占 279 css/dp）
+
+| 控件 | 尺寸（css px = dp） | 设备坐标（点它的位置） | `elementFromPoint` 命中 | 在可视区 |
+|---|---|---|---|---|
+| 输入框 `#cinput` | **257×38** | (529, 1173) | `TEXTAREA#cinput` | ✓ |
+| 「写入/⏎」`#csend` | **60×38** | (981, 1174) | `BUTTON#csend` | ✓ |
+| 键条「⏎」 | **44×40** | (1003, 1316) | `BUTTON.key` | ✓ |
+（键条可见 16 键；三者都 ≥44dp 高或宽符合既有口径）
+**副作用读数（本轮踩到）**：键盘弹起会把整条输入区**整体上移约 145dp** —— 用"键盘未弹起时量到的坐标"去点会点空（我第一次就点空了，日志里 0 字节）。
+⇒ 结论：**不是"被键盘顶掉/点不到"，而是坐标会随键盘变化，量完再点。**
+
+## 其它读数
+- **0 未捕获异常 / 0 console.error**（harness 的 `Runtime.exceptionThrown` 全程 0）
+- rpc 计数（`rpc计数.json`）：本轮全部操作只产生 **1 次** `pref.set`（切模式）；**`talk.*` = 0、`bridge/tmux/key/host` 相关 = 0** ⇒ 终端页这条链走 SSH，不经过这些 RPC
+- 输入框节点核对（`输入框节点与重复id核对.json`）：`#cinput`/`#csend`/`#cmode` **各只有 1 个**（没有 R-32 那种重复 id）；但**页面重渲染会换掉节点**（我装的采集器在几步之后 `hookedStillInDom=false`）—— 自动化取元素要每次重取，不能缓存引用
+
+## 未验（未验 ≠ 通过）
+- **中文键盘**：模拟器里只有 Gboard 英语布局，切不到中文键盘 ⇒ 中文键盘下键位是否同样不被顶掉：**未验**
+- `capture-pane` 屏幕原文：本机 tmux 3.3a 下读到空白（已改逐字节日志替代）
+- 真机＋真平台的端到端：不接主机那几条照旧
+
+## 候选（供经理/本人拍，本轮不做）
+- **A**：终端页复用 R-41 那套（`enterkeyhint='send'` + keydown/keyup/beforeinput 三条兜底 + 防重复闸）把软键盘回车接成发 `\r`。本轮的额外约束读数：**回车这一下没有 `beforeinput` 可用**，只能靠 `keyup(Enter, kc=13)`；且现有实时主路有 `composing / e.isComposing / kc===229` 三道守卫，这台 IME 的 keydown **一律 `isComposing=true`**（这也是"实时输入整条不通"的原因），A 案必须同时处理这个。
+- **B**：只保留应用内「⏎」但把显式可点的回车键位放到显眼处（键条 ⏎ 44×40dp 已达标、已验证真发 `\r`；composer 的 ⏎ 也达 60×38dp）。
+- **C**：两者都做。
+
+## 清理读数（已全部清掉）
+- 靶子会话 `a-r47probe` 已 kill（`tmux list-sessions` 只剩 `hermes`、`roles`，均未动）
+- 临时 sshd 已停（`2222` 监听数 = 0）、`/tmp/r47probe-sshd` 已删
+- App 里的测试主机 `靶机-r47` 与测试密钥 `r47probe` 已删（现存仍只有 `复验主机` / `verify-key`）
+- NAS `~/.ssh/authorized_keys`：**7 条、mtime 2026-09-21 20:41:42**（与开工前一致）
+
+## 证据文件
+`evidence/终端回车-20260927/`：
+`靶子逐字节日志-原始.log`（逐字节，含 0x0D）· `R48-软键盘回车-事件序列.json` · `R48-键盘弹出-键位几何.json` ·
+`R48-enterkeyhint对照.json` · `输入框节点与重复id核对.json` · `rpc计数.json` · `清理-App侧.json` / `清理-App侧-第二次.json` / `清理-App侧-最终.json`
+驱动脚本：`/vol1/1000/aicache/tmp/r47-{drive,bytes2,t15,full,reconnect}.py`、`r47-probe.py`、`r47-sshd-up.sh`；页面探针在 `tools/验收脚本/r47-*-20260927.mjs`

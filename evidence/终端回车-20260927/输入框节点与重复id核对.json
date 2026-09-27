@@ -1,0 +1,40 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r47-dup-check": {
+    "check": {
+      "ids": {
+        "cinput": 1,
+        "csend": 1,
+        "cmode": 1,
+        "keybar": 1,
+        "composer": 1
+      },
+      "hookedSameAsCurrent": false,
+      "hookedStillInDom": false,
+      "curInDom": true,
+      "allCinputs": [
+        {
+          "tag": "TEXTAREA",
+          "inDom": true,
+          "visible": true,
+          "rect": {
+            "x": 64,
+            "y": 359,
+            "w": 257,
+            "h": 38
+          },
+          "sameAsActive": true,
+          "value": "Y47IME"
+        }
+      ],
+      "activeElement": "TEXTAREA#cinput",
+      "allCsends": [
+        {
+          "visible": true,
+          "label": "⏎"
+        }
+      ],
+      "composerHTMLHead": "\n    <button id=\"cmode\" title=\"实时＝敲一个字就送进终端；攒着＝写完点发送整行送\" class=\"on\">实时</button>\n    <textarea id=\"cinput\" rows=\"1\" placeholder=\"实时输入：敲一个字就送进终端（和点功能键条一样）\" autocapitalize=\"off\" autocorrect=\"off\" spellch"
+    }
+  }
+}

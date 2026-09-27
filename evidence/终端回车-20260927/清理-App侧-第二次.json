@@ -1,0 +1,15 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r47-cleanup-app": {
+    "check": {
+      "deletedHost": "靶机-r47",
+      "deletedKey": "r47probe",
+      "hostsAfter": [
+        "复验主机"
+      ],
+      "keysAfter": [
+        "verify-key"
+      ]
+    }
+  }
+}

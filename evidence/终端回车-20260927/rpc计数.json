@@ -1,0 +1,14 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r47-rpc-count": {
+    "check": {
+      "n": 1,
+      "talk": 0,
+      "bridge": 0,
+      "ops": [
+        "pref.set"
+      ],
+      "wrapped": true
+    }
+  }
+}

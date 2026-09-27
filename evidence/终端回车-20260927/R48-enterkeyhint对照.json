@@ -1,0 +1,14 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r47-r48-probe": {
+    "check": {
+      "termInput": {
+        "enterkeyhint": null,
+        "inputmode": null,
+        "tag": "TEXTAREA"
+      },
+      "chatInput": null,
+      "chatInputsInDom": 0
+    }
+  }
+}
