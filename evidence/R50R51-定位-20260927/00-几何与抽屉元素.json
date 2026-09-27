@@ -1,0 +1,170 @@
+{
+ "geometry": {
+  "screenX": 0,
+  "screenY": 136,
+  "dw": 1080,
+  "dh": 2138,
+  "iw": 393,
+  "ih": 778,
+  "dpr": 2.75
+ },
+ "drawer": {
+  "n": 14,
+  "rows": [
+   {
+    "act": null,
+    "id": "btn-panel",
+    "txt": "☰",
+    "box": [
+     6,
+     4,
+     34,
+     32
+    ]
+   },
+   {
+    "act": null,
+    "id": "btn-keys",
+    "txt": "⌨",
+    "box": [
+     313,
+     4,
+     34,
+     32
+    ]
+   },
+   {
+    "act": null,
+    "id": "btn-immersive",
+    "txt": "⛶",
+    "box": [
+     353,
+     4,
+     34,
+     32
+    ]
+   },
+   {
+    "act": null,
+    "id": "btn-drawer-close",
+    "txt": "‹",
+    "box": [
+     274,
+     50,
+     20,
+     23
+    ]
+   },
+   {
+    "act": null,
+    "id": "btn-board-list",
+    "txt": "☰",
+    "box": [
+     12,
+     50,
+     28,
+     26
+    ]
+   },
+   {
+    "act": null,
+    "id": "btn-close-panel",
+    "txt": "✕",
+    "box": [
+     352,
+     50,
+     29,
+     26
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "立刻省电一次",
+    "box": [
+     25,
+     3734,
+     113,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "立刻退出省电",
+    "box": [
+     146,
+     3734,
+     113,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "刷新状态",
+    "box": [
+     268,
+     3734,
+     85,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "申请通知权限",
+    "box": [
+     25,
+     3852,
+     113,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "打开系统通知设置",
+    "box": [
+     146,
+     3852,
+     141,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "发一条测试通知",
+    "box": [
+     25,
+     3904,
+     127,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "看明细",
+    "box": [
+     25,
+     4378,
+     71,
+     44
+    ]
+   },
+   {
+    "act": null,
+    "id": null,
+    "txt": "清理",
+    "box": [
+     104,
+     4378,
+     57,
+     44
+    ]
+   }
+  ]
+ }
+}

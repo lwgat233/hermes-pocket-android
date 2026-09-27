@@ -1,0 +1,138 @@
+{
+ "calls": {
+  "talk.roles": {
+   "n": 2,
+   "ms": 0,
+   "sample": null
+  },
+  "ping": {
+   "n": 1,
+   "ms": 0,
+   "sample": null
+  },
+  "talk.since": {
+   "n": 1,
+   "ms": 0,
+   "sample": null
+  }
+ },
+ "talkState": {
+  "view": "channel",
+  "sel": null,
+  "rolesLen": 6,
+  "roles": [
+   {
+    "id": "maid",
+    "name": "maid",
+    "state": "running"
+   },
+   {
+    "id": "me",
+    "name": "me",
+    "state": "running"
+   },
+   {
+    "id": "author",
+    "name": "author",
+    "state": "running"
+   },
+   {
+    "id": "renderer",
+    "name": "renderer",
+    "state": "running"
+   },
+   {
+    "id": "tester",
+    "name": "tester",
+    "state": "running"
+   },
+   {
+    "id": "investigator",
+    "name": "investigator",
+    "state": "running"
+   }
+  ],
+  "sessionsLen": 0,
+  "groupsLen": 0
+ },
+ "overlayHidden": false,
+ "tabpages": [
+  {
+   "id": "tab-hosts",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 4,
+   "box": null
+  },
+  {
+   "id": "tab-keys",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 4,
+   "box": null
+  },
+  {
+   "id": "tab-settings",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 7,
+   "box": null
+  },
+  {
+   "id": "tab-hermes",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 4,
+   "box": null
+  },
+  {
+   "id": "tab-sessions",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 0,
+   "box": null
+  },
+  {
+   "id": "tab-net",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 0,
+   "box": null
+  },
+  {
+   "id": "tab-talk",
+   "cls": "tabpage on",
+   "vis": false,
+   "kids": 0,
+   "box": null
+  },
+  {
+   "id": "tab-group",
+   "cls": "tabpage",
+   "vis": false,
+   "kids": 0,
+   "box": null
+  }
+ ],
+ "panelBodyKids": [
+  "section#tab-hosts.tabpage",
+  "section#tab-keys.tabpage",
+  "section#tab-settings.tabpage",
+  "section#tab-hermes.tabpage",
+  "section#tab-sessions.tabpage",
+  "section#tab-net.tabpage",
+  "section#tab-talk.tabpage",
+  "section#tab-group.tabpage"
+ ],
+ "tkChat": 0,
+ "tkBub": 0,
+ "tkSayin": 0,
+ "tkRoleCards": 0,
+ "drawerVisible": {
+  "cls": "",
+  "vis": true,
+  "btns": [
+   "‹@vis"
+  ]
+ }
+}

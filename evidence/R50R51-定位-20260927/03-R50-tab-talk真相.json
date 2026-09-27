@@ -1,0 +1,79 @@
+{
+ "tabTalk": {
+  "cls": "tabpage on",
+  "children": 0,
+  "childTags": [],
+  "text": "",
+  "html": "",
+  "style": {
+   "display": "block",
+   "visibility": "visible",
+   "height": "0px",
+   "overflow": "visible",
+   "position": "static",
+   "zIndex": "auto"
+  },
+  "box": [
+   12,
+   97,
+   369,
+   0
+  ]
+ },
+ "overlay": {
+  "cls": "",
+  "style": {
+   "display": "flex",
+   "visibility": "visible",
+   "height": "311.466px",
+   "overflow": "hidden",
+   "position": "absolute",
+   "zIndex": "40"
+  },
+  "box": [
+   0,
+   40,
+   393,
+   311
+  ],
+  "kids": [
+   "div.panel-head",
+   "div.panel-body"
+  ]
+ },
+ "stage": {
+  "style": {
+   "display": "block",
+   "visibility": "visible",
+   "height": "311.466px",
+   "overflow": "hidden",
+   "position": "relative",
+   "zIndex": "auto"
+  },
+  "box": [
+   0,
+   40,
+   393,
+   311
+  ]
+ },
+ "panelBody": {
+  "style": {
+   "display": "block",
+   "visibility": "visible",
+   "height": "264.739px",
+   "overflow": "auto",
+   "position": "static",
+   "zIndex": "auto"
+  },
+  "box": [
+   0,
+   87,
+   393,
+   265
+  ],
+  "kids": 8
+ },
+ "tkChatAnywhere": 0,
+ "visibleText": "☰ 靶机-r47 TUI·鼠标 48×17 5348ms ↓ 5.1K ⌨ ⛶ <CR>R47PROBE<CR>Y47IMEZ47IME [a-r47prob<python3*\"galaxy-fnos\" 22:03 27-Sep-26 Hermes Pocket ‹ 连接 主机 地址 / 用户 / 启动命令 密钥 生成 / 导入 / 装到服务器 设置 字号 / 回滚 / 省电 / 通知 会话 远端 tmux 会话 · 点一下就切过去（永不终止） Hermes 技能与记忆 远端"
+}

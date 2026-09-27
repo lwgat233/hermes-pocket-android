@@ -1,0 +1,183 @@
+{
+ "view": "channel",
+ "sel": null,
+ "msgsLen": 2007,
+ "tabTalkChildren": 21,
+ "tkChat": 0,
+ "chatBox": null,
+ "chatScroll": null,
+ "bub": 0,
+ "bubTexts": [],
+ "tkSayin": 0,
+ "sayinBox": null,
+ "saylineBox": null,
+ "inputs": [
+  {
+   "id": null,
+   "ph": "",
+   "box": [
+    166,
+    234,
+    8,
+    17
+   ]
+  },
+  {
+   "id": "cinput",
+   "ph": "攒着输入：写完点「写入」把这段送进终端（",
+   "box": [
+    64,
+    637,
+    257,
+    38
+   ]
+  }
+ ],
+ "buttons": [
+  {
+   "txt": "实时",
+   "id": null,
+   "box": [
+    14,
+    105,
+    51,
+    44
+   ]
+  },
+  {
+   "txt": "含私信 🔒",
+   "id": null,
+   "box": [
+    73,
+    105,
+    84,
+    44
+   ]
+  },
+  {
+   "txt": "可爱女仆（个人助手：管生活，把要",
+   "id": null,
+   "box": [
+    12,
+    246,
+    369,
+    82
+   ]
+  },
+  {
+   "txt": "我（经理：能管流程，但看不到私信",
+   "id": null,
+   "box": [
+    12,
+    358,
+    369,
+    59
+   ]
+  },
+  {
+   "txt": "功能创造者43›#10 · pi",
+   "id": null,
+   "box": [
+    12,
+    448,
+    369,
+    59
+   ]
+  },
+  {
+   "txt": "渲染者33›#8 · pipel",
+   "id": null,
+   "box": [
+    12,
+    515,
+    369,
+    59
+   ]
+  },
+  {
+   "txt": "测试者37›#5 · pipel",
+   "id": null,
+   "box": [
+    12,
+    583,
+    369,
+    59
+   ]
+  },
+  {
+   "txt": "调查者（调研与功能分析，不改代码",
+   "id": null,
+   "box": [
+    12,
+    672,
+    369,
+    59
+   ]
+  },
+  {
+   "txt": "＋ 新角色",
+   "id": "tk-addrole",
+   "box": [
+    12,
+    740,
+    87,
+    44
+   ]
+  },
+  {
+   "txt": "频道（1）▸",
+   "id": "tk-channels-toggle",
+   "box": [
+    12,
+    790,
+    369,
+    44
+   ]
+  },
+  {
+   "txt": "🗣 全体喊话",
+   "id": null,
+   "box": [
+    14,
+    850,
+    105,
+    44
+   ]
+  },
+  {
+   "txt": "＋ 新对话（只对我）",
+   "id": null,
+   "box": [
+    127,
+    850,
+    157,
+    44
+   ]
+  }
+ ],
+ "counters": {
+  "renders": {
+   "onShow": 4,
+   "render": 6,
+   "refreshRoles": 6,
+   "paintChannel": 6,
+   "paintSends": 6
+  },
+  "rpc": {
+   "talk.roles": 8,
+   "talk.asks": 5,
+   "talk.sessions": 6,
+   "talk.since": 39,
+   "talk.doctor": 3,
+   "pref.set": 8,
+   "ping": 5,
+   "talk.hermesSessions": 3,
+   "host.list": 2,
+   "host.delete": 1,
+   "key.list": 2,
+   "key.delete": 1,
+   "app.notify": 1
+  },
+  "errors": []
+ }
+}

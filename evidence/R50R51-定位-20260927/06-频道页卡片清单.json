@@ -1,0 +1,68 @@
+[
+ {
+  "txt": "可爱女仆（个人助手：管生活，把要紧的话中转给我）371›#4 · 女仆（本人通道）接入频道：qqbot",
+  "head": "可爱女仆（个人助手：管生活，把要紧的话中转给我）371›",
+  "cls": "card tk-rolecard online",
+  "box": [
+   12,
+   246,
+   369,
+   82
+  ]
+ },
+ {
+  "txt": "我（经理：能管流程，但看不到私信内容）258›#6 · owner-me",
+  "head": "我（经理：能管流程，但看不到私信内容）258›",
+  "cls": "card tk-rolecard online",
+  "box": [
+   12,
+   358,
+   369,
+   59
+  ]
+ },
+ {
+  "txt": "功能创造者43›#10 · pipeline-author",
+  "head": "功能创造者43›",
+  "cls": "card tk-rolecard online",
+  "box": [
+   12,
+   448,
+   369,
+   59
+  ]
+ },
+ {
+  "txt": "渲染者33›#8 · pipeline-renderer",
+  "head": "渲染者33›",
+  "cls": "card tk-rolecard online",
+  "box": [
+   12,
+   515,
+   369,
+   59
+  ]
+ },
+ {
+  "txt": "测试者37›#5 · pipeline-tester",
+  "head": "测试者37›",
+  "cls": "card tk-rolecard online",
+  "box": [
+   12,
+   583,
+   369,
+   59
+  ]
+ },
+ {
+  "txt": "调查者（调研与功能分析，不改代码）16›#11 · research-investigator",
+  "head": "调查者（调研与功能分析，不改代码）16›",
+  "cls": "card tk-rolecard online",
+  "box": [
+   12,
+   672,
+   369,
+   59
+  ]
+ }
+]

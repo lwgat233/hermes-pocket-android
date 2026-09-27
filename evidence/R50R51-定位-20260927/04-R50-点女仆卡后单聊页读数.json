@@ -1,0 +1,72 @@
+{
+ "view": "channel",
+ "sel": null,
+ "msgsLen": 2007,
+ "tabTalkChildren": 21,
+ "tabTalkTags": [
+  "div.tk-row",
+  "div#tk-serverline.tk-title",
+  "button#tk-setupbtn.tk-chip",
+  "div.tk-title",
+  "div.tk-scene",
+  "button.card",
+  "div.tk-scene",
+  "button.card"
+ ],
+ "tkChat": 0,
+ "bub": 0,
+ "bubTexts": [],
+ "tkSayin": 0,
+ "sayinBox": null,
+ "sayline": 0,
+ "inputs": [
+  {
+   "tag": "textarea",
+   "id": null,
+   "ph": null,
+   "box": [
+    166,
+    234,
+    8,
+    17
+   ]
+  },
+  {
+   "tag": "textarea",
+   "id": "cinput",
+   "ph": "攒着输入：写完点「写入」把这段送进终端（不带回车；要回车点键条的 ⏎）",
+   "box": [
+    64,
+    637,
+    257,
+    38
+   ]
+  }
+ ],
+ "visibleText": "☰ 靶机-r47 shell 48×33 6ms ↓ 5.4K ⌨ ⛶ Hermes Pocket 移动端 SSH + Hermes TUI 渲染层 u nified-20260926-183153 点左上 ☰ 选栏目（主机 / 密钥 / 设置 / Hermes）。 打字：功能键条的「⌨键盘」；长文本：「✎输入」；冷 门键：「⌄更多」。 单击终端不会弹键盘；长按终端或「▤」出菜单。 Last login: Sun Sep 27 21:25:01 2026 from 100.12 6.54.35 lwgat@gala",
+ "counters": {
+  "renders": {
+   "onShow": 4,
+   "render": 6,
+   "refreshRoles": 6,
+   "paintChannel": 6,
+   "paintSends": 6
+  },
+  "rpc": {
+   "talk.roles": 8,
+   "talk.asks": 5,
+   "talk.sessions": 6,
+   "talk.since": 31,
+   "talk.doctor": 3,
+   "pref.set": 6,
+   "ping": 4,
+   "talk.hermesSessions": 3,
+   "host.list": 2,
+   "host.delete": 1,
+   "key.list": 2,
+   "key.delete": 1,
+   "app.notify": 1
+  },
+  "errors": []
+ }
+}

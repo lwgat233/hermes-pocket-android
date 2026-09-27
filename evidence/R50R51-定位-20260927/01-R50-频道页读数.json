@@ -1,0 +1,32 @@
+{
+ "counters": {
+  "rpc": {
+   "talk.roles": 2,
+   "talk.asks": 2,
+   "talk.sessions": 1,
+   "talk.since": 2
+  },
+  "rpcMs": {
+   "talk.roles": 561,
+   "talk.asks": 416,
+   "talk.sessions": 313
+  },
+  "renders": {
+   "onShow": 2,
+   "render": 2,
+   "refreshRoles": 2
+  },
+  "errors": [],
+  "t0": 174587
+ },
+ "visibleTabpages": [],
+ "tkChat": false,
+ "tkChatChildren": 0,
+ "tkChatChildTypes": [],
+ "tkBub": 0,
+ "tkSayin": 0,
+ "tkSayline": 0,
+ "tkRoleCards": 0,
+ "roleNames": [],
+ "scroll": null
+}
