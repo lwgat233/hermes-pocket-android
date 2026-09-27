@@ -305,7 +305,7 @@ button, input, textarea {
 .key {
   width: 100%;
   min-width: 0;
-  height: 40px;
+  height: 44px;              /* R-48：键条命中区 40 → 44dp（真机量得 ⏎ 44×40，高不够）；只加高，不动排版形态 */
   padding: 0 2px;
   border-radius: 8px;
   border: 1px solid var(--line);

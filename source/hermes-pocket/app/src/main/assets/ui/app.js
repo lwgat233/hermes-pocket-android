@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260926-183153";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-26 18:31 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "09-26 汇总包：当前源树出的整包（含 R39/R40/R41/R42/R45 与更早 R25/R26/R27/R29/R31~R37 全部已收尾改动）；零代码改动", "featureId": "汇总-20260926", "note": "汇总包（不是单轮）：自 汇总-20260924 之后新增 R39/R40/R41/R42/R45；R43 是平台侧（App 一行未改）不含；R38 判非缺陷；R28/R30 未做（见 evidence/汇总-20260926/清单-轮次对照.txt）", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260926-183153"};
+  HP.BUILD = "unified-20260927-222009";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-27 22:20 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "终端页 #cinput：enterkeyhint=send + 回车放行（只拦 keyCode 229；isComposing 不再单独当闸）+ keydown/keyup 共用 400ms 防重复闸 + e.repeat 不算新按键（长按不刷屏）⇒ 恰好一个 \\r；键条 .key 高 40→44dp", "featureId": "R-48", "note": "汇总包（不是单轮）：自 汇总-20260924 之后新增 R39/R40/R41/R42/R45；R43 是平台侧（App 一行未改）不含；R38 判非缺陷；R28/R30 未做（见 evidence/汇总-20260926/清单-轮次对照.txt）", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260927-222009"};
   /* —— 打包信息结束 —— */
 
   const THEME = {
@@ -1882,6 +1882,19 @@
 
     bindComposer() {
       const ta = $('cinput');
+      /* R-48：终端页输入框也要 enterkeyhint=send（与聊天页三处同口径，talk.js 里是同样一句） */
+      ta.setAttribute('enterkeyhint', 'send');
+      /* R-48：回车**防重复闸** + 只发一个 `\r`
+       * 真机实测：这台 IME 的 Enter＝`keydown(key="Enter", keyCode=13, isComposing=true)` + `keyup`，
+       * **没有 beforeinput/input** ⇒ keydown 与 keyup 各会来一次，必须只发一遍；
+       * 又因为 `isComposing` 在这台上**恒为 true**，它不能单独当闸（只能配 keyCode===229 用）。
+       * fresh=true（keydown，真按键）⇒ 重置窗口再发；fresh=false（keyup 兜底）⇒ 400ms 内已发过就跳过。 */
+      const enterOnce = (fresh) => {
+        const t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        if (!fresh && t - (this._enterAt || 0) < 400) return;
+        this._enterAt = t;
+        this.sendLive('\r');                 /* 恰好一个 0x0D（与键条「⏎」一致） */
+      };
       // 具体高度要受 fitChrome() 设的 maxHeight 约束，别顶到 132px 把键条挤出屏幕
       this.growComposer = () => {
         const cap = parseFloat(ta.style.maxHeight) || 132;
@@ -1931,7 +1944,18 @@
       });
       ta.addEventListener('keydown', (e) => {
         if (!this.liveInput()) return;
-        if (composing || e.isComposing || e.keyCode === 229) return;   // 输入法在组合，交给 input
+        /* R-48：**回车必须先放行** —— 这台 IME 的 Enter 恒带 `isComposing=true`，
+         * 下面那条老守卫（`composing || e.isComposing || keyCode===229`）会把回车一起吞掉，
+         * 这就是"软键盘按回车发不出去（靶子收到 0 个 0x0D）"的根因。
+         * 只对 Enter 开口：与 `keyCode === 229` 配合判断（229 才是真正的合成中间态），并走防重复闸。 */
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          if (e.keyCode === 229) return;
+          if (e.repeat) return;                  /* R-48：长按的自动重复不算新按键（别刷屏）；连按仍是 3 次 3 个 */
+          e.preventDefault();
+          enterOnce(true);
+          return;
+        }
+        if (composing || e.isComposing || e.keyCode === 229) return;   // 输入法在组合，交给 input（其它键维持原样）
         const m = HP.Keybar.mods, hasMod = !!(m.ctrl || m.alt);
         let seq = null;
         switch (e.key) {
@@ -1960,6 +1984,14 @@
         if (!v) return;
         this.sendLive(v);
         ta.value = ''; ta.style.height = 'auto';
+      });
+      /* R-48：回车的 **keyup 兜底** —— 这台 IME 的 Enter 会来一次 keydown + 一次 keyup，
+       * 有的输入法只给 keyup；两条路共用上面那把闸（同一次按键只发一个 `\r`，连按 3 次就是 3 个）。 */
+      ta.addEventListener('keyup', (e) => {
+        if (!this.liveInput()) return;
+        if (!(e.key === 'Enter' || e.keyCode === 13)) return;
+        if (e.keyCode === 229) return;
+        enterOnce(false);
       });
       // 输入框右边的按钮同理：点它们不该把软键盘收走
       //（不然点一下「⏎」键盘就没了，还得再点屏幕把它叫回来）
