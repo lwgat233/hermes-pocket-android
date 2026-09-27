@@ -139,15 +139,18 @@ export default {
       return { syncMs, firstPaintMs: paint - t0 };
     });
     const enterChat = () => page.evaluate(async () => {
-      const t0 = performance.now();
+      const parts = {}; let t = performance.now();
       HP.App.openBoard('talk');
-      await new Promise((r) => setTimeout(r, 400));
-      await HP.Talk.refreshRoles();
-      await HP.Talk.openRole('home.maid');
-      const syncMs = performance.now() - t0;          // 从点到"单聊页建完"的整段
-      const paint = await new Promise((r) => requestAnimationFrame((t) => r(t)));
+      parts.openBoardMs = performance.now() - t;                 // 建/显示频道页（同步段）
+      await new Promise((r) => setTimeout(r, 400));              // 等角色列表就绪（**不计入切页耗时**）
+      t = performance.now(); await HP.Talk.refreshRoles();
+      parts.refreshRolesMs = performance.now() - t;              // 拉角色列表（RPC）
+      t = performance.now(); await HP.Talk.openRole('home.maid');
+      parts.openRoleMs = performance.now() - t;                  // 进单聊（建整页 DOM，同步段）
+      const paint = await new Promise((r) => requestAnimationFrame((x) => r(x)));
+      const firstPaintMs = paint - t;                            // 到"单聊页第一帧"
       await new Promise((r) => setTimeout(r, 900));
-      return { syncMs, firstPaintMs: paint - t0 };
+      return { syncMs: parts.openRoleMs, firstPaintMs, parts };
     });
 
     const first = { channel: [], terminal: [], chat: [] };
