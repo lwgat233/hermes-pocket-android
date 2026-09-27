@@ -1,0 +1,428 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "R45-复测-Shift回车不误发": {
+    "check": {
+      "A_plain_enter": {
+        "say": 1,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-plain",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [
+          {
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false
+          }
+        ],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "B1_shift_enter": {
+        "before": {
+          "say": 1,
+          "shout": 0,
+          "ans": 0,
+          "args": {
+            "role": "pipeline.author",
+            "body": "R45-plain",
+            "kind": "private",
+            "by": "me"
+          },
+          "vals": [
+            "R45-shift",
+            null,
+            null
+          ],
+          "sayinCount": 1,
+          "rows": [
+            "我 → 功能创造者 · 已送达 3329ms"
+          ],
+          "ev": [],
+          "toasts": [
+            "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+          ]
+        },
+        "after": {
+          "say": 1,
+          "shout": 0,
+          "ans": 0,
+          "args": {
+            "role": "pipeline.author",
+            "body": "R45-plain",
+            "kind": "private",
+            "by": "me"
+          },
+          "vals": [
+            "R45-shift",
+            null,
+            null
+          ],
+          "sayinCount": 1,
+          "rows": [
+            "我 → 功能创造者 · 已送达 3329ms"
+          ],
+          "ev": [],
+          "toasts": [
+            "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+          ]
+        }
+      },
+      "B2_plain_600ms_after_shift": {
+        "say": 2,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-shift",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "B3_plain_150ms_after_shift": {
+        "say": 2,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-shift",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "R45-shift-fast",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "B4_plain_1000ms_after_shift": {
+        "say": 3,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-shift-ok",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "C_ime_enter": {
+        "before": {
+          "say": 3,
+          "shout": 0,
+          "ans": 0,
+          "args": {
+            "role": "pipeline.author",
+            "body": "R45-shift-ok",
+            "kind": "private",
+            "by": "me"
+          },
+          "vals": [
+            "R45-ime",
+            null,
+            null
+          ],
+          "sayinCount": 1,
+          "rows": [
+            "我 → 功能创造者 · 已送达 3329ms",
+            "我 → 功能创造者 · 已送达 3329ms",
+            "我 → 功能创造者 · 已送达 3329ms"
+          ],
+          "ev": [],
+          "toasts": [
+            "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+          ]
+        },
+        "after": {
+          "say": 4,
+          "shout": 0,
+          "ans": 0,
+          "args": {
+            "role": "pipeline.author",
+            "body": "R45-ime",
+            "kind": "private",
+            "by": "me"
+          },
+          "vals": [
+            "R45-ime",
+            null,
+            null
+          ],
+          "sayinCount": 1,
+          "rows": [
+            "我 → 功能创造者 · 已送达 3329ms",
+            "我 → 功能创造者 · 已送达 3329ms",
+            "我 → 功能创造者 · 已送达 3329ms",
+            "我 → 功能创造者 · 已送达 3329ms"
+          ],
+          "ev": [],
+          "toasts": [
+            "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+          ]
+        }
+      },
+      "D1_triple": {
+        "say": 5,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-burst",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "D2_again_same_text_600ms": {
+        "say": 5,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-burst",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "D3_retyped_again": {
+        "say": 6,
+        "shout": 0,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-second",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "E1_group_plain": {
+        "say": 6,
+        "shout": 1,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-second",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          null,
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 全体（广播） · 1/1 已送达 3368ms"
+        ],
+        "ev": [
+          {
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false
+          }
+        ],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道",
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "E2_group_shift": {
+        "say": 6,
+        "shout": 1,
+        "ans": 0,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-second",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "",
+          "R45-group-shift",
+          null
+        ],
+        "sayinCount": 1,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 全体（广播） · 1/1 已送达 3368ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道",
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道"
+        ]
+      },
+      "F1_ask_plain": {
+        "say": 6,
+        "shout": 1,
+        "ans": 1,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-second",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "R45-group-shift",
+          null
+        ],
+        "sayinCount": 0,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 全体（广播） · 1/1 已送达 3368ms"
+        ],
+        "ev": [
+          {
+            "t": "keydown",
+            "key": "Enter",
+            "kc": 13,
+            "shift": false
+          }
+        ],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道",
+          "答复已回给 pipeline.author"
+        ]
+      },
+      "F2_ask_shift": {
+        "say": 6,
+        "shout": 1,
+        "ans": 1,
+        "args": {
+          "role": "pipeline.author",
+          "body": "R45-second",
+          "kind": "private",
+          "by": "me"
+        },
+        "vals": [
+          "R45-group-shift",
+          "R45-ask-shift"
+        ],
+        "sayinCount": 0,
+        "rows": [
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 功能创造者 · 已送达 3329ms",
+          "我 → 全体（广播） · 1/1 已送达 3368ms"
+        ],
+        "ev": [],
+        "toasts": [
+          "已同步：1 个角色 · 1 条等你授权 · 0 个频道",
+          "答复已回给 pipeline.author"
+        ]
+      },
+      "chrome": {
+        "keybar": 16,
+        "composer": 2
+      }
+    }
+  }
+}

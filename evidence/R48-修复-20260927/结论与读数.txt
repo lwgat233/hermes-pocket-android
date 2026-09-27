@@ -1,0 +1,48 @@
+R-48 第 1 步「修 + 出包」—— 终端页软键盘回车（走 A 案） 结论与读数
+角色 pipeline.renderer · 2026-09-27 · 构件 hermes-pocket-R48-终端回车-20260927.apk
+依据：派活 #1597（本人当场点名优先：回车按不了＝全队停摆）；口径＝A 案（B 案＝现状键条 ⏎ 本就能用、C 与 A 等价）
+
+== 根因（我这边的锅）==
+`app.js` 实时输入那条 keydown 守卫写的是 `if (composing || e.isComposing || e.keyCode === 229) return;` ——
+**这台 IME 的 Enter 恒带 `isComposing=true`**（真机读数），于是回车在那条守卫上被整条吞掉 ⇒
+靶子侧 `0x0D` 计数 0（"软键盘回车发不出去"）。与 R-41 那次踩的是同一类坑（把 `isComposing` 当闸）。
+
+== 本次改了什么（**两个文件，只动这几处**）==
+1) `assets/ui/app.js` · `bindComposer()`：
+   · `#cinput` 挂 **`enterkeyhint="send"`**；
+   · 新增 `enterOnce(fresh)`：**防重复闸**（keydown 与 keyup 各来一次，只发一遍）+ **恰好一个 `\r`**（`sendLive('\r')`，与键条 ⏎ 同一条发射链路）；
+   · 实时模式 keydown：**回车先放行** —— `if (e.key === 'Enter' || e.keyCode === 13) { if (e.keyCode === 229) return; if (e.repeat) return; e.preventDefault(); enterOnce(true); return; }`
+     （**只拦 `keyCode === 229`**；`isComposing` 不再单独当闸；`e.repeat` 挡掉长按自动重复）
+   · 新增 **`keyup` 兜底**：`if (!(e.key === 'Enter' || e.keyCode === 13)) return; if (e.keyCode === 229) return; enterOnce(false);`（这台 IME 只给 keydown+keyup、**没有 beforeinput/input**）
+   · **其它键的守卫一字未动**（`composing || e.isComposing || keyCode===229` 照旧），所以实时打字的既有行为不变。
+2) `assets/ui/style.css`：`.key { height: 40px }` → **`44px`**（真机量得 ⏎ 44×40dp，高不够；只加高，不动排版形态）。
+**没碰**：聊天页三处输入框（`#tk-sayin`/`#tk-shoutin`/`.tk-askin`）与 R-41 三条兜底、键条 ⏎ 的既有逻辑（R-24：键条真发 1 个 `0x0D`，tui.js 一行未动）、R-31/R-36、R-39、R-42、投递侧与 `Bridge.kt`。
+
+== 判据读数（本地测试台；原始 JSON 同目录 t-r48-cr-原始输出.json + t-r41-回归-原始输出.json）==
+计数口＝在 `HP.App.send` 上打点（发送口记账，等价于靶子侧逐字节数 `0x0D`；真机 `stty -icanon` 那套归 tester）。
+| # | 判据 | 读数 |
+|---|---|---|
+| ① | **真按键回车**（真焦点 + playwright 真键） | **恰好 1 个 `\r`** ✓ |
+| ① | **真机 IME 形状**（`keydown(key="Enter", keyCode=13, isComposing=true)` + `keyup`，无 beforeinput/input） | **恰好 1 个 `\r`** ✓（改前＝0，就是这次修的点） |
+| ① | **实时模式打的字真进终端** | 真键敲 `l` `s` → 收到 `"l"`, `"s"`，输入框**立刻为空**，无多余 `0x0D` ✓ |
+| ② | `#cinput` 的 `enterkeyhint` 读回 | **`send`** ✓ |
+| ③ | **键条 ⏎**（真点键）仍恰好 1 个 `\r` | **1 个** ✓（不回归；tui.js 未动） |
+| ③ | R-41 三处不回归（重跑 R-41 探针） | Gboard 形状群聊/单聊/授权框各 1、组字 1.5s 复位、229 拦、闸、Shift+Enter 0 —— **全绿，报错 0** ✓ |
+| ④ | **连按 3 次** | **3 个 `\r`**（不多不少）✓ |
+| ④ | **长按不刷屏**（1 次按下 + 5 次 `repeat=true` 的 keydown） | **1 个 `\r`** ✓ |
+| ⑤ | 键条 ⏎ 命中区 | **47 × 44 dp**（改前 44×40）✓；可见 32 个键**全部高 44**（量尺寸时临时显示 TUI 行、量完还原） |
+| ⑥ | `keyCode===229` 的合成中间态 | **0 个** ✓（不误发） |
+其它：`pageerror`＋`console.error` **0 条** ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R48-终端回车-20260927.apk（**5138197 字节**）
+整包 sha256：**b0b1ade038802f20c9f2141e9cd2f88dd3ed6c525f687b9c833da4268127b476**
+包内 assets/build-info.json：testVersion=**unified-20260927-222009** · featureId=**R-48** · builtAt=2026-09-27 22:20 CST
+本次改动文件 sha256（**包内 == 源树**）：
+  ui/app.js    3ad7371cf73ac4d2…（包内=源树 ✓ 一致）
+  ui/style.css d617bb727e2c99f4…（包内=源树 ✓ 一致）
+整树对账：`python3 source/hermes-pocket/tools/stamp-build.py --verify <apk>` → **退出码 0**，79 行原文落
+`evidence/R48-修复-20260927/verify-整树-原始输出.txt`（sha256 `cf8fe84fb260…`），末行 **PASS 包内 ↔ 源树 对账**。
+
+== 没验的（未验 ≠ 通过）==
+真机复测（真软键盘 + 靶子侧 `stty -icanon` 逐字节数）归 tester 第 2 步：软键盘打字+回车 ⇒ 恰好 1 个 `0x0D`、键条 ⏎ 不回归、连按 3 次＝3 个、长按不刷屏。

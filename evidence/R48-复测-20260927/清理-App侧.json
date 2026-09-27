@@ -1,0 +1,49 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r48-cleanup-v2": {
+    "check": {
+      "shape": {
+        "h": "[object Array]",
+        "hKeys": [
+          "0",
+          "1"
+        ],
+        "k": "[object Array]",
+        "kKeys": [
+          "0",
+          "1"
+        ]
+      },
+      "hHead": "[{\"id\":\"a316a11f34de4244\",\"name\":\"复验主机\",\"host\":\"192.168.1.10\",\"port\":22,\"user\":\"lwgat\",\"auth\":\"key\",\"keyId\":\"8090b58a5ec3453d\",\"startCmd\":\"bash -l\",\"autoReconnect\":true,\"keepalive\":30,\"lastUsed\":1789985604386,\"hasPassword\":false,\"keyName\":\"verify-key\"},{\"id\":\"",
+      "kHead": "[{\"id\":\"8090b58a5ec3453d\",\"name\":\"verify-key\",\"algo\":\"Ed25519\",\"bits\":0,\"publicKey\":\"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILTQkMaseEGbvWlxRTzKFF9UHykvYaSSmj9Wu/G5jogt hermes-pocket:verify-key\",\"fingerprint\":\"SHA256:ex2+qroRlUZvqwh8hlk6XYStJg8KulXGwCpoJ/eUVro\",\"",
+      "hostsSeen": [
+        {
+          "id": "a316a11f34de4244",
+          "name": "复验主机"
+        },
+        {
+          "id": "e9413eb37d364a3a",
+          "name": "R48靶机"
+        }
+      ],
+      "keysSeen": [
+        {
+          "id": "8090b58a5ec3453d",
+          "name": "verify-key"
+        },
+        {
+          "id": "a7cc54814c0c4dd4",
+          "name": "r48probe"
+        }
+      ],
+      "deletedHost": "R48靶机",
+      "deletedKey": "r48probe",
+      "afterH": [
+        "复验主机"
+      ],
+      "afterK": [
+        "verify-key"
+      ]
+    }
+  }
+}

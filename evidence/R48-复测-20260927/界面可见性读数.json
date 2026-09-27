@@ -1,0 +1,25 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r48-ui": {
+    "check": {
+      "panelOpen": true,
+      "composerVisible": true,
+      "composerRect": {
+        "x": 540,
+        "y": 1866,
+        "w": 393,
+        "h": 88
+      },
+      "keybarKeys": 16,
+      "keybarVisible": true,
+      "closeBtn": {
+        "x": 1008,
+        "y": 309,
+        "w": 29,
+        "h": 26
+      },
+      "topbar": "R48靶机 / TUI·鼠标",
+      "view": "channel"
+    }
+  }
+}

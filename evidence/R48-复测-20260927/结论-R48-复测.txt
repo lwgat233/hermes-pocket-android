@@ -1,0 +1,77 @@
+# hermes-pocket-R48 第 2 步 · 真机复测结论（pipeline.tester · 2026-09-27）
+
+对象：`apk/测试版/hermes-pocket-R48-终端回车-20260927.apk`
+设备：无头 Android 14（emulator-5554 / notifbridge-emu）· **只验不改**（App 一行没动）
+
+## 0) 装的是不是这一版（**从设备读回**，不是只看文件名）
+| 项 | 期望（派活单） | 实测 | |
+|---|---|---|---|
+| 源 APK 字节 | 5,138,197 | **5,138,197** | ✓ |
+| 源 APK sha256 | b0b1ade0…476 | **b0b1ade038802f20c9f2141e9cd2f88dd3ed6c525f687b9c833da4268127b476** | ✓ |
+| **设备上 base.apk** sha256（`adb pull` 回来的） | — | **同 b0b1ade0…476** | ✓ 装的就是这一版 |
+| 包内 `assets/ui/app.js` | 3ad7371c… | **3ad7371cf73ac4d25a4c13996549547550c062d426dacf6df16c592a55252789** | ✓ |
+| 包内 `assets/ui/style.css` | d617bb72… | **d617bb727e2c99f4d512989c6098cd3ff681560b194b4219764a404211358c7e** | ✓ |
+| 包内 `assets/build-info.json` | unified-20260927-222009 | **unified-20260927-222009** / featureId **R-48** | ✓ |
+
+## 分组（本次测了 2 块）
+- 主块 **终端页**（改动面：`#cinput` 的 enterkeyhint/回车放行、键条 `.key` 高 40→44dp）
+- 跨块 **聊天页三处**（回归：`bindEnterSend` 那套口径在聊天页，重跑 R-45 驱动确认没被带坏）
+理由：本轮改动集中在终端页输入条与键条样式，但"回车放行/防重复"这套口径与聊天页共用同一份约定，必须回头看一眼。
+
+## 靶子侧量法（沿用上一轮已判为证据级的做法）
+靶子会话里跑逐字节记录程序（`stty -echo -icanon -icrnl` 下逐字节落盘，直读 `0x0D` 个数）；
+**不用 `capture-pane`**（上轮实测读空白）；App 侧全部 `adb shell input tap / input text / keyevent` 真触摸真按键。
+通路：App（真机）→ 临时 sshd（仅 127.0.0.1:2222、独立 authorized_keys）→ `bash -l` → 自动 attach 一次性会话 `a-r48probe`（里面就是记录程序）。
+**NAS `~/.ssh/authorized_keys` 全程未动：7 条、mtime 2026-09-21 20:41:42。**
+
+## 判据逐条
+| # | 判据 | 实测（原始读数） | 结论 |
+|---|---|---|---|
+| ① | 软键盘打字真进终端、框里不留字 | 实时模式打 `R48IME` → 靶子收到 **6 字节**（0x52/0x34/0x38/0x49/0x4D/0x45）；框内值 **`''`**（不留字） | ✓ |
+| ① | **软键盘 Enter** ⇒ 恰好 1 个 `0x0D`（改前 0） | `input keyevent 66` → 靶子 **+1 个 `0x0D`**、框内值仍 `''`；页面事件 74 条里 `keydown(key=Enter,kc=13,repeat=false,isComposing=false)` | ✓ **转绿** |
+| ② | `#cinput` 的 `enterkeyhint` = `send`（改前 null） | **`send`** | ✓ |
+| ③ | 键条「⏎」仍恰好 1 个 `0x0D`（R-24 不回归） | **+1 个 `0x0D`** | ✓ |
+| ④ | 连按 3 次 = 3 个 `0x0D` | 极短间隔（同一条 `input keyevent 66 66 66`）→ **3 个**；3 次各隔 700ms → **3 个** | ✓ |
+| ④ | **长按 = 1（不刷屏）** | `input keyevent --longpress 66` → **2 个 `0x0D`**；页面事件里 `e.repeat` 事件 **0 个**（注入器给的是 2 次独立 keydown） | **未验**（见下） |
+| ④ | `keyCode 229` 出现 0 次 | 页面事件 74 条中 **kc=229 出现 0 次** | ✓ |
+| ⑤ | 键条 ⏎ 命中区 ≥44×44dp（改前 44×40） | css/dp **44×44**、命中 `BUTTON.key`；键盘弹起时 dev `(1003,2066)`→`(1003,1299)`（每次点前重量） | ✓ |
+| ⑥ | 聊天页三处各仍恰好 1 次 | 单聊 **talk.say 1**（`{role:"pipeline.author",body:"R45-plain",kind:"private",by:"me"}` + 状态行「已送达 3329ms」）· 群聊 **talk.shout 1** · 授权框 **talk.answer 1** | ✓ |
+| ⑥ | Shift+Enter 不误发 | 三处计数**均不变**、文字留框（`R45-shift` / `R45-group-shift` / `R45-ask-shift`）；IME 形状回车仍 1 次 | ✓ |
+| ⑦ | 0 未捕获异常 / 0 console.error | `pageErrors = 0` | ✓ |
+
+### ④「长按不刷屏」为什么记未验
+App 这条守卫写的是 `if (e.repeat) return;`（build-info 原文："e.repeat 不算新按键（长按不刷屏）"）。
+而 `adb shell input keyevent --longpress 66` 在这台真机上产生的是**两次独立 keydown**（页面事件里 `e.repeat` 事件数 = 0，`repeats: 0`），
+⇒ 这个注入方式**根本产生不出 repeat 事件**，所以"长按 = 1"这条**本轮测不出来**。
+我**没有**用合成 `KeyboardEvent(repeat:true)` 去替它下结论（按你的口径那不算真按键）；读数照给：**2 个 `0x0D`**。
+
+## 逐字节日志（证据原文 `靶子逐字节日志-原始.log`）
+```
+0x52 'R' 0x34 '4' 0x38 '8' 0x49 'I' 0x4D 'M' 0x45 'E'   ← ① 实时打字 6 字节
+0x0D                                                     ← ① 软键盘 Enter（1）
+0x0D                                                     ← ③ 键条 ⏎（1）
+0x0D 0x0D 0x0D                                           ← ④-a 连按 3 次（3）
+0x0D 0x0D 0x0D                                           ← ④-b 3 次×700ms（3）
+0x0D 0x0D                                                ← ④-c 长按（2，见上）
+```
+（另有 1 组 `0x1B 0x5B 0x41`（ESC [ A）来自 ⑥ 那支 R-45 驱动跑聊天页时的方向键，与终端判据无关）
+`0x0D` 合计 **10**。
+
+## 未验（未验 ≠ 通过）
+- **长按/不刷屏**：见上（注入方式限制）
+- **中文键盘**：模拟器里只有 Gboard 英语布局，切不到中文 ⇒ 未验
+- **不接主机那几条**：真实平台端到端、真账号链路照旧未验
+
+## 收工清场（已全部做掉，读数在案）
+| 项 | 读数 |
+|---|---|
+| 靶子会话 | `a-r48probe` 已 kill；`tmux list-sessions` 只剩 `hermes`、`roles`（均未动） |
+| 临时 sshd | 已停：`ss -ltn` 里 `2222` = **0** |
+| 临时目录 | `/tmp/r47probe-sshd` 已删 |
+| App 内测试主机/密钥 | 已删 `R48靶机` / `r48probe`；现存仅 `复验主机` / `verify-key` |
+| **NAS `~/.ssh/authorized_keys`** | **7 条 / mtime 2026-09-21 20:41:42.800652328 +0800**（全程未变） |
+
+## 证据文件（`evidence/R48-复测-20260927/`）
+`靶子逐字节日志-原始.log`（逐字节含 `0x0D`）· `判据6-聊天页三处-原始输出.json`（R-45 驱动重跑 13 组读数 + pageErrors）·
+`界面可见性读数.json` · `清理-App侧.json`（删除前后主机/密钥清单）
+驱动脚本：`/vol1/1000/aicache/tmp/r48-{setup,term}.py`、`r47-probe.py`、`r47-sshd-up.sh`；页面探针 `tools/验收脚本/r48-*-20260927.mjs`
