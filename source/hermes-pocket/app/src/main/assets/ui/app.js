@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260927-222009";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-27 22:20 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "终端页 #cinput：enterkeyhint=send + 回车放行（只拦 keyCode 229；isComposing 不再单独当闸）+ keydown/keyup 共用 400ms 防重复闸 + e.repeat 不算新按键（长按不刷屏）⇒ 恰好一个 \\r；键条 .key 高 40→44dp", "featureId": "R-48", "note": "汇总包（不是单轮）：自 汇总-20260924 之后新增 R39/R40/R41/R42/R45；R43 是平台侧（App 一行未改）不含；R38 判非缺陷；R28/R30 未做（见 evidence/汇总-20260926/清单-轮次对照.txt）", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260927-222009"};
+  HP.BUILD = "unified-20260927-223349";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-27 22:33 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "09-27 汇总包：当前源树整包（含 R-48 终端页软键盘回车 + 更早全部已收尾改动）；零代码改动", "featureId": "汇总-20260927", "note": "汇总包（不是单轮）：自 汇总-20260926 之后新增 R48；不含 R43（平台侧）、R38（非缺陷）、R46/R47/R50/R51/R54（只到定位未改码）、R44/R49/R52/R53（等本人拍）——见 evidence/汇总-20260927/清单-轮次对照.txt", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260927-223349"};
   /* —— 打包信息结束 —— */
 
   const THEME = {
