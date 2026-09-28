@@ -1,0 +1,83 @@
+# R56 · 会话页找女仆 · 真机读数（pipeline.tester · 2026-09-27）
+
+对象：`apk/测试版/hermes-pocket-汇总-20260927.apk` · 设备：无头 Android 14（emulator-5554）· **代码一行未改**
+
+## 装包核对（**从设备读回**）
+| 项 | 读数 |
+|---|---|
+| 设备 base.apk sha256 | **613d1faba06d4d9393b536c4561ba545a06ea7a900c54d853995a721663f1be1**（5,138,144 字节） |
+| 设备内 `assets/ui/app.js` | **d98277b048d2082b7a8182d5eb26177657518622b4d06e39a32595ac4aad78c6** |
+| 设备内 `assets/ui/style.css` | **d617bb727e2c99f4d512989c6098cd3ff681560b194b4219764a404211358c7e** |
+| 设备内 `assets/build-info.json` | **unified-20260927-223349** / featureId **汇总-20260927** |
+
+**本次只测一块：会话页**（面板 → 会话）。理由：本人问的就是"在 /session 里找不到女仆"，判据全落这一个页面。
+读法：真机真触摸（☰ → 会话）；列表数据来自远端 tmux（通过临时 sshd 连上，**只读列举**）。
+
+## ① 女仆那条在不在 / 哪个分组 / 原文
+**在 —— 而且是两行**，两行都落在「**在跑（7）**」组里：
+
+| 行 | 标题 | 副行 | 右标 |
+|---|---|---|---|
+| `data-testid="session-13"` | **`#13 可爱女仆`** | `窗口 7 · tmux roles:home-maid · 建了 3 天` | **在跑** |
+| `data-testid="session-4"` | **`#4 女仆（本人通道）`** | `QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844` | **QQ 通道** |
+
+分组头（原文）：`在线：已连接 · 人/通道 9 行（tmux 容器 3 个）` → `在跑（7）` → `临时对话（2）`；
+「在跑（7）」里的 7 行依次是 `#13 可爱女仆`、`#4 女仆（本人通道）`、`#5 测试者`、`#8 渲染者`、`#10 功能创造者`、`#6 我`、`#11 调查者`。
+
+**DOM 原文（节选，缩进加了换行便于阅读）**：
+```html
+<div class="card"><div class="sub ui-status">在线：已连接 · 人/通道 9 行（tmux 容器 3 个）</div><button class="btn">刷新</button></div>
+<div class="sub ui-status">在跑（7）</div>
+<div class="ui-list">
+  <div class="row-item" data-testid="session-13" role="button" tabindex="0">
+    <div class="ri-main"><div class="ri-t">#13 可爱女仆</div><div class="ri-s">窗口 7 · tmux roles:home-maid · 建了 3 天</div></div>
+    <div class="ri-r">在跑</div>
+  </div>
+  <div class="row-item" data-testid="session-4" role="button" tabindex="0">
+    <div class="ri-main"><div class="ri-t">#4 女仆（本人通道）</div><div class="ri-s">QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844</div></div>
+    <div class="ri-r">QQ 通道</div>
+  </div>
+  …（#5 / #8 / #10 / #6 / #11）
+</div>
+<div class="sub ui-status">临时对话（2）</div>
+…（#7 临时对话（已废）· 没在跑 / #2 临时对话（已废）· 没在跑）
+```
+
+## ② `#13` 有没有多出一行
+**有，女仆现在共 2 行**（`session-13` + `session-4`），而且**两份并存**：
+两者 tmux 名不同（`roles:home-maid` vs `qqbot:3FDE0CB3…`）⇒ 按 `panels.js` 的去重口径（**同 tmux 才去重、只留 alive 那条**，`panels.js:841` 注释）**不会去重** ⇒ 两行都画出来。
+⇒ **确实容易让人"找不到本体"**：列表里**先出现的是「#13 可爱女仆」**；本人要是按名字去找「女仆（本人通道）」，那一行在它**下一行**、右标还是「QQ 通道」（不是「在跑」），很容易扫过去。
+
+## ③ 数据源与代码（不猜，给 file:line）
+- 现状 `talk.py sessions-json`（本轮现取，落在 `数据源-sessions-json.json`）：**`#13` 在** ——
+  `{"id":13,"role":"home.maid","name":"home.maid","tmux":"roles:home-maid","kind":"role","alive":true}`
+  ⇒ 与派活单给的"**#13 压根没出现在 `sessions-json` 里**"**不一致**（数据已变：现在 #13 在、且 `alive=true`）。我按现测报。
+- `#4` 与派活单一致：`{"id":4,"role":"home.maid","name":"可爱女仆（奈奈）","tmux":"qqbot:3FDE0CB3…","alive":false}`
+- **R-40 那条特判确实生效**（这就是 #4 右标显示「QQ 通道」而不是「没在跑」的原因）：
+  - `panels.js:857` `const isChan = (s) => !!s && chanForm(s.tmux);`
+  - `panels.js:862` `if (isChan(s)) return '女仆（本人通道）';`
+  - `panels.js:881` `const live = (s) => (isChan(s) ? true : !!s.alive);`  ← 通道目标恒在线
+  - `panels.js:892` `right: chan ? 'QQ 通道' : (live(s) ? (t.attached ? 'attach 中' : '在跑') : '没在跑')`
+  ⇒ 与真机实测一致（#4 显示「QQ 通道」、没显示「没在跑」）✓
+- 结论：**女仆没丢** ⇒ 不存在"根本没显示"要定位的场景；真正要定位的是"**同一人两行**"（②）与下面的滚动问题（④）。
+
+## ④ 滚动 / 常驻按键 / JS 报错
+| 项 | 读数 | |
+|---|---|---|
+| 列表能不能滚到底 | `#overlay .panel-body`：`scrollTop **0** / scrollHeight **1475** / clientHeight **518**`；**三次真滑动**（`adb input swipe` 400ms / 500ms / 600ms 各一档）后 `scrollTop` **仍是 0** | **未达**（滑不动，如实报） |
+| 滑不动的原因读数（不替它下结论） | DOM 里**残留 3 组 hostkey 确认框**（「信任并保存 / 取消」，本轮我每次连靶机各留一组、没被清掉），盖在面板上吞触摸；我点「取消」×3 也没消掉 | 缺陷线索 |
+| 常驻按键 | **顶栏 3 个**（`#btn-panel` ☰ / `#btn-keys` ⌨ / `#btn-immersive` ⛶）✓ ≤3；会话页自身 **1 个「刷新」** ✓ | ✓ |
+| 页面可见 button 总数 | **32**（含键条 16、输入条 2、残留确认框 6、面板头 3、刷新 2 …）—— 其中确认框那 6 个是残留 | 读数 |
+| JS 报错 | 多次读 `pageErrors` = **0** | ✓ |
+| 附带读数 | 会话页列表**渲染了两份**（2 个 `.card`、4 个 `.ui-list`、**18 个 `.row-item` = 9 行 ×2**；第二份 `top=945` 在视口外）⇒ 与 R-39/R-45 那条"重复渲染"同族 | 读数 |
+
+## 红线核对
+- **不接主机** ✓：靶子走临时 sshd（仅 `127.0.0.1:2222`、独立 authorized_keys）；**NAS `~/.ssh/authorized_keys` 7 条 / mtime 2026-09-21 20:41:42.800652328 全程未变**
+- **没改任何代码** ✓：app 源树 `git status` 干净（只有我新增的验收脚本是 untracked；`docs/需求登记.md` 是别人改的）
+- **没往 `roles:home-maid` 投东西** ✓（只做只读列举）
+- 未验 ≠ 通过：不接主机那几条（真实动态流/登录态）
+
+## 证据（`evidence/R56-会话页找女仆-20260927/`）
+`会话页-读数-原始.json`（含 `#tab-sessions` innerHTML 原文 + overlay 全文）· `会话页-计数-滑动前.json` / `会话页-计数-滑动后.json` ·
+`数据源-sessions-json.json` · `装包核对-从设备读回.txt` · `清理-App侧.json`
+脚本：`tools/验收脚本/r56-{probe2,count,app-host,cleanup-app}-20260927.mjs`；驱动 `/vol1/1000/aicache/tmp/r56-{drive,step2,setup-read}.py`

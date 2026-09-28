@@ -1,0 +1,91 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r56-count": {
+    "check": {
+      "rowItems": 18,
+      "rowItemsVisible": 18,
+      "rowOnScreen": 8,
+      "cards": 2,
+      "lists": 4,
+      "maid": [
+        {
+          "t": "#13 可爱女仆 | 窗口 7 · tmux roles:home-maid · 建了 3 天 | 在跑",
+          "id": "session-13",
+          "top": 225,
+          "visible": true
+        },
+        {
+          "t": "#4 女仆（本人通道） | QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844 | QQ 通道",
+          "id": "session-4",
+          "top": 288,
+          "visible": true
+        },
+        {
+          "t": "#13 可爱女仆 | 窗口 7 · tmux roles:home-maid · 建了 3 天 | 在跑",
+          "id": "session-13",
+          "top": 945,
+          "visible": true
+        },
+        {
+          "t": "#4 女仆（本人通道） | QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844 | QQ 通道",
+          "id": "session-4",
+          "top": 1009,
+          "visible": true
+        }
+      ],
+      "sectionBtnCount": 2,
+      "sectionBtns": [
+        "刷新",
+        "刷新"
+      ],
+      "allVisibleButtons": 32,
+      "allButtons": [
+        "#btn-panel",
+        "#btn-keys",
+        "#btn-immersive",
+        "#btn-drawer-close",
+        "#btn-board-list",
+        "#btn-close-panel",
+        "刷新",
+        "刷新",
+        "信任并保存",
+        "取消",
+        "信任并保存",
+        "取消",
+        "信任并保存",
+        "取消",
+        "#cmode",
+        "#csend",
+        "Esc",
+        "Tab",
+        "⇧Tab",
+        "↑",
+        "↓",
+        "←",
+        "→",
+        "⏎",
+        "Ctrl",
+        "Alt",
+        "⌫",
+        "^C",
+        "PgUp",
+        "PgDn",
+        "▤",
+        "⌄更多"
+      ],
+      "scroll": {
+        "scrollTop": 0,
+        "scrollHeight": 1435,
+        "clientHeight": 1435
+      },
+      "overlayScroll": {
+        "tag": "panel-body",
+        "scrollTop": 0,
+        "scrollHeight": 1475,
+        "clientHeight": 518
+      },
+      "secondCopyTop": 817,
+      "viewportH": 778
+    }
+  }
+}

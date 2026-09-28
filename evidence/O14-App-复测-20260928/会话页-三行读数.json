@@ -1,0 +1,352 @@
+{
+ "ui": {
+  "board": null,
+  "overlayDisplay": "none",
+  "drawerClass": "",
+  "btnPanel": {
+   "x": 63,
+   "y": 190
+  },
+  "title": "O14靶机",
+  "sessionsRows": 0
+ },
+ "rows": {
+  "sel": "a-o14probe",
+  "rowCount": 20,
+  "rowItems": [
+   {
+    "i": 0,
+    "id": "session-14",
+    "vis": true,
+    "top": 225,
+    "x": 540,
+    "y": 833,
+    "t": "#14 奈奈（女仆本体）",
+    "s": "窗口 2 · tmux hermes:女仆本体 · 建了 7 天",
+    "r": "本体",
+    "full": "#14 奈奈（女仆本体） | 窗口 2 · tmux hermes:女仆本体 · 建了 7 天 | 本体"
+   },
+   {
+    "i": 1,
+    "id": "session-4",
+    "vis": true,
+    "top": 288,
+    "x": 540,
+    "y": 1007,
+    "t": "#4 女仆（本人通道）",
+    "s": "QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844",
+    "r": "QQ 通道",
+    "full": "#4 女仆（本人通道） | QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844 | QQ 通道"
+   },
+   {
+    "i": 2,
+    "id": "session-13",
+    "vis": true,
+    "top": 351,
+    "x": 540,
+    "y": 1181,
+    "t": "#13 多余的一份（平台误建）",
+    "s": "窗口 7 · tmux roles:home-maid · 建了 3 天",
+    "r": "在跑",
+    "full": "#13 多余的一份（平台误建） | 窗口 7 · tmux roles:home-maid · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 3,
+    "id": "session-5",
+    "vis": true,
+    "top": 415,
+    "x": 540,
+    "y": 1354,
+    "t": "#5 测试者",
+    "s": "窗口 7 · tmux roles:pipeline-tester · 建了 3 天",
+    "r": "在跑",
+    "full": "#5 测试者 | 窗口 7 · tmux roles:pipeline-tester · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 4,
+    "id": "session-8",
+    "vis": true,
+    "top": 478,
+    "x": 540,
+    "y": 1528,
+    "t": "#8 渲染者",
+    "s": "窗口 7 · tmux roles:pipeline-renderer · 建了 3 天",
+    "r": "在跑",
+    "full": "#8 渲染者 | 窗口 7 · tmux roles:pipeline-renderer · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 5,
+    "id": "session-10",
+    "vis": true,
+    "top": 541,
+    "x": 540,
+    "y": 1702,
+    "t": "#10 功能创造者",
+    "s": "窗口 7 · tmux roles:pipeline-author · 建了 3 天",
+    "r": "在跑",
+    "full": "#10 功能创造者 | 窗口 7 · tmux roles:pipeline-author · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 6,
+    "id": "session-6",
+    "vis": true,
+    "top": 605,
+    "x": 540,
+    "y": 1876,
+    "t": "#6 我",
+    "s": "窗口 7 · tmux roles:owner-me · 建了 3 天",
+    "r": "在跑",
+    "full": "#6 我 | 窗口 7 · tmux roles:owner-me · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 7,
+    "id": "session-11",
+    "vis": true,
+    "top": 668,
+    "x": 540,
+    "y": 2050,
+    "t": "#11 调查者",
+    "s": "窗口 7 · tmux roles:research-investigator · 建了 3 天",
+    "r": "在跑",
+    "full": "#11 调查者 | 窗口 7 · tmux roles:research-investigator · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 8,
+    "id": "session-7",
+    "vis": true,
+    "top": 760,
+    "x": 540,
+    "y": 2300,
+    "t": "#7 临时对话（已废）",
+    "s": "tmux solo-solo1790090392",
+    "r": "没在跑",
+    "full": "#7 临时对话（已废） | tmux solo-solo1790090392 | 没在跑"
+   },
+   {
+    "i": 9,
+    "id": "session-2",
+    "vis": true,
+    "top": 820,
+    "x": 540,
+    "y": 2465,
+    "t": "#2 临时对话（已废）",
+    "s": "tmux solo-solo1790081404",
+    "r": "没在跑",
+    "full": "#2 临时对话（已废） | tmux solo-solo1790081404 | 没在跑"
+   },
+   {
+    "i": 10,
+    "id": "session-14",
+    "vis": true,
+    "top": 1009,
+    "x": 540,
+    "y": 2986,
+    "t": "#14 奈奈（女仆本体）",
+    "s": "窗口 2 · tmux hermes:女仆本体 · 建了 7 天",
+    "r": "本体",
+    "full": "#14 奈奈（女仆本体） | 窗口 2 · tmux hermes:女仆本体 · 建了 7 天 | 本体"
+   },
+   {
+    "i": 11,
+    "id": "session-4",
+    "vis": true,
+    "top": 1072,
+    "x": 540,
+    "y": 3160,
+    "t": "#4 女仆（本人通道）",
+    "s": "QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844",
+    "r": "QQ 通道",
+    "full": "#4 女仆（本人通道） | QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844 | QQ 通道"
+   },
+   {
+    "i": 12,
+    "id": "session-13",
+    "vis": true,
+    "top": 1135,
+    "x": 540,
+    "y": 3334,
+    "t": "#13 多余的一份（平台误建）",
+    "s": "窗口 7 · tmux roles:home-maid · 建了 3 天",
+    "r": "在跑",
+    "full": "#13 多余的一份（平台误建） | 窗口 7 · tmux roles:home-maid · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 13,
+    "id": "session-5",
+    "vis": true,
+    "top": 1198,
+    "x": 540,
+    "y": 3508,
+    "t": "#5 测试者",
+    "s": "窗口 7 · tmux roles:pipeline-tester · 建了 3 天",
+    "r": "在跑",
+    "full": "#5 测试者 | 窗口 7 · tmux roles:pipeline-tester · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 14,
+    "id": "session-8",
+    "vis": true,
+    "top": 1262,
+    "x": 540,
+    "y": 3682,
+    "t": "#8 渲染者",
+    "s": "窗口 7 · tmux roles:pipeline-renderer · 建了 3 天",
+    "r": "在跑",
+    "full": "#8 渲染者 | 窗口 7 · tmux roles:pipeline-renderer · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 15,
+    "id": "session-10",
+    "vis": true,
+    "top": 1325,
+    "x": 540,
+    "y": 3856,
+    "t": "#10 功能创造者",
+    "s": "窗口 7 · tmux roles:pipeline-author · 建了 3 天",
+    "r": "在跑",
+    "full": "#10 功能创造者 | 窗口 7 · tmux roles:pipeline-author · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 16,
+    "id": "session-6",
+    "vis": true,
+    "top": 1388,
+    "x": 540,
+    "y": 4030,
+    "t": "#6 我",
+    "s": "窗口 7 · tmux roles:owner-me · 建了 3 天",
+    "r": "在跑",
+    "full": "#6 我 | 窗口 7 · tmux roles:owner-me · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 17,
+    "id": "session-11",
+    "vis": true,
+    "top": 1451,
+    "x": 540,
+    "y": 4203,
+    "t": "#11 调查者",
+    "s": "窗口 7 · tmux roles:research-investigator · 建了 3 天",
+    "r": "在跑",
+    "full": "#11 调查者 | 窗口 7 · tmux roles:research-investigator · 建了 3 天 | 在跑"
+   },
+   {
+    "i": 18,
+    "id": "session-7",
+    "vis": true,
+    "top": 1544,
+    "x": 540,
+    "y": 4453,
+    "t": "#7 临时对话（已废）",
+    "s": "tmux solo-solo1790090392",
+    "r": "没在跑",
+    "full": "#7 临时对话（已废） | tmux solo-solo1790090392 | 没在跑"
+   },
+   {
+    "i": 19,
+    "id": "session-2",
+    "vis": true,
+    "top": 1604,
+    "x": 540,
+    "y": 4618,
+    "t": "#2 临时对话（已废）",
+    "s": "tmux solo-solo1790081404",
+    "r": "没在跑",
+    "full": "#2 临时对话（已废） | tmux solo-solo1790081404 | 没在跑"
+   }
+  ],
+  "maid": [
+   {
+    "i": 0,
+    "id": "session-14",
+    "full": "#14 奈奈（女仆本体） | 窗口 2 · tmux hermes:女仆本体 · 建了 7 天 | 本体",
+    "top": 225
+   },
+   {
+    "i": 1,
+    "id": "session-4",
+    "full": "#4 女仆（本人通道） | QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844 | QQ 通道",
+    "top": 288
+   },
+   {
+    "i": 2,
+    "id": "session-13",
+    "full": "#13 多余的一份（平台误建） | 窗口 7 · tmux roles:home-maid · 建了 3 天 | 在跑",
+    "top": 351
+   },
+   {
+    "i": 3,
+    "id": "session-14",
+    "full": "#14 奈奈（女仆本体） | 窗口 2 · tmux hermes:女仆本体 · 建了 7 天 | 本体",
+    "top": 1009
+   },
+   {
+    "i": 4,
+    "id": "session-4",
+    "full": "#4 女仆（本人通道） | QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844 | QQ 通道",
+    "top": 1072
+   },
+   {
+    "i": 5,
+    "id": "session-13",
+    "full": "#13 多余的一份（平台误建） | 窗口 7 · tmux roles:home-maid · 建了 3 天 | 在跑",
+    "top": 1135
+   }
+  ],
+  "lists": 4,
+  "cards": 2,
+  "btns": [
+   "刷新",
+   "刷新"
+  ],
+  "allVisBtns": [
+   "#btn-panel",
+   "#btn-keys",
+   "#btn-immersive",
+   "#btn-drawer-close",
+   "#btn-board-list",
+   "#btn-close-panel",
+   "刷新",
+   "刷新",
+   "信任并保存",
+   "取消",
+   "信任并保存",
+   "取消",
+   "信任并保存",
+   "取消",
+   "#cmode",
+   "#csend",
+   "Esc",
+   "Tab",
+   "⇧Tab",
+   "↑",
+   "↓",
+   "←",
+   "→",
+   "⏎",
+   "Ctrl",
+   "Alt",
+   "⌫",
+   "^C",
+   "PgUp",
+   "PgDn",
+   "▤",
+   "⌄更多"
+  ],
+  "dialogs": [
+   "10.0.2.2:2222|算法 ssh-ed25519|指纹 SHA256:PyoGv15Cxr3",
+   "10.0.2.2:2222|算法 ssh-ed25519|指纹 SHA256:PyoGv15Cxr3",
+   "10.0.2.2:2222|算法 ssh-ed25519|指纹 SHA256:PyoGv15Cxr3"
+  ],
+  "ctxMenu": null,
+  "ctxMenuVis": false,
+  "panelScroll": {
+   "scrollTop": 0,
+   "scrollHeight": 1601,
+   "clientHeight": 518
+  },
+  "expl": [],
+  "html": "<div class=\"card\"><div class=\"sub ui-status\">在线：已连接 · 人/通道 10 行（tmux 容器 3 个）</div><button class=\"btn\">刷新</button></div><div class=\"sub ui-status\">在跑（8）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-14\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#14 奈奈（女仆本体）</div><div class=\"ri-s\">窗口 2 · tmux hermes:女仆本体 · 建了 7 天</div></div><div class=\"ri-r\">本体</div></div><div class=\"row-item\" data-testid=\"session-4\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#4 女仆（本人通道）</div><div class=\"ri-s\">QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844</div></div><div class=\"ri-r\">QQ 通道</div></div><div class=\"row-item\" data-testid=\"session-13\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#13 多余的一份（平台误建）</div><div class=\"ri-s\">窗口 7 · tmux roles:home-maid · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-5\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#5 测试者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-tester · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-8\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#8 渲染者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-renderer · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-10\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#10 功能创造者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-author · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-6\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#6 我</div><div class=\"ri-s\">窗口 7 · tmux roles:owner-me · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-11\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#11 调查者</div><div class=\"ri-s\">窗口 7 · tmux roles:research-investigator · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div></div><div class=\"sub ui-status\">临时对话（2）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-7\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#7 临时对话（已废）</div><div class=\"ri-s\">tmux solo-solo1790090392</div></div><div class=\"ri-r\">没在跑</div></div><div class=\"row-item\" data-testid=\"session-2\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#2 临时对话（已废）</div><div class=\"ri-s\">tmux solo-solo1790081404</div></div><div class=\"ri-r\">没在跑</div></div></div><div class=\"card\"><div class=\"sub ui-status\">在线：已连接 · 人/通道 10 行（tmux 容器 3 个）</div><button class=\"btn\">刷新</button></div><div class=\"sub ui-status\">在跑（8）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-14\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#14 奈奈（女仆本体）</div><div class=\"ri-s\">窗口 2 · tmux hermes:女仆本体 · 建了 7 天</div></div><div class=\"ri-r\">本体</div></div><div class=\"row-item\" data-testid=\"session-4\" role=\"button\" tabinde"
+ },
+ "pageErrors": null
+}

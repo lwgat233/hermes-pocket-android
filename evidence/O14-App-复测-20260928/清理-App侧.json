@@ -1,0 +1,23 @@
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket
+{
+  "r56-cleanup-app": {
+    "check": {
+      "hostsSeen": [
+        "复验主机",
+        "O14靶机"
+      ],
+      "deletedHost": "O14靶机",
+      "keysSeen": [
+        "verify-key",
+        "o14probe"
+      ],
+      "deletedKey": "o14probe",
+      "afterH": [
+        "复验主机"
+      ],
+      "afterK": [
+        "verify-key"
+      ]
+    }
+  }
+}

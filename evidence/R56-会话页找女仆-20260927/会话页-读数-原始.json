@@ -1,0 +1,185 @@
+{
+ "ui": {
+  "board": null,
+  "overlayDisplay": "none",
+  "drawerClass": "",
+  "btnPanel": {
+   "x": 63,
+   "y": 190
+  },
+  "title": "R56靶机",
+  "sessionsRows": 1
+ },
+ "drawer": {
+  "cls": "show",
+  "text": "Hermes Pocket|‹|连接|主机|地址 / 用户 / 启动命令|密钥|生成 / 导入 / 装到服务器|设置|字号 / 回滚 / 省电 / 通知|会话|远端 tmux 会话 · 点一下就切过去（永不终止）|Hermes|技能与记忆|远端 SKILL.md / USER.md / MEMORY.md|角色|频道|角色与对话 · 点谁就是跟谁说话|诊断|网络与流量|连通性 / 丢包 / 上下行",
+  "items": [
+   {
+    "t": "Hermes Pocket",
+    "cls": "dw-title",
+    "x": 382,
+    "y": 305,
+    "h": 16
+   },
+   {
+    "t": "‹",
+    "cls": "tb-btn",
+    "x": 780,
+    "y": 305,
+    "h": 23
+   },
+   {
+    "t": "连接",
+    "cls": "dw-group",
+    "x": 420,
+    "y": 451,
+    "h": 17
+   },
+   {
+    "t": "主机",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 543,
+    "h": 20
+   },
+   {
+    "t": "地址 / 用户 / 启动命令",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 601,
+    "h": 17
+   },
+   {
+    "t": "密钥",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 717,
+    "h": 20
+   },
+   {
+    "t": "生成 / 导入 / 装到服务器",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 775,
+    "h": 17
+   },
+   {
+    "t": "设置",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 891,
+    "h": 20
+   },
+   {
+    "t": "字号 / 回滚 / 省电 / 通知",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 948,
+    "h": 17
+   },
+   {
+    "t": "会话",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 1065,
+    "h": 20
+   },
+   {
+    "t": "远端 tmux 会话 · 点一下就切",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 1122,
+    "h": 17
+   },
+   {
+    "t": "Hermes",
+    "cls": "dw-group",
+    "x": 420,
+    "y": 1228,
+    "h": 14
+   },
+   {
+    "t": "技能与记忆",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 1316,
+    "h": 20
+   },
+   {
+    "t": "远端 SKILL.md / USER",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 1374,
+    "h": 17
+   },
+   {
+    "t": "角色",
+    "cls": "dw-group",
+    "x": 420,
+    "y": 1484,
+    "h": 17
+   },
+   {
+    "t": "频道",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 1576,
+    "h": 20
+   },
+   {
+    "t": "角色与对话 · 点谁就是跟谁说话",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 1634,
+    "h": 17
+   },
+   {
+    "t": "诊断",
+    "cls": "dw-group",
+    "x": 420,
+    "y": 1744,
+    "h": 17
+   },
+   {
+    "t": "网络与流量",
+    "cls": "ri-t",
+    "x": 420,
+    "y": 1837,
+    "h": 20
+   },
+   {
+    "t": "连通性 / 丢包 / 上下行",
+    "cls": "ri-s",
+    "x": 420,
+    "y": 1894,
+    "h": 17
+   }
+  ]
+ },
+ "rows": {
+  "tabOn": true,
+  "scrollTop": 0,
+  "scrollHeight": 1435,
+  "clientHeight": 1435,
+  "text": "在线：已连接 · 人/通道 9 行（tmux 容器 3 个）\n刷新\n在跑（7）\n#13 可爱女仆\n窗口 7 · tmux roles:home-maid · 建了 3 天\n在跑\n#4 女仆（本人通道）\nQQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844\nQQ 通道\n#5 测试者\n窗口 7 · tmux roles:pipeline-tester · 建了 3 天\n在跑\n#8 渲染者\n窗口 7 · tmux roles:pipeline-renderer · 建了 3 天\n在跑\n#10 功能创造者\n窗口 7 · tmux roles:pipeline-author · 建了 3 天\n在跑\n#6 我\n窗口 7 · tmux roles:owner-me · 建了 3 天\n在跑\n#11 调查者\n窗口 7 · tmux roles:research-investigator · 建了 3 天\n在跑\n临时对话（2）\n#7 临时对话（已废）\ntmux solo-solo1790090392\n没在跑\n#2 临时对话（已废）\ntmux solo-solo1790081404\n没在跑\n在线：已连接 · 人/通道 9 行（tmux 容器 3 个）\n刷新\n在跑（7）\n#13 可爱女仆\n窗口 7 · tmux roles:home-maid · 建了 3 天\n在跑\n#4 女仆（本人通道）\nQQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844\nQQ 通道\n#5 测试者\n窗口 7 · tmux roles:pipeline-tester · 建了 3 天\n在跑\n#8 渲染者\n窗口 7 · tmux roles:pipeline-renderer · 建了 3 天\n在跑\n#10 功能创造者\n窗口 7 · tmux roles:pipeline-author · 建了 3 天\n在跑\n#6 我\n窗口 7 · tmux roles:owner-me · 建了 3 天\n在跑\n#11 调查者\n窗口 7 · tmux roles:research-investigator · 建了 3 天\n在跑\n临时对话（2）\n#7 临时对话（已废）\ntmux solo-solo1790090392\n没在跑\n#2 临时对话（已废）\ntmux solo-solo1790081404\n没在跑",
+  "html": "<div class=\"card\"><div class=\"sub ui-status\">在线：已连接 · 人/通道 9 行（tmux 容器 3 个）</div><button class=\"btn\">刷新</button></div><div class=\"sub ui-status\">在跑（7）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-13\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#13 可爱女仆</div><div class=\"ri-s\">窗口 7 · tmux roles:home-maid · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-4\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#4 女仆（本人通道）</div><div class=\"ri-s\">QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844</div></div><div class=\"ri-r\">QQ 通道</div></div><div class=\"row-item\" data-testid=\"session-5\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#5 测试者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-tester · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-8\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#8 渲染者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-renderer · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-10\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#10 功能创造者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-author · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-6\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#6 我</div><div class=\"ri-s\">窗口 7 · tmux roles:owner-me · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-11\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#11 调查者</div><div class=\"ri-s\">窗口 7 · tmux roles:research-investigator · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div></div><div class=\"sub ui-status\">临时对话（2）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-7\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#7 临时对话（已废）</div><div class=\"ri-s\">tmux solo-solo1790090392</div></div><div class=\"ri-r\">没在跑</div></div><div class=\"row-item\" data-testid=\"session-2\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#2 临时对话（已废）</div><div class=\"ri-s\">tmux solo-solo1790081404</div></div><div class=\"ri-r\">没在跑</div></div></div><div class=\"card\"><div class=\"sub ui-status\">在线：已连接 · 人/通道 9 行（tmux 容器 3 个）</div><button class=\"btn\">刷新</button></div><div class=\"sub ui-status\">在跑（7）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-13\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#13 可爱女仆</div><div class=\"ri-s\">窗口 7 · tmux roles:home-maid · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-4\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#4 女仆（本人通道）</div><div class=\"ri-s\">QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844</div></div><div class=\"ri-r\">QQ 通道</div></div><div class=\"row-item\" data-testid=\"session-5\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#5 测试者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-tester · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-8\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#8 渲染者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-renderer · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-10\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#10 功能创造者</div><div class=\"ri-s\">窗口 7 · tmux roles:pipeline-author · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-6\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#6 我</div><div class=\"ri-s\">窗口 7 · tmux roles:owner-me · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div><div class=\"row-item\" data-testid=\"session-11\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#11 调查者</div><div class=\"ri-s\">窗口 7 · tmux roles:research-investigator · 建了 3 天</div></div><div class=\"ri-r\">在跑</div></div></div><div class=\"sub ui-status\">临时对话（2）</div><div class=\"ui-list\"><div class=\"row-item\" data-testid=\"session-7\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#7 临时对话（已废）</div><div class=\"ri-s\">tmux solo-solo1790090392</div></div><div class=\"ri-r\">没在跑</div></div><div class=\"row-item\" data-testid=\"session-2\" role=\"button\" tabindex=\"0\"><div class=\"ri-main\"><div class=\"ri-t\">#2 临时对话（已废）</div><div class=\"ri-s\">tmux solo-solo1790081404</div></div><div class=\"ri-r\">没在跑</div></div></div>",
+  "cardCount": 2,
+  "rows": [
+   {
+    "text": "在线：已连接 · 人/通道 9 行（tmux 容器 3 个） | 刷新",
+    "cls": "card",
+    "x": 540,
+    "y": 527
+   },
+   {
+    "text": "在线：已连接 · 人/通道 9 行（tmux 容器 3 个） | 刷新",
+    "cls": "card",
+    "x": 540,
+    "y": 2506
+   }
+  ],
+  "heads": [],
+  "fullText": "☰\n会话\n✕\n在线：已连接 · 人/通道 9 行（tmux 容器 3 个）\n刷新\n在跑（7）\n#13 可爱女仆\n窗口 7 · tmux roles:home-maid · 建了 3 天\n在跑\n#4 女仆（本人通道）\nQQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844\nQQ 通道\n#5 测试者\n窗口 7 · tmux roles:pipeline-tester · 建了 3 天\n在跑\n#8 渲染者\n窗口 7 · tmux roles:pipeline-renderer · 建了 3 天\n在跑\n#10 功能创造者\n窗口 7 · tmux roles:pipeline-author · 建了 3 天\n在跑\n#6 我\n窗口 7 · tmux roles:owner-me · 建了 3 天\n在跑\n#11 调查者\n窗口 7 · tmux roles:research-investigator · 建了 3 天\n在跑\n临时对话（2）\n#7 临时对话（已废）\ntmux solo-solo1790090392\n没在跑\n#2 临时对话（已废）\ntmux solo-solo1790081404\n没在跑\n在线：已连接 · 人/通道 9 行（tmux 容器 3 个）\n刷新\n在跑（7）\n#13 可爱女仆\n窗口 7 · tmux roles:home-maid · 建了 3 天\n在跑\n#4 女仆（本人通道）\nQQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844\nQQ 通道\n#5 测试者\n窗口 7 · tmux roles:pipeline-tester · 建了 3 天\n在跑\n#8 渲染者\n窗口 7 · tmux roles:pipeline-renderer · 建了 3 天\n在跑\n#10 功能创造者\n窗口 7 · tmux roles:pipeline-author · 建了 3 天\n在跑\n#6 我\n窗口 7 · tmux roles:owner-me · 建了 3 天\n在跑\n#11 调查者\n窗口 7 · tmux roles:research-investigator · 建了 3 天\n在跑\n临时对话（2）\n#7 临时对话（已废）\ntmux solo-solo1790090392\n没在跑\n#2 临时对话（已废）\ntmux solo-solo1790081404\n没在跑"
+ },
+ "pageErrors": null
+}

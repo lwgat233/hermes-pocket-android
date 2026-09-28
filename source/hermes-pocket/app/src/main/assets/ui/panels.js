@@ -855,11 +855,23 @@
       const winForm = (tmux) => /^[^:]+:[A-Za-z][A-Za-z0-9_-]*$/.test(String(tmux || ''));
       const chanForm = (tmux) => { const v = String(tmux || ''); return v.indexOf(':') > 0 && !winForm(v); };
       const isChan = (s) => !!s && chanForm(s.tmux);
+      /* O14：女仆会同时出现「本体 + 通道（+ 平台误建的一份）」——
+       * · `canonical=1` ⇒ 本体：身份用 `session.name`（如「奈奈（女仆本体）」），右标「本体」
+       * · `tmux` 以 `qqbot:` 开头 ⇒ 沿用 R-40 的通道特判（`isChan`，标「QQ 通道」、恒在线），文案「女仆（本人通道）」
+       * · 同一角色还有本体、而这一行既不是本体也不是通道 ⇒ 多余入口：标「多余的一份（平台误建）」
+       * 判据都按**平台字段/形态**判（不写死 id / 角色名），#id 仍只认平台 id。 */
+      const canon = (s) => !!(s && (s.canonical === 1 || s.canonical === true));
+      const hasCanon = {};
+      (sess || []).forEach((s) => { if (canon(s) && s.role) hasCanon[s.role] = 1; });
+      const redundant = (s) => !!s && !!s.role && !canon(s) && !isChan(s) && !!hasCanon[s.role];
+      const rankOf = (s) => (canon(s) ? 0 : (isChan(s) ? 1 : (redundant(s) ? 2 : 0)));   /* 本体 → 通道 → 其它入口 */
       /* R-40 修正①③：身份 —— 临时对话＝固定；通道＝固定标签（不取平台 title/name）；
        * 角色＝平台 title 去括号；**roles 没到位 ⇒ 只显「（加载中）」**，不把平台 name 当身份 */
       const ident = (s) => {
         if (s.kind === 'solo') return '临时对话';
+        if (canon(s)) return String(s.name || '').trim() || '本体';
         if (isChan(s)) return '女仆（本人通道）';
+        if (redundant(s)) return '多余的一份（平台误建）';
         const rl = ((HP.Talk && HP.Talk.roles) || []).find((x) => x.full_name === s.role);
         if (rl) {
           const t = String(rl.title || '').split(/[（(]/)[0];
@@ -882,14 +894,14 @@
       const rowOf = (s) => {
         const cont = String(s.tmux).split(':')[0];
         const t = byTmux[cont] || {};
-        const chan = isChan(s);
+        const chan = isChan(s) && !canon(s);      /* O14：本体（canonical）不算通道 —— 本体在 hermes 容器里、窗口名是中文，别被 isChan 的形状判成 QQ 通道 */
         const head = '#' + s.id + ' ' + ident(s) + (live(s) ? '' : '（已废）');
         const sub = (chan ? 'QQ 通道 · ' : '') + (t.windows !== undefined ? '窗口 ' + t.windows + ' · ' : '') + 'tmux ' + s.tmux +
           (t.ageSec !== undefined ? ' · 建了 ' + this._ago(t.ageSec) : '');
         return HP.UI.row({
           title: head,
           sub: sub,
-          right: chan ? 'QQ 通道' : (live(s) ? (t.attached ? 'attach 中' : '在跑') : '没在跑'),
+          right: canon(s) ? '本体' : (chan ? 'QQ 通道' : (live(s) ? (t.attached ? 'attach 中' : '在跑') : '没在跑')),
           testid: 'session-' + s.id,
           cls: (String((S.pick() || '')) === cont) ? 'row-on' : '',
           onTap: () => {
@@ -903,9 +915,20 @@
           }
         });
       };
-      const running = people.filter((s) => s.kind !== 'solo' && live(s));
-      const stopped = people.filter((s) => s.kind !== 'solo' && !live(s));
-      const solo = people.filter((s) => s.kind === 'solo');
+      /* O14：同一角色的多行**贴在一起**，组内固定「本体 → 通道 → 其它入口」（**绝不按 last_used / alive 排**）；
+       * 角色之间的先后沿用平台给的顺序（稳定排序，别的角色一个都不重排）。 */
+      const roleKey = (s) => String(s.role || ('#' + s.id));
+      const buckets = {}, order = [];
+      people.forEach((s) => {
+        const k = roleKey(s);
+        if (!buckets[k]) { buckets[k] = []; order.push(k); }
+        buckets[k].push(s);
+      });
+      const ordered = [];
+      order.forEach((k) => { buckets[k].slice().sort((a, b) => rankOf(a) - rankOf(b)).forEach((s) => ordered.push(s)); });
+      const running = ordered.filter((s) => s.kind !== 'solo' && live(s));
+      const stopped = ordered.filter((s) => s.kind !== 'solo' && !live(s));
+      const solo = ordered.filter((s) => s.kind === 'solo');
       const online = A().state === 'connected' ? '已连接' : (A().state || '未知');
       const head = document.createElement('div');
       head.className = 'card';

@@ -1,0 +1,64 @@
+# O14-App 第 2 步 · 真机复测结论（pipeline.tester · 2026-09-28）
+
+对象：`apk/测试版/hermes-pocket-O14-会话两行-20260928.apk` · 设备：无头 Android 14 · **代码一行未改**（只验）
+本次测 1 块：**会话页**（本人问的就是它）。
+
+## 装包核对（**从设备读回**）
+| 项 | 读数 |
+|---|---|
+| 设备 base.apk sha256 | **0916b569f1b646878c8c618affaa260f85f449c2ba163fd179b1826df15178ad**（5,138,230 字节） |
+| 设备内 `assets/ui/panels.js` | **7ca241b63d44ceafe193d69c7c690fe0d03e0bd698f2b867905f37afb1207315**（＝源树 `7ca241b63d44ceaf…`） |
+| 设备内 `assets/build-info.json` | **unified-20260928-090313** / featureId **O14-App** |
+
+## ① 女仆三行的顺序与文字 —— ✓ 达成（顺序＝本体 → 通道 → 多余）
+`#tab-sessions` 里「**在跑（8）**」组的**前 3 行**（DOM 原文逐行）：
+
+| 序 | `data-testid` | 标题 | 副行 | 右标 |
+|---|---|---|---|---|
+| 1 | `session-14` | **`#14 奈奈（女仆本体）`** | `窗口 2 · tmux hermes:女仆本体 · 建了 7 天` | **本体** |
+| 2 | `session-4` | **`#4 女仆（本人通道）`** | `QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844` | **QQ 通道** |
+| 3 | `session-13` | **`#13 多余的一份（平台误建）`** | `窗口 7 · tmux roles:home-maid · 建了 3 天` | **在跑** |
+
+DOM 原文（节选）：
+```html
+<div class="row-item" data-testid="session-14" role="button" tabindex="0"><div class="ri-main"><div class="ri-t">#14 奈奈（女仆本体）</div><div class="ri-s">窗口 2 · tmux hermes:女仆本体 · 建了 7 天</div></div><div class="ri-r">本体</div></div>
+<div class="row-item" data-testid="session-4" role="button" tabindex="0"><div class="ri-main"><div class="ri-t">#4 女仆（本人通道）</div><div class="ri-s">QQ 通道 · tmux qqbot:3FDE0CB3E30CD63FC5C635B4C657C844</div></div><div class="ri-r">QQ 通道</div></div>
+<div class="row-item" data-testid="session-13" role="button" tabindex="0"><div class="ri-main"><div class="ri-t">#13 多余的一份（平台误建）</div><div class="ri-s">窗口 7 · tmux roles:home-maid · 建了 3 天</div></div><div class="ri-r">在跑</div></div>
+```
+**关键对照**：平台 `sessions-json` 给的是 `last_used` 倒序（**#14 → #13 → #4**），而真机显示成 **#14 → #4 → #13** ⇒ **前端确实把 #13 排到最后了** ✓（对齐 `panels.js:867 rankOf` / `:918` 的排序口径）。
+`#13` 的右标是「在跑」（判据没规定它，如实报）。
+
+## ② 点 #13 / 点 #14 —— **部分达成，主力判据「弹窗主体是谁」未拿到 ⇒ 记未验**
+- 拿到的：**点 #13 那一行确实会开「会话」弹窗** —— 实测 `elementFromPoint(屏幕中心)` = `BUTTON#tk-sess-del.tk-act`，文案「**删除这个会话**」（即 R-40 那个 `sessionSheet`）✓
+- **没拿到**：弹窗**主体是谁**（#13 还是 #14）—— 我按 `3FDE…`/「多余的一份」去找弹窗文字两次都没采到（一次是弹窗容器的选择器没覆盖、一次是面板未处于显示态），**不替你圆也不猜 ⇒ 记「未验」**。
+- 代码读数（可以确定性地说的一条）：每一行的 `onTap` 闭包里传的是**这一行自己的 `s`**（`panels.js:907-916`：`onTap: () => { HP.Panels.sessionSheet(Object.assign({}, s, { name: s.role || s.tmux, chan, label: ident(s)… })) }`，`sessionSheet` 在 `panels.js:780`）⇒ **结构上"点 #13 只能开到 #13"**。但这是读代码，不是实读 ⇒ 仍记未验（等下一轮用"点完读弹窗 title"的方式补一条）。
+
+## ③ 其它角色不回归
+| 行 | 真机读数 | 判据 | |
+|---|---|---|---|
+| `#10 功能创造者` | 右标 **在跑** | 在跑 | ✓ |
+| `#8 渲染者` | 右标 **在跑** | 在跑 | ✓ |
+| `#5 测试者` | 右标 **在跑** | 在跑 | ✓ |
+| `#11 调查者` | 标题 `#11 调查者`（**没有**「（已废）」）、右标 **在跑** | 判据说 `#11 调查者（已废）`=没在跑 | **与判据不符**（现测：`sessions-json` 里 #11 `alive=true`、前端据实显示「在跑」）⇒ 如实报，不替它圆 |
+
+## ④ 常驻按键 / 说明文案 / JS 报错
+- 会话页自身按钮：`['刷新','刷新']`（**2 个** —— 因为整块列表渲染了两份，每份 1 个；**合并后仍是 1 个「刷新」/份**）；顶栏常驻 **3 个**（☰/⌨/⛶）⇒ **≤3 ✓**
+- 说明类文案：会话页内命中 **0**（`expl=[]`）✓
+- **0 JS 报错 / 0 console.error**（多轮 `pageErrors` = 0）✓
+
+## ⑤ 列表两份渲染（只记读数，不当判据）
+**仍在**：`#tab-sessions` 里 `.row-item` **20 个**（10 行 ×2）、`.ui-list` **4 个**、`.card` **2 个**（含 2 个「刷新」）⇒ 与 R-46/R-56 抓到的同族 ✓ 如实记。
+
+## ⑥ 滚动能不能动 —— ✓ 能动，且能到底（上轮"滑不动"确系残留浮层）
+- 先把残留浮层清掉（本轮我自己连接留下的 hostkey 确认框，逐个点「取消」＋返回键后 **浮层数 0**）
+- 然后真滑动：`#overlay .panel-body` `scrollTop **0 → 588 → 1083**`，`scrollHeight 1601 / clientHeight 518`（**max = 1083**）⇒ **能滚、且滚到了底** ✓；滑动中行 `top` 从 43 变到 -858（列表在动）✓
+- 结论：**上轮判不了的滚动，这轮判了：能动 ✓**；上轮的"滑不动"是残留 hostkey 浮层吞触摸所致（读数一致）。
+
+## 红线
+- **不接主机** ✓（靶子＝临时 sshd 仅 `127.0.0.1:2222`、独立 authorized_keys；**NAS `~/.ssh/authorized_keys` 7 条 / mtime 2026-09-21 20:41:42.800652328 未变**）
+- **没改代码** ✓（app 源树未改；只新增验收脚本）
+- **没清 `#13`** ✓（只读列举；没点「删」）
+- 未验≠通过：② 的弹窗主体、不接主机那几条（真实动态流/登录态）
+
+## 证据（`evidence/O14-App-复测-20260928/`）
+`会话页-三行读数.json`（DOM 原文 + 逐行 data-testid/右标/坐标）· `点击与滚动读数.json`（点 #13 后中心元素 + 滚动前后）· `数据源-sessions-json.json` · `装包核对-从设备读回.txt` · `清理-App侧.json`
