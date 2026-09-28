@@ -1,0 +1,79 @@
+包：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-汇总-20260928.apk
+包 sha256：3784052603dc49d1714a0b1a44014e782a54444757607d5fef5b67ef3df03c2f
+
+=== ① 包内 build-info.json ↔ 源 build-info.json ===
+  包内 testVersion=unified-20260928-213941 builtAt=2026-09-28 21:39 CST
+  源   testVersion=unified-20260928-213941 builtAt=2026-09-28 21:39 CST
+  ✓ 两份逐字段相同
+
+=== ② 包内 ui/app.js 的 HP.BUILD / HP.BUILDINFO ↔ 源 ===
+  包内 HP.BUILD = unified-20260928-213941
+  ✓ 与 build-info.testVersion 一致
+  ✓ 包内盖章块与源逐字节相同
+
+=== ③ 包内 ui/ 每个文件 ↔ 源（含 talk.js）===
+  ✓ assets/ui/app.js
+     源  4250e95982ec0dfec6bf5e2e0e642c3fe1a96411bda382fe95cdcaa311bc8d5e
+     包内4250e95982ec0dfec6bf5e2e0e642c3fe1a96411bda382fe95cdcaa311bc8d5e
+  ✓ assets/ui/cache.js
+     源  15cc0922778083f1f71ddac373a08593e3b6a92a96d256c1d009cc4d97f025f8
+     包内15cc0922778083f1f71ddac373a08593e3b6a92a96d256c1d009cc4d97f025f8
+  ✓ assets/ui/chatstate.js
+     源  42fcaad2c599f885c379c6f8acd8fb6a59a85c3d20cf022df347fb8257bfc711
+     包内42fcaad2c599f885c379c6f8acd8fb6a59a85c3d20cf022df347fb8257bfc711
+  ✓ assets/ui/index.html
+     源  514902d17abcc5daddf9de0f0a3ff543fcbbd193e31cf8b57002c9770a7e6229
+     包内514902d17abcc5daddf9de0f0a3ff543fcbbd193e31cf8b57002c9770a7e6229
+  ✓ assets/ui/net.js
+     源  df6347e15467b15ca6beb88e2f24aee4b81220cde0f48231a980e3340bba1c9b
+     包内df6347e15467b15ca6beb88e2f24aee4b81220cde0f48231a980e3340bba1c9b
+  ✓ assets/ui/netstats.js
+     源  c6ced8b79dd0201c512f69d763aba3d562f1cea56661ed87a89837d6751a0ce5
+     包内c6ced8b79dd0201c512f69d763aba3d562f1cea56661ed87a89837d6751a0ce5
+  ✓ assets/ui/panels.js
+     源  7ca241b63d44ceafe193d69c7c690fe0d03e0bd698f2b867905f37afb1207315
+     包内7ca241b63d44ceafe193d69c7c690fe0d03e0bd698f2b867905f37afb1207315
+  ✓ assets/ui/registry.js
+     源  cbccce4ce0f9140e03831ddac3ff650a2369246f7937b4cf909093d7445dcfa7
+     包内cbccce4ce0f9140e03831ddac3ff650a2369246f7937b4cf909093d7445dcfa7
+  ✓ assets/ui/remote.js
+     源  990465e7dc90f40163e7d6a84d91cf629be53465a9745afa7a6725c9193e6c66
+     包内990465e7dc90f40163e7d6a84d91cf629be53465a9745afa7a6725c9193e6c66
+  ✓ assets/ui/sessions.js
+     源  65d39453135d5a7830e36dc702ef89148190752d6745c6c27c797811e959d0d9
+     包内65d39453135d5a7830e36dc702ef89148190752d6745c6c27c797811e959d0d9
+  ✓ assets/ui/style.css
+     源  d617bb727e2c99f4d512989c6098cd3ff681560b194b4219764a404211358c7e
+     包内d617bb727e2c99f4d512989c6098cd3ff681560b194b4219764a404211358c7e
+  ✓ assets/ui/talk.css
+     源  09d999e278a7e916d0d5fdd9343744e65e23f8cc9d95feafdfc33e6df703e4c3
+     包内09d999e278a7e916d0d5fdd9343744e65e23f8cc9d95feafdfc33e6df703e4c3
+  ✓ assets/ui/talk.js
+     源  7cbe502b129a536ccbf2c8b65952c34573aaeea3b9178dd5c42996e426b569ca
+     包内7cbe502b129a536ccbf2c8b65952c34573aaeea3b9178dd5c42996e426b569ca
+  ✓ assets/ui/transport.js
+     源  a7bfa7c20be7d5297b8f234916766a7b73cb31278cf18448c135cb619bbc0f09
+     包内a7bfa7c20be7d5297b8f234916766a7b73cb31278cf18448c135cb619bbc0f09
+  ✓ assets/ui/tui.js
+     源  720d05b82be23797d55564a5d8108eb9e5ddd1cf452d4a9ef7a5c8b5e07780b2
+     包内720d05b82be23797d55564a5d8108eb9e5ddd1cf452d4a9ef7a5c8b5e07780b2
+  ✓ assets/ui/ui.js
+     源  5f1dc0f7f4c8173491c5c1e56f646c40a33f8fa4501040f7278f7fa2f241e7a2
+     包内5f1dc0f7f4c8173491c5c1e56f646c40a33f8fa4501040f7278f7fa2f241e7a2
+  ✓ assets/ui/vendor/addon-fit.js
+     源  bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089
+     包内bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089
+  ✓ assets/ui/vendor/addon-unicode11.js
+     源  b0c3be540a9984713aea996966c24ed1a639d11f60d44986b22661e3a8a148d0
+     包内b0c3be540a9984713aea996966c24ed1a639d11f60d44986b22661e3a8a148d0
+  ✓ assets/ui/vendor/addon-web-links.js
+     源  f230a6c8211ce4614dda5441f27b603c7c1ca95151a655bc0efac6377ee643f0
+     包内f230a6c8211ce4614dda5441f27b603c7c1ca95151a655bc0efac6377ee643f0
+  ✓ assets/ui/vendor/xterm.css
+     源  ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6
+     包内ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6
+  ✓ assets/ui/vendor/xterm.js
+     源  1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+     包内1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495
+
+PASS 包内 ↔ 源树 对账

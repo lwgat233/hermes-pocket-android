@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260928-090313";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-28 09:03 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "会话页：女仆本体（canonical=1）与 QQ 通道分行显示、固定顺序（本体→通道→其它入口），平台误建的 roles:home-maid 一份标「多余的一份（平台误建）」排最后；不动 R-40 的 isChan/编号口径与其它角色显示", "featureId": "O14-App", "note": "汇总包（不是单轮）：自 汇总-20260926 之后新增 R48；不含 R43（平台侧）、R38（非缺陷）、R46/R47/R50/R51/R54（只到定位未改码）、R44/R49/R52/R53（等本人拍）——见 evidence/汇总-20260927/清单-轮次对照.txt", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260928-090313"};
+  HP.BUILD = "unified-20260928-213941";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-28 21:39 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "09-28 汇总包：当前源树整包（新增 O14-App 会话页女仆「本体 + 通道 + 多余一份」两行与固定顺序）；除 build-info 盖章外零改动", "featureId": "汇总-20260928", "note": "汇总包（不是单轮）：自 汇总-20260927 之后新增 O14-App#1/#2；不含社媒轮次（属 social-archive）、平台侧修复（R-43 类）、等本人拍（R-44/R-49/R-52/R-53）、只到定位未改码（R-46/R-47/R-50/R-51/R-54）——见 evidence/汇总-20260928/清单-轮次对照.txt", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260928-213941"};
   /* —— 打包信息结束 —— */
 
   const THEME = {
