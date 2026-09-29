@@ -1,0 +1,95 @@
+{
+  "name": "R52R53#4：会话钉住显式化 + 聊天页装数据（真平台回包/失败形状）",
+  "result": {
+    "check": {
+      "00_真平台回包": {
+        "last": 927,
+        "条数": 200,
+        "hidden_count": 0,
+        "首条": {
+          "id": 285,
+          "from": "owner.me",
+          "len": 5
+        }
+      },
+      "01_会话_sel失效": {
+        "bootstrap": {
+          "action": "need-pick",
+          "count": 3,
+          "names": [
+            "hermes",
+            "r52t",
+            "roles"
+          ],
+          "why": "钉住的会话 已经没了的会话 已经不在了（远端有 3 条）",
+          "at": 1790660754529
+        },
+        "发出去的字节": [],
+        "有没有 attach": false,
+        "toast": "钉住的会话 已经没了的会话 已经不在了（远端有 3 条）：请在「会话」里点一条，我不替你挑",
+        "面板开着吗": true,
+        "lastPick": {
+          "action": "need-pick",
+          "count": 3,
+          "names": [
+            "hermes",
+            "r52t",
+            "roles"
+          ],
+          "why": "钉住的会话 已经没了的会话 已经不在了（远端有 3 条）",
+          "at": 1790660754529
+        }
+      },
+      "02_会话_sel有效": {
+        "bootstrap": {
+          "action": "attach",
+          "name": "r52t",
+          "count": 3,
+          "why": "连的是你钉住的那条"
+        },
+        "发出去的字节": [
+          "tmux attach -t 'r52t'\r"
+        ],
+        "钉住的就是它": true
+      },
+      "03_会话_只有一条": {
+        "bootstrap": {
+          "action": "attach",
+          "name": "hermes",
+          "count": 1,
+          "why": "远端只有一条会话"
+        },
+        "发出去的字节": [
+          "tmux attach -t 'hermes'\r"
+        ]
+      },
+      "04_聊天页_真回包": {
+        "view=channel": {
+          "last": 927,
+          "msgs": 200,
+          "流子节点": -1,
+          "bub": 0,
+          "rpcErr": "",
+          "页面文字": "实时含私信 🔒服务端：还没搭建 —— 点右边「搭服务端」搭服务端跟谁说roles作者›pipeline.author · 未起会话＋ 新角色建频道（0）▸🗣 全体喊话＋ 新对话"
+        },
+        "view=role": {
+          "流子节点": 0,
+          "bub": 0,
+          "页面文字": "← 频道聊天终端作者　不在线（还没聊过）可见：只给他身份：本人说发送"
+        }
+      },
+      "05_聊天页_命令失败": {
+        "tk_bub数": 0,
+        "rpcErr": "python3: command not found",
+        "rpcCmd": "since-json --id 0",
+        "toast": "频道取数失败：python3: command not found",
+        "状态行里能看到失败": true,
+        "tk_chat_子节点": 0
+      },
+      "06_报错": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}

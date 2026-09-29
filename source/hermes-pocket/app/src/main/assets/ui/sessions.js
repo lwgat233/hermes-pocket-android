@@ -70,10 +70,17 @@
       }
     },
 
-    /** 进哪个会话：用户点过的优先，否则第一个 */
+    /** 进哪个会话：**只认用户钉住的那条**（sel）；钉住的不在/没钉过 ⇒ 返回空（**不猜**，R52R53#4） */
     pick() {
       if (this.sel && this.list.some((s) => s.name === this.sel)) return this.sel;
-      return this.list.length ? this.list[0].name : '';
+      return '';
+    },
+
+    /** 为什么没选出来（给界面与日志看，**不许静默**） */
+    pickWhy() {
+      if (!this.list.length) return '远端没有 tmux 会话';
+      if (this.sel) return '钉住的会话 ' + this.sel + ' 已经不在了（远端有 ' + this.list.length + ' 条）';
+      return '还没钉住哪条会话（远端有 ' + this.list.length + ' 条）';
     },
 
     /** attach 到某个会话（发到终端里，用户能看见） */
@@ -106,9 +113,21 @@
       const o = opts || {};
       await this.refresh();
       if (this.list.length) {
+        if (this.list.length === 1) {                       /* 只有一条 ⇒ 不是猜，直接连它 */
+          this.attach(this.list[0].name);
+          return { action: 'attach', name: this.list[0].name, count: 1, why: '远端只有一条会话' };
+        }
         const n = this.pick();
+        if (!n) {
+          /* **不猜**：多条会话又没钉住（或钉住的没了）⇒ 明确报出来 + 打开会话栏目让用户点一条 */
+          const why = this.pickWhy();
+          this.lastPick = { action: 'need-pick', count: this.list.length, names: this.list.map((x) => x.name), why, at: Date.now() };
+          HP.App.toast(why + '：请在「会话」里点一条，我不替你挑', 4600);
+          try { HP.App.openPanel(); } catch (e) { }
+          return this.lastPick;
+        }
         this.attach(n);
-        return { action: 'attach', name: n, count: this.list.length };
+        return { action: 'attach', name: n, count: this.list.length, why: '连的是你钉住的那条' };
       }
       const cmd = (HP.App.host && HP.App.host.startCmd) || '';
       if (cmd) { HP.App.send(cmd + '\r'); this.sel = this.name; return { action: 'startCmd', cmd, count: 0 }; }

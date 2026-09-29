@@ -109,7 +109,9 @@ object Bridge {
 
     private fun talkCmd(args: List<String>): String {
         val q = { x: String -> "'" + x.replace("'", "'\\''") + "'" }
-        return "python3 " + q("$talkRoot/tools/talk.py") + " " + args.joinToString(" ") { q(it) }
+        // exec 通道是**非交互 shell**（PATH 可能很窄甚至没有 python3）⇒ 钉一段 PATH 再跑（R52R53#4）
+        val path = "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        return path + " python3 " + q("$talkRoot/tools/talk.py") + " " + args.joinToString(" ") { q(it) }
     }
 
     /** 跑 talk.py 并把它的 JSON 输出解析回对象（不是 JSON 就把原文放 raw 里，别吞掉） */

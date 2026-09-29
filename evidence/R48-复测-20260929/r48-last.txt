@@ -1,0 +1,32 @@
+{
+  "r58-app-host": {
+    "check": {
+      "steps": [],
+      "gen": {
+        "fp": "SHA256:2xyd72tPVwAmGHeYQx0WLM/6ruw+Acbkpe7hhwQeepc",
+        "reused": true
+      },
+      "host": {
+        "id": "fe4027cb30154b81",
+        "host": "10.0.2.2",
+        "port": 2222,
+        "startCmd": "R49_LOG=/tmp/r49-probe.log python3 -u /vol1/1000/aicache/tmp/r49-probe3.py"
+      },
+      "connected": true,
+      "topbar": "R58靶机 / TUI·鼠标",
+      "badgeHasTui": true,
+      "termText": "────────────────────────────────────────────────────────────────────────────────[hermes] 0:____-________- 1:________*              \"galaxy-fnos\" 13:45 29-Sep-26",
+      "viewport": {
+        "sh": 0,
+        "ch": 0,
+        "st": 0,
+        "bottom": 0
+      },
+      "xtermCount": 1
+    }
+  },
+  "pageErrors": [
+    "未捕获异常: TypeError: Cannot read properties of undefined (reading 'UI')\n    at https://appassets.androidplatform.net/ui/app.js:2255:22\n    at new Promise (<anonymous>)\n    at Object.confirm (https://appassets.androidplatform.net/ui/app.js:2241:14)\n    at Object.onHostKey (https://appassets.androidplatform.net"
+  ]
+}
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket

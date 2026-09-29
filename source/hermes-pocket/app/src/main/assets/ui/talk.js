@@ -380,7 +380,16 @@
       try {
         await this.refreshRoles();
         await this.refreshAsks();
-        if (!this.last) { const r = await rpc('talk.since', { id: 0 }); this.last = (r && r.last) || 0; this.msgs = (r && r.messages) || []; }
+        if (!this.last) {
+          const r = await rpc('talk.since', { id: 0 });
+          /* 桥回的不是 JSON（= 那条命令自己失败了）⇒ 露出来，别静默成"0 条消息"（R52R53#4） */
+          if (r && r.raw !== undefined) {
+            this.rpcErr = String(r.raw || '').trim().split('\n')[0].slice(0, 120) || '（命令没有输出）';
+            this.rpcCmd = r.cmd || '';
+            HP.App.toast('频道取数失败：' + this.rpcErr, 5200);
+          } else { this.rpcErr = ''; this.rpcCmd = ''; }
+          this.last = (r && r.last) || 0; this.msgs = (r && r.messages) || [];
+        }
       } catch (e) { HP.App.toast('连不上频道：' + e.message); }
       try { (this.view === 'role' && this.sel) ? this.paintRole(el) : this.paintChannel(el); }
       catch (e) { el.textContent = '频道画不出来：' + e.message; }
@@ -398,6 +407,13 @@
       /* 服务端状态（每次进频道页核对）：几个角色、缺几个会话、中转站在跑吗 */
       const sl = document.createElement('div');
       sl.className = 'tk-title';
+      if (this.rpcErr) {                                             /* R52R53#4：失败要看得见，且**不被后面覆盖** */
+        const er = document.createElement('div');
+        er.className = 'tk-title';
+        er.id = 'tk-rpcerr';
+        er.textContent = '取数失败：' + this.rpcErr;
+        el.appendChild(er);
+      }
       sl.id = 'tk-serverline';
       sl.textContent = '服务端：核对中…';
       el.appendChild(sl);

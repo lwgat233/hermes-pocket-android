@@ -1,0 +1,66 @@
+# hermes-pocket-R48 第 4 步 · 真机复测结论（pipeline.tester · 2026-09-29 · #1889）
+
+**一句话**：**① 浮层 ✓（连 3 次后浮层 0、按钮真触摸命中自己）、② 三条路径里 2 条 ✓（键条「⏎」与 `#csend` 都让靶子端收到恰好 1 个 `0x0D`）、③ 尺寸 ✓（`#csend` 60×44、键条键 44×44）、⑥ 清场 ✓**；**② 的软键盘 Enter 未验**（我没把输入焦点拿起来）、**④ 的 `R-49` 未验**（靶子在备用屏没有滚动空间）、**⑤ 有一条真 pageerror**（`HP.UI` 未就绪就调用 `closeDialogs`）。
+
+## 装包核对（✓）
+| 项 | 读数 |
+|---|---|
+| 宿主 APK | `apk/测试版/hermes-pocket-R48-字节与浮层-20260929.apk` **5146700 字节** ✓ · sha256 **`da21e54d38f30c021b50f8f5272b5adf01d15905870277ee5cd63b85d9a8fe50`**（＝`da21e54d38f3…`） |
+| **设备侧 base.apk** | **5146700 字节 / sha256 同上（逐字节相同）** ✓ ⇒ 装的正是这一版 |
+| 包内 vs 源树 | `ui/ui.js` **4882324f0fd6487d**（两侧同 ✓）· `ui/style.css` **c5ca52140bd96a61**（两侧同 ✓） |
+| ⚠ build-info 注 | 本包 `build-info.json` 的 **`featureId` 仍是 `R-52R53`**、`feature` 文案仍是 R-58 那段（`testVersion unified-20260929-133223` ✓）⇒ 出包时**没刷新这两个字段**，只记读数、不改判据 |
+
+## ① 浮层（R-57）—— ✓
+| 读数 | 值 |
+|---|---|
+| 连接流程跑的次数 | **4 次 `connect()`**：好主机 ×2、**坏主机（127.0.0.1:1，失败路径）×1**、再连好主机 ×1（含"被顶掉"） |
+| 连完之后 `.hp-dialog`（可见） | **0** ✓ |
+| 其它浮层（`.hp-dialog` / `#tk-sheet` 可见数） | **0** ✓ |
+| `elementFromPoint('#btn-term' 中心)` | **`by = btn-term`、`isSelf = true`** ✓（**收起态**也命中自己 ✓） |
+| `#btn-term` 矩形 | **393×44** ✓（≥44dp） |
+
+## ② 三条路径的字节（靶子先 `stty raw -echo` ✓）—— 2/3 ✓
+靶子脚本启动时已做 raw（`icanon/echo/icrnl/opost` 全关 ⇒ 收到的是原始字节），日志 `evidence/R48-复测-20260929/靶子逐字节日志-原始.log`：
+| 路径 | 操作 | 靶子端读数 |
+|---|---|---|
+| **键条「⏎」** | `#keybar .key`（文案 ⏎）真触摸 ×1 | **`RX 1 字节 0x0D=1 本批hex=0d`** ✓ |
+| **`#csend`**（输入框那颗 ⏎） | 真触摸 ×1 | **`RX 1 字节 0x0D=1 本批hex=0d`** ✓ |
+| **真软键盘 Enter** | 点顶栏「⌨」→ 宿主 `adb shell input keyevent 66` ×2 | **未验**：点 ⌨ 后 `document.activeElement` 仍是 `btn-keys`、`#cinput` **没拿到焦点** ⇒ 键事件没进应用 ⇒ 靶子端**无新字节**（日志仍是上面 2 条） |
+⇒ **App 侧发的确是真 `0d`**（作者 #1881 的结论我这边独立复现了 2 条 ✓）；软键盘那条我**没测成**，不写"应该也行"。
+
+## ③ 尺寸 —— ✓
+| 元素 | `getBoundingClientRect` |
+|---|---|
+| `#csend` | **60×44** ✓（作者由 38 → 44 的那处生效 ✓） |
+| 键条 `#keybar .key`（Esc / Tab / ⇧Tab / ↑ / ↓ / ← …） | 全 **44×44** ✓（≥44 ✓） |
+
+## ④ 回归
+| 探针 | 结果 |
+|---|---|
+| **`R-58` 收起/展开** | **✓**：收起 `pannerH **0** / termHidden true`；真触摸展开 ⇒ `pannerH **521** / false`；再触摸 ⇒ 回 0/true（按钮 y 从 322→62→322 ✓） |
+| **`R-49` 离底** | **未验**：靶子跑在 tmux 会话里（备用屏）⇒ `.xterm-viewport` `scrollHeight = clientHeight = 508` **没有滚动空间** ⇒ 离底读数退化、判不了（要判得先 `Ctrl-b d` detach 到普通屏，见 `R58#3` 那条经验） |
+| **`t-composer` / `t-r48-cr` / `t-r58` / `t-r49` 四个命名探针** | **不在仓库里**（作者的 raw 输出在 `evidence/R48-字节与浮层-20260929/`，探针本体没进 `tools/`）⇒ "有探针就跑"我没法跑它们；**我用自己的等价探针**（`tools/验收脚本/r48-probe*.mjs`）给了上面这些读数 |
+| **`R-52R53` 三态/长按菜单顺手看** | **未验**（同一个原因：本机聊天页 0 个 `#tk-chat`/0 气泡 —— 见 `evidence/R52R53-复测-20260929/结论-R52R53-第3步.txt`）；派活里"点不动「显示终端」按已在 R48#3 修记" ⇒ **我实测能点到**（`isSelf=true` ✓） |
+
+## ⑤ 常驻按键 / 文案 / 报错
+- 顶栏常驻按钮实读：**`☰` / `⌨` / `⛶` = 3 个** ✓（顺带：那颗 ⌨ 是 `#btn-keys`，**34×32**，本轮不判尺寸）
+- 说明类文案：**未验**（本轮没单独量 `#stage` 裸文字数）
+- **`pageerror` = 1 条** ✗（见下）
+
+### ✗ 唯一一条真报错（给作者）
+```
+未捕获异常: TypeError: Cannot read properties of undefined (reading 'UI')
+  at app.js:2255:22   ← new Promise
+  at Object.confirm  (app.js:2241:14)
+  at Object.onHostKey
+```
+⇒ 这条发生在**连接流程的主机键确认**里：`confirm()` 走到 **`HP.UI.closeDialogs()`**（`R48#3` 新加的那句）时 **`HP.UI` 还没就绪** ⇒ 抛 `TypeError`。它没把连接打断（我后面 4 次 connect 与两条字节路径都跑通了 ✓），但**`pageerror` 0 这条判据不成立**；建议把 `HP.UI.closeDialogs?.()` 做成可选调用或加存在性判断。
+
+## ⑥ 清场（✓ 含上轮欠账）
+- **App 内 `R58靶机` + `r58probe` 已删** ✓（本轮另建的 `R48坏靶机` 也一并删了）；回读 `deleted = ["R58靶机","R48坏靶机","key:r58probe"]`、`hostsLeft=["复验主机"]`、`keysLeft=["verify-key"]` ⇒ **用户自己的两件始终没碰** ✓
+- 临时 sshd 停 + `/tmp/r47probe-sshd` 删 ⇒ **2222 = 0 监听** ✓；靶子会话 `r48t` 已 `kill-session` ⇒ tmux 只剩 **`hermes` / `roles`** ✓；**清场是在停模拟器之前做的** ✓（做完了才 `emu.sh stop`）
+- NAS `~/.ssh/authorized_keys`：**7 条 / mtime `2026-09-21 20:41:42.800652328 +0800` 未变** ✓
+- 代码：**我没改产品代码**（本轮只新增 `tools/验收脚本/r48-{probe,probe2,kbd}-20260929.mjs`；`git status` 里的 `M sessions.js` / `M talk.js` / `M Bridge.kt` 是**正在改的人**的在制品）
+
+## 未验（未验 ≠ 通过）
+② 的真软键盘 Enter（我没拿住输入焦点）；④ 的 `R-49` 离底（备用屏无滚动空间）＋四个命名探针（不在仓库）＋`R-52R53` 三态/长按菜单（聊天页无数据）；⑤ 的说明文案数。判不了就照实写。
