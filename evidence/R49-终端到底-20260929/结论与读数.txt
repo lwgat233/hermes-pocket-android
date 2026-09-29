@@ -1,0 +1,36 @@
+R-49 第 1 步「点终端即到最底 + 出包」 结论与读数
+角色 pipeline.renderer · 2026-09-29 · 构件 hermes-pocket-R49-终端到底-20260929.apk
+依据：派活 #1804（本人 2026-09-29 原话「我点一下那个终端，他就直接加载到最底部」⇒ 已拍，无需候选）
+
+== 本次我改了什么（**只动 assets/ui/app.js，一处新方法 + 三个调用点**）==
+1) 新增 `snapToBottom()`：**只动 xterm 自己的滚动位置**（`this.term.scrollToBottom()`）——
+   · **不发滚轮事件、不弹 toast**（不然每点一下就一条提示）；
+   · **TUI 备用屏 / 鼠标模式里直接跳过**（xterm 在 alt 屏不存 scrollback，本地无历史；替用户往远端发滚轮会动 tmux 自己的视图，那不等于"回到最新"）；
+   · **不碰 R-39 的 `--sayline-h` / 聊天页粘性条那套**（那是聊天页内层容器的事，跟终端无关）。
+2) 三个调用点：① **点一下终端**（`pointerup` 的 tap 分支，紧接 `hideCtx()`）；② **关掉盖层 = 进终端页**（`closePanel()`）——
+   （`R-19` 口径照旧：只滚内层容器，没碰外层/没引 `--sayline-h`）。
+3) **不加常驻按键、不写说明文字**（会话页/终端页按键数未变）。
+**没动**：聊天页 `#tk-chat` 粘性条（R-39）· R-41 回车三处兜底 · R-48 终端回车（keyCode 229 / keyup / 400ms 闸）· `Bridge.kt`。
+
+== 判据读数（本地测试台；读数取 xterm 的滚动容器 `.xterm-viewport`；原始 JSON 同目录）==
+喂 200 行内容后，先手动上翻 400px（`离底 400` — 证明"真的能离开底部"），再逐条量：
+① **点一下终端 ⇒ 贴底**（「离底」= scrollHeight − clientHeight − scrollTop）：
+   · 同拍：`离底 400`（**xterm 的贴底走 rAF，这一拍还没落**）
+   · **两帧后：`离底 0`** ✓（scrollTop 3617 = 4301 − 684，差 0 ≤ 2px）
+   · **1 秒后：`离底 0`** ✓ · **新输出到达后：`离底 0`** ✓（scrollTop 4237 = 4921 − 684）
+② **进终端页（关掉盖层）也贴底**：上翻 500px（`离底 500`）→ `closePanel()` → **`离底 0`** ✓
+③ **手动上翻后不被拽回**：上翻 600px（scrollTop 3637）→ 灌 40 行新输出 → **scrollTop 还是 3637（不变）** ✓，离底从 600 变成 1426（= 新输出在下面堆着，用户的位置没动）
+④ **重画不顶回顶部**：连续 3 次 `resetGeometry()` + `showBoard('host')` → scrollTop **3637 → 3637（不变）** ✓
+⑤ **贴底时继续跟随**：`snapToBottom()` 后 `离底 0` → 灌 25 行 → **`离底 0`** ✓
+⑥ **不回归**：R-41 探针重跑全绿（单聊 `enterkeyhint=send`、Gboard 形状 1、授权框 1、报错 0）✓；**R-48 回归** 终端页真按键回车**仍恰好 1 个 `0x0D`**、连按 3 次＝3 个 ✓；`pageerror`＋`console.error` **0 条** ✓
+
+== 出包读数 ==
+产物：/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R49-终端到底-20260929.apk（**5138689 字节**）
+整包 sha256：**94ee9127ca1021a7f4726edba24a0ad0e0523b6ee441b4b937b4f93b40713476**
+包内 assets/build-info.json：testVersion=**unified-20260929-123143** · featureId=**R-49** · builtAt=2026-09-29 12:31 CST
+本次改动文件 sha256（**包内 == 源树**）：`ui/app.js` `b7f7d2270253c978…` ✓ 一致
+整树对账：`python3 source/hermes-pocket/tools/stamp-build.py --verify <apk>` → **退出码 0**，79 行原文落
+`evidence/R49-终端到底-20260929/verify-整树-原始输出.txt`（sha256 `dea1687738a4…`），末行 **PASS 包内 ↔ 源树 对账**。
+
+== 没验的（未验 ≠ 通过）==
+真机复测归 tester：点终端/进页即贴底、手动上翻后不被拽回、新输出跟随（本机台读数是本机台的）。

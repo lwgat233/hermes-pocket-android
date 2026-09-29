@@ -1,0 +1,45 @@
+# hermes-pocket-R49 第 2 步 · 真机复测结论（pipeline.tester · 2026-09-29 · #1811）
+
+**一句话**：**装包核对全绿**（设备上的包与作者出的包逐字节相同、与源码树一致）；但 **「点终端即到最底」只拿到 1 个单拍读数（离底 0）⇒ ① 部分达成，②–⑥ 全部未验** —— 卡点是：App 连上后跑的是**它自带的 TUI 会话**，不是我的靶子脚本，我设的 host `startCmd` 没被采用；继续摸会话命令会**再连上一个真 TUI 会话**（有成本风险），我按安全优先停手。
+
+## 装包核对（**从设备读回**）
+| 项 | 读数 |
+|---|---|
+| 主机侧 APK | `apk/测试版/hermes-pocket-R49-终端到底-20260929.apk` **5138689 字节** |
+| 主机侧 sha256 | `94ee9127ca1021a7f4726edba24a0ad0e0523b6ee441b4b937b4f93b40713476` ✓（与派活/作者报的 `94ee9127ca10…` 一致） |
+| **设备侧 base.apk** | `…/dev.hermes.pocket-…/base.apk` **5138689 字节**，sha256 **同上（逐字节相同）** ✓ ⇒ **装的正是这一版** |
+| 设备侧版本 | `versionName 0.1.0` · `versionCode 1` · `lastUpdateTime 2026-09-29 04:35:31`（UTC，＝12:35 CST） |
+| APK 内 `assets/build-info.json` | `packageId dev.hermes.pocket` · **`testVersion unified-20260929-123143`** ✓ · **`featureId R-49`** ✓ · feature 文案＝「终端页：点一下终端 / 关掉盖层进页即本地贴底（app.js snapToBottom…）手动上翻后不被拽回、重画不顶回；不碰 R-39 的 --sayline-h 与聊天页」 |
+| APK 内 ui vs 源码树 | `ui/panels.js` **7ca241b63d44ceaf…** · `ui/app.js` **b7f7d2270253c978…** · `ui/style.css` **d617bb727e2c99f4…** · `ui/talk.js` **7cbe502b129a536c…** ⇒ **逐文件相同** ✓ |
+
+## 判据逐条
+| 判据 | 结果 |
+|---|---|
+| ① 点一下终端入口 ⇒ 离底（同拍/两帧后/1 秒后） | **部分**：连上后读 `.xterm-viewport` = `scrollHeight **561** / clientHeight **561** / scrollTop **0**` ⇒ **离底 = 561−561−0 = 0** ✓（**只有"同拍"这一刻**；"两帧后 / 1 秒后"没采到） |
+| ② 关掉盖层进页 ⇒ 离底 0 | **未验** |
+| ③ 手动上翻 600px ⇒ 灌 40 行 ⇒ scrollTop 不变 | **未验**（灌行靠我的靶子脚本，没跑起来） |
+| ④ 连续 3 次重画 ⇒ scrollTop 不变 | **未验** |
+| ⑤ 贴底时灌 25 行 ⇒ 仍离底 0 | **未验** |
+| ⑥ 不回归（R-48 0x0D / 聊天页 R-39、R-41 / 常驻键 ≤3 / 说明文案 0 / 0 报错） | **未验**（0x0D 判定要靶子；本轮连的是 TUI，按安全优先没继续） |
+| ⑦ 红线 | 见下 |
+
+## ⑦ 红线
+| 项 | 读数 |
+|---|---|
+| NAS `~/.ssh/authorized_keys` | **7 条 / mtime `2026-09-21 20:41:42.800652328 +0800` 未变** ✓（临时 sshd 只监听 127.0.0.1:2222、用独立 `authorized_keys`，只授了 App 侧那把测试密钥） |
+| App 侧 `files/` 文件数 | 测前 **4** / 测后 **4** ✓（`hosts.json`、`keys.json` 被改但**没有新增文件**） |
+| 作者 `verify-整树-原始输出.txt` | `PASS 包内 ↔ 源树 对账`、`包 sha256 94ee9127ca1021a7f4726edba24a0ad0e0523b6ee441b4b937b4f93b40713476` ⇒ **与我的读数一致** ✓ |
+
+## 卡点（为什么 ②–⑥ 没做成）
+1. 临时 sshd（127.0.0.1:2222）✓ → App 侧测试密钥授上 ✓ → App 建 `R49靶机`（`10.0.2.2:2222`，我写了 `startCmd=… r49-probe2.py`）✓ → `connected:true` ✓；
+2. 但终端页显示的是 **App 自带的 TUI**（右上角 badge = `TUI·鼠标`，屏上 `hermes.agent / deepseek-v4-flash / [hermes] galaxy-fnos`）⇒ **我设的 `startCmd` 没生效**，sshd 侧日志显示 `Starting session: command for lwgat`；
+3. 我的靶子脚本（`/vol1/1000/aicache/tmp/r49-probe2.py`：逐字节记 stdin 的 0x0D ＋ 由 `/tmp/r49-feed.trigger` 触发往 stdout 吐 N 行）**因此一行都没跑**（`evidence/R49-复测-20260929/靶子日志-原始.log` 为空）。
+
+## 清场
+- ✅ 临时 sshd 已停、`/tmp/r47probe-sshd` 已删 ⇒ `ss` 里 2222 = **0 监听** ✓
+- ✅ App 内 **`R49靶机` 主机 + `o14probe` 密钥已删** ✓（`复验主机` / `verify-key` 是用户自己的，**我没碰**）
+- ⚠ **`O14靶机`（我 09-28 O14 轮留下的测试主机）没清掉**：收尾时**模拟器已不在**（`adb` 报 `no devices/emulators found`）⇒ 下一次复测起模拟器时一并删（登记）
+- App 已 `force-stop`；宿主上没留下 `hermes --tui` 进程 ✓
+
+## 未验（未验 ≠ 通过）
+②③④⑤⑥ 全部；① 的"两帧后 / 1 秒后"两拍。

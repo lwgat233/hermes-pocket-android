@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260928-213941";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-28 21:39 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "09-28 汇总包：当前源树整包（新增 O14-App 会话页女仆「本体 + 通道 + 多余一份」两行与固定顺序）；除 build-info 盖章外零改动", "featureId": "汇总-20260928", "note": "汇总包（不是单轮）：自 汇总-20260927 之后新增 O14-App#1/#2；不含社媒轮次（属 social-archive）、平台侧修复（R-43 类）、等本人拍（R-44/R-49/R-52/R-53）、只到定位未改码（R-46/R-47/R-50/R-51/R-54）——见 evidence/汇总-20260928/清单-轮次对照.txt", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260928-213941"};
+  HP.BUILD = "unified-20260929-124255";
+  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-29 12:42 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "终端页默认收起（本人拍）：收起时容器 display:none 高度 0、只留一颗「显示终端」按钮（≥44dp、无说明文字）；展开即贴底（补 R-49 第三条路径）+ 收起时跳过几何计算（不 resize 成 1×1）；snapToBottom 同时按 DOM 视图区确保真到底", "featureId": "R-58", "note": "汇总包（不是单轮）：自 汇总-20260927 之后新增 O14-App#1/#2；不含社媒轮次（属 social-archive）、平台侧修复（R-43 类）、等本人拍（R-44/R-49/R-52/R-53）、只到定位未改码（R-46/R-47/R-50/R-51/R-54）——见 evidence/汇总-20260928/清单-轮次对照.txt", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260929-124255"};
   /* —— 打包信息结束 —— */
 
   const THEME = {
@@ -262,14 +262,17 @@
 
     resetGeometry() {
       if (!this.term) return;
+      // 顶栏高度缓存起来给 fitChrome 用（避免键盘动画期间每帧都去量）
+      this._chromeTop = $('topbar').classList.contains('hidden') ? 0 : $('topbar').getBoundingClientRect().height;
+      this.fitChrome();       // 空间不够时先保住键条，再去算几何
+      /* R-58：终端收起时容器是 `display:none`（量到 0）⇒ **不量、不 pushResize**
+       *（否则会把远端 resize 成 1×1，还会因 SIGWINCH 让 TUI 整屏重画）。 */
+      if (this.termHidden()) { $('tb-geom').textContent = '—'; return; }
       const g = HP.Geom.apply(this.term, this.fit, this.watcher);
       if (!g) return;
       this.panEnabled = g.pan;
       this.term.options.fontSize = g.fontSize;
       this.clampPan();
-      // 顶栏高度缓存起来给 fitChrome 用（避免键盘动画期间每帧都去量）
-      this._chromeTop = $('topbar').classList.contains('hidden') ? 0 : $('topbar').getBoundingClientRect().height;
-      this.fitChrome();       // 空间不够时先保住键条，再去算几何
       // 超出屏幕时给个明确的记号，别让用户以为是显示坏了
       $('tb-geom').textContent = g.cols + '×' + g.rows + (g.pan ? ' ⟷' : '');
       $('tb-geom').title = g.pan
@@ -1066,7 +1069,9 @@
 
         if (mode === 'tap' && moved < 12 && pts.size === 0) {
           const p = at(e.clientX, e.clientY);
-          if (mouseOn()) {
+          if (this.termHidden()) {
+            this.hideCtx();          /* R-58：终端收着时，点空舞台不往远端发鼠标事件（也别做贴底） */
+          } else if (mouseOn()) {
             this.send(HP.mouseSeq(0, p.col, p.row, true, this.watcher.sgr, {}));
             this.send(HP.mouseSeq(0, p.col, p.row, false, this.watcher.sgr, {}));
           } else if (this.bool('tapKeyboard', false)) {
@@ -1084,6 +1089,7 @@
             this.blurInputs();
           }
           this.hideCtx();
+          this.snapToBottom();      /* R-49：点一下终端 ⇒ 本地贴底（发到最新，跟"点开看一下"的直觉一致） */
         }
         if (mode === 'drag' && drag && drag.active && pts.size === 0) {
           const p = at(e.clientX, e.clientY);
@@ -1162,6 +1168,46 @@
       el.textContent = '⇣ 回到底部（上面还有 ' + up + ' 行）';
       el.classList.remove('hidden');
     },
+    /** R-49：**本地**贴底（进终端页 / 点终端时用，本人 2026-09-29 拍）——
+     * · 只动 xterm 自己的滚动位置（`term.scrollToBottom()`）：**不发滚轮事件、不弹 toast**（否则每点一下就一条提示）；
+     * · TUI 备用屏 / 鼠标模式里**本地没有历史**（xterm 在 alt 屏不存 scrollback）⇒ 直接跳过：
+     *   别替用户往远端发滚轮，那会动 tmux 自己的视图，不等于"回到最新"；
+     * · 不碰 R-39 的 `--sayline-h` / 聊天页粘性条那套（那是聊天页内层容器的事，跟终端无关）。 */
+    snapToBottom() {
+      try {
+        if (!this.term) return;
+        if (this.watcher && (this.watcher.alt || this.watcher.mouseMode > 0)) return;
+        this.term.scrollToBottom();
+        /* xterm 的 `scrollToBottom()` 只挪它自己的视图状态，DOM 视图区有时还差一截
+         * （本机台实测：调完只走 7px、离底仍差 1178px）⇒ 再把视图区按到底，两边对齐。
+         * xterm 自己监听 scroll 事件同步 ydisp，所以按 DOM 那一下是安全的。 */
+        const vp = this.term.element && this.term.element.querySelector('.xterm-viewport');
+        if (vp) vp.scrollTop = vp.scrollHeight;
+        this.scheduleScrollChip();
+      } catch (e) { }
+    },
+
+    /* ---- R-58：终端页收起 / 展开（**默认收起**）--------------------------------
+     * 本人 2026-09-29 拍：「完全可以隐藏起来 —— 点按钮再连接 / 显示终端界面」。
+     * · 收起只做**"不显示"**（容器 `display:none`，高度 0）：不建/不杀会话（R-47 的"退出释放"是另一条，不在本轮）；
+     * · 收起时**跳过几何计算**（0 尺寸会把远端 resize 成 1×1），展开时 `resetGeometry()` 会重新量一次；
+     * · 展开那一刻**贴底**：与 R-49 同一条 `snapToBottom()`（R49 只挂了"点终端/关盖层"两条路，这里补第三条）。 */
+    termHidden() { return document.body.classList.contains('term-hide'); },
+    applyTermPane(show) {
+      document.body.classList.toggle('term-hide', !show);
+      const b = $('btn-term');
+      if (b) { b.textContent = show ? '收起终端' : '显示终端'; b.classList.toggle('on', !!show); }
+      this.resetGeometry();
+      if (show) {
+        this.snapToBottom();
+        /* 几何刚应用完（字号/行列可能变了），xterm 又要等一次渲染才把 scrollHeight 落定
+         * ⇒ 钉两拍（60ms / 200ms），免得"展开那一瞬"停在半路（本机台实测两帧时还差 145px） */
+        setTimeout(() => { if (!this.termHidden()) this.snapToBottom(); }, 60);
+        setTimeout(() => { if (!this.termHidden()) this.snapToBottom(); }, 200);
+      }
+    },
+    toggleTerm(show) { this.applyTermPane(show === undefined ? this.termHidden() : !!show); },
+
     /** 一键回到最新：普通缓冲滚到底；TUI 里把之前发出去的滚轮**反向还回去**（tmux 自己会回到最新视图） */
     scrollToBottom() {
       if (this.watcher && this.watcher.alt) {
@@ -1253,6 +1299,8 @@
       });
       $('btn-close-panel').addEventListener('click', () => this.closePanel());
       $('btn-immersive').addEventListener('click', () => this.toggleImmersive());
+      $('btn-term').addEventListener('click', () => this.toggleTerm());   /* R-58：显示终端 / 收起终端（默认收起） */
+      this.applyTermPane(false);                                          /* 起步＝收起（本人拍：别一进来就铺满） */
       $('btn-keys').addEventListener('click', () => {
         const kb = $('keybar');
         kb.classList.toggle('hidden');
@@ -1377,7 +1425,7 @@
     },
 
     openPanel() { $('overlay').classList.remove('hidden'); HP.Panels.load().then(() => HP.Panels.renderAll()); },
-    closePanel() { $('overlay').classList.add('hidden'); $('ctxmenu').classList.remove('show'); this.resetGeometry(); },
+    closePanel() { $('overlay').classList.add('hidden'); $('ctxmenu').classList.remove('show'); this.resetGeometry(); this.snapToBottom(); },   /* R-49：一进终端页（关掉盖层）就贴底 */
 
     /** 原生返回键先问这里：返回 true = 我处理了，false = 交给系统退出 */
     onBack() {

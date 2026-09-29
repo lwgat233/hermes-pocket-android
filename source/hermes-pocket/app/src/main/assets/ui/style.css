@@ -166,6 +166,25 @@ button, input, textarea {
   inset: 0;
   overflow: hidden;
 }
+/* R-58：终端默认收起 —— 收起时终端容器整个不显示（高度 0）；展开时给它让出按钮条那 44px */
+body.term-hide #panner { display: none; }
+body:not(.term-hide) #panner { top: 44px; }
+#btn-term {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 6;
+  min-height: 44px;                    /* R-33 硬线：命中区 ≥44dp */
+  border: 0;
+  background: var(--bg-bar, #0f1218);
+  color: var(--fg-dim, #8b93a5);
+  font-size: 13px;
+  font-family: inherit;
+}
+#btn-term.on { color: var(--accent, #46d17a); }
+/* 收起态：按钮居中，像一张"可以点开"的卡片 —— 只有按钮，没有说明文字 */
+body.term-hide #btn-term { top: 50%; transform: translateY(-50%); }
 /* termhost 负责横向平移，尺寸恒等于可视区；
    termsizer 是 fit 插件的测量基准，必须始终等于可视区尺寸，
    否则「内容比屏幕宽 → 撑宽父容器 → 量出更多列 → 内容更宽」会失控。 */
