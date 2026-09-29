@@ -707,7 +707,9 @@ print('@@OK', '1')
             // 面板上全是按键，用户不敲命令 —— 这一族就是那些按键的落点。
             "talk.roles" -> if (hasId) ok(id, talkJson(listOf("roles-json")))
             "talk.sessions" -> if (hasId) ok(id, talkJson(listOf("sessions-json")))
-            "talk.since" -> if (hasId) ok(id, talkJson(listOf("since-json", "--id", m.optInt("id", 0).toString())))
+            "talk.since" -> if (hasId) ok(id, talkJson(listOf("since-json", "--id", m.optInt("id", 0).toString()) +
+                    // R-53：`show_hidden` ⇒ `--show-hidden`（「显示已删除」靠它把被隐藏的找回来）
+                    (if (m.optBoolean("show_hidden", false)) listOf("--show-hidden") else emptyList())))
             "talk.inbox" -> if (hasId) ok(id, talkJson(listOf("inbox", "--role", talkRole(m.optString("role")))))
             "talk.switch" -> if (hasId) ok(id, talkJson(listOf("switch", "--role", talkText(m.optString("role", "")))))
             "talk.doctor" -> if (hasId) ok(id, talkJson(listOf("doctor")))
@@ -718,6 +720,9 @@ print('@@OK', '1')
                     m.optString("limit", "20"))))
             "talk.thread" -> if (hasId) ok(id, talkJson(listOf("thread", "--role", talkText(m.optString("role", "")),
                     "--lines", m.optString("limit", "100"))))
+            // R-53：「从我这儿删掉 / 恢复」—— 只置 `hidden_by_user`，不删行、不动 `talk/*.md` 台账
+            "talk.hidden" -> if (hasId) ok(id, talkJson(listOf("hidden", "--id", m.optString("id", "0"),
+                    "--action", if (m.optString("action", "hide") == "restore") "restore" else "hide")))
             "talk.spawn" -> if (hasId) ok(id, talkJson(listOf("spawn", "--role", talkRole(m.optString("role")))))
             "talk.solo" -> if (hasId) ok(id, talkJson(listOf("solo") +
                     (if (m.optString("name", "").isBlank()) emptyList() else listOf("--name", talkText(m.optString("name"))))))

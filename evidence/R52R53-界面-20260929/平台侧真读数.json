@@ -1,0 +1,62 @@
+{
+ "picked_msg": {
+  "id": 1867,
+  "to_role": "pipeline.tester",
+  "body": "接 **`hermes-pocket-R58` 第 3 步："
+ },
+ "count_before": 1056,
+ "count_after_hide": 1056,
+ "count_after_restore": 1056,
+ "hidden_before": 0,
+ "md_before": {
+  "md_files": 131,
+  "md_bytes": 2053575,
+  "md_sha256_12": "86a125b1cca9"
+ },
+ "hide_reply": {
+  "id": 1867,
+  "action": "hide",
+  "hidden_by_user": 1,
+  "changed": 1,
+  "可见条数": 1056,
+  "隐藏条数": 1,
+  "总行数（不减）": 1056
+ },
+ "row_still_there": 1,
+ "hidden_flag_after_hide": 1,
+ "since_default": {
+  "present": false,
+  "flag": null,
+  "count": 4,
+  "hidden_count": 1
+ },
+ "since_show_hidden": {
+  "present": true,
+  "flag": true,
+  "count": 5,
+  "hidden_count": 1
+ },
+ "thread_after_hide": {
+  "present": false,
+  "count": 187
+ },
+ "restore_reply": {
+  "id": 1867,
+  "action": "restore",
+  "hidden_by_user": 0,
+  "changed": 1,
+  "可见条数": 1056,
+  "隐藏条数": 0,
+  "总行数（不减）": 1056
+ },
+ "hidden_after_restore": 0,
+ "flag_after_restore": 0,
+ "md_after": {
+  "md_files": 131,
+  "md_bytes": 2053575,
+  "md_sha256_12": "86a125b1cca9"
+ },
+ "thread_after_restore": {
+  "present": true
+ }
+}

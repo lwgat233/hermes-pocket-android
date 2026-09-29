@@ -3,10 +3,10 @@
   "appName": "Hermes Pocket",
   "packageId": "dev.hermes.pocket",
   "entry": "dev.hermes.pocket.MainActivity",
-  "testVersion": "unified-20260929-124255",
+  "testVersion": "unified-20260929-130859",
   "feature": "终端页默认收起（本人拍）：收起时容器 display:none 高度 0、只留一颗「显示终端」按钮（≥44dp、无说明文字）；展开即贴底（补 R-49 第三条路径）+ 收起时跳过几何计算（不 resize 成 1×1）；snapToBottom 同时按 DOM 视图区确保真到底",
-  "featureId": "R-58",
+  "featureId": "R-52R53",
   "acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动",
-  "builtAt": "2026-09-29 12:42 CST",
+  "builtAt": "2026-09-29 13:08 CST",
   "note": "汇总包（不是单轮）：自 汇总-20260927 之后新增 O14-App#1/#2；不含社媒轮次（属 social-archive）、平台侧修复（R-43 类）、等本人拍（R-44/R-49/R-52/R-53）、只到定位未改码（R-46/R-47/R-50/R-51/R-54）——见 evidence/汇总-20260928/清单-轮次对照.txt"
 }

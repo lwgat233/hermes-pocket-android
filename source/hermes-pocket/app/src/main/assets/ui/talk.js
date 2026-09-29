@@ -44,6 +44,7 @@
     box.appendChild(t);
     if (o.time) {
       const d = document.createElement('div');
+      d.className = 'tk-time';                       /* R-52：状态图标并进这一行（同一行，不加高度） */
       d.style.fontSize = '10px';
       d.style.opacity = '.62';
       d.style.alignSelf = o.mine ? 'flex-end' : 'flex-start';
@@ -257,8 +258,9 @@
     asks: [],
     sends: [],                     /* R-31：最近几条发送的状态（发送中 / 已送达◯◯ms / 没送达:原因） */
     sendSeq: 0,
+    showHidden: false,             /* R-53：长按菜单里的「显示已删除」（从 pref 读，见 initTalk） */
 
-    onShow(tab) { this.tab = tab || 'talk'; this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
+    onShow(tab) { this.tab = tab || 'talk'; try { this.showHidden = HP.App.bool('showHidden', false); } catch (e) { } this.verifySync().catch(() => { }); this.render(); this.startPoll(); },
     onHide() { this.stopPoll(); },
     /* 轮询周期：前台一律 2.5s（实时）；省电档按设置（R-25，与「聊天要实时」的冲突交本人定，这里只给档位）——
      *   slow30（默认，作者推荐）：省电时降到 30s —— 牺牲：新消息最多晚 30s 才亮，亮屏立刻补一次
@@ -1192,13 +1194,30 @@
       /* R-32：原来这里还有一段 `const live = ((this.live || {})[r.full_name] || [])` 的「live 追加」分支 ——
        * this.live 是**布尔开关**（141/166/187/250/275 都按开关用），所以那段永远走不到（死代码）。
        * 按作者口径删掉（R-37 挂在那段里的 tapWho 也随之一并没了，已在报告里写明）。 */
-      if (!items.length) { box.textContent = '（还没聊过）'; this.pinBottom(box, { force: true }); return; }
+      if (!items.length && !this.showHidden) { box.textContent = '（还没聊过）'; this.pinBottom(box, { force: true }); return; }
+      /* R-53：开了「显示已删除」就把被隐藏的那几条找回来（灰显），按时间插回去 */
+      if (this.showHidden) {
+        try {
+          const hid = await this.hiddenItems(r.full_name);
+          hid.forEach((m) => {
+            if (items.some((x) => x.id === m.id)) return;
+            const mine2 = (m.from === 'me' || m.from === 'owner.me');
+            items.push({ id: m.id, who: mine2 ? 'me' : 'him', body: m.body, at: m.at,
+                         send_state: m.send_state, send_note: m.send_note, hidden: true });
+          });
+          items.sort((a, b) => ((a.at || 0) - (b.at || 0)) || ((a.id || 0) - (b.id || 0)));
+        } catch (e) { /* 找不回来也不能挡住正常气泡 */ }
+      }
       items.forEach((m) => {
         const me = m.who === 'me';
         const head = me ? ('我 → ' + (r.title || r.full_name)) : ((r.title || r.full_name) + ' → 我');
         const bu = bubbleEl({ mine: me, head: head, text: m.body, time: hhmm(m.at) });
-        bu.className = 'tk-bub ' + (me ? 'me' : 'him');
+        bu.className = 'tk-bub ' + (me ? 'me' : 'him') + (m.hidden ? ' tk-bub-hidden' : '');
+        bu.setAttribute('data-msg', String(m.id || ''));
+        this.longPress(bu, () => this.msgMenu(m, r.full_name));          /* R-53：长按出两档菜单（先挂，好把长按后的 click 吃掉） */
         if (!me) this.tapWho(bu, r.full_name);   /* R-37 B：他说的气泡点了也开信息窗（我说的不挂） */
+        if (me) this.paintStateIcon(bu, m, r.full_name);                 /* R-52：状态并进气泡那一行 */
+        if (m.hidden) { const tag = document.createElement('span'); tag.className = 'tk-delmark'; tag.setAttribute('data-testid', 'talk-hidden-mark'); tag.textContent = '␡'; bu.appendChild(tag); }
         box.appendChild(bu);
       });
       if (wasNear) this.pinBottom(box, { force: true });
@@ -1237,7 +1256,7 @@
     fillSends(box) {
       if (!box) return;
       box.textContent = '';
-      this.sends.slice(-4).forEach((s) => {
+      this.sends.filter((s) => s.state !== 'sent').slice(-4).forEach((s) => {
         const row = document.createElement('div');
         const cls = (s.state === 'sent') ? 'ok'
           : ((s.state === 'sending' || s.state === 'waiting' || s.state === 'unconfirmed') ? 'wait' : 'bad');   /* unconfirmed＝中性态，别归进 ok 绿 */
@@ -1267,8 +1286,14 @@
         box.appendChild(row);
       });
     },
+    /* R-52：成功态**不再**另起这一行 —— 只有还有没落定的（发送中/还在发/超时/没送达）才画；
+     * 全成功时把节点从 DOM 里摘掉（判据：成功态 `#tk-sends` 节点数 = 0）。 */
     paintSends(el) {
-      if (!el || !this.sends.length) return;
+      const old = document.getElementById('tk-sends');
+      const live = this.sends.filter((s) => s.state !== 'sent');
+      if (!live.length) { if (old) old.remove(); return; }
+      if (!el) return;
+      if (old) { this.fillSends(old); return; }
       const box = document.createElement('div');
       box.className = 'tk-sends';
       box.id = 'tk-sends';
@@ -1278,6 +1303,7 @@
     repaintSends() {
       const box = document.getElementById('tk-sends');
       if (box) this.fillSends(box);
+      else this.paintSends(document.getElementById('tk-chat'));
     },
     /* R-37：点一下就开信息窗（单聊抬头 + 他说的气泡）——
      * **只挂 click**；touchstart 记一下手指位置，click 时若位移 >8px 就当滚动、不开窗。
@@ -1304,6 +1330,141 @@
       return el;
     },
 
+    /* ---- R-52 / R-53：气泡三态 + 长按两档菜单（拼进气泡那一行，不另起状态行、不占常驻键）------
+     * 口径出处：作者配方 `roles-chat/evidence/R52R53-平台侧-20260929/03-给renderer-配方.md`
+     *  · 三态：pending＝小圈、sent＝对号、failed＝红叹号（可点重发）；成功态**不再**出 `#tk-sends` 那行；
+     *  · 状态源只用平台字段 `send_state` / `send_note`（`talk.thread` / `talk.since` 都已带回），界面不造状态；
+     *  · 「删除」＝ `talk.hidden {action:'hide'}`（只把自己这份藏起来，`talk/*.md` 台账与库行都不动）；
+     *    「显示已删除」＝ 拿 `talk.since --show-hidden` 找回那几条（灰显）。
+     */
+    stateOf(m) {
+      if (!m) return null;
+      const st = m.send_state;
+      return (st === 'pending' || st === 'sent' || st === 'failed') ? st : null;
+    },
+    /* 把状态图标**就地拼进气泡**（绝对定位在气泡右下角）：不占行高；尺寸 ≤14px（R-33 的 44dp 是触控区，图标本身要小） */
+    paintStateIcon(bu, m, role) {
+      if (!bu || !m || !m.id) return bu;
+      if (this._retryPending && this._retryPending[m.id]) { /* 刚点过重发：先按 pending 画 */ }
+      const st = (this._retryPending && this._retryPending[m.id]) ? 'pending' : this.stateOf(m);
+      const old = bu.querySelector('.tk-ic');
+      if (old) old.remove();
+      if (!st) return bu;
+      const cls = (st === 'pending') ? 'sending' : (st === 'failed' ? 'fail' : 'sent');
+      const ic = document.createElement('span');
+      ic.className = 'tk-ic tk-ic-' + cls;
+      ic.setAttribute('data-testid', 'talk-ic-' + st);
+      ic.setAttribute('data-msg', String(m.id));
+      ic.setAttribute('data-role', role || '');
+      ic.setAttribute('data-body', String(m.body || ''));    /* 重发要用：气泡正文 */
+      ic.textContent = (st === 'sent') ? '✓' : (st === 'failed' ? '!' : '');
+      if (st === 'failed') {
+        const note = (m.send_note && (m.send_note.reason || m.send_note.result)) || '没送达';
+        ic.setAttribute('data-note', String(note));
+        ic.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); this.retryMsg(ic); });
+      }
+      const rowT = bu.querySelector('.tk-time');
+      if (rowT) rowT.appendChild(ic); else bu.appendChild(ic);   /* 并进气泡那一行（时间行尾），不新增行 */
+      return bu;
+    },
+    /* 点红叹号 = 把这一条重投一次：不新建气泡、不重画列表；同一条 1.2s 内只投一次（防连点） */
+    async retryMsg(ic) {
+      const id = ic && ic.getAttribute ? ic.getAttribute('data-msg') : null;
+      const role = ic && ic.getAttribute ? ic.getAttribute('data-role') : '';
+      const body = ic && ic.getAttribute ? ic.getAttribute('data-body') : null;
+      if (!id || !body) return;
+      const now = performance.now();
+      this._retryAt = this._retryAt || {};
+      if (this._retryAt[id] && now - this._retryAt[id] < 1200) return;    /* 防连点：连点 3 次只投 1 次 */
+      this._retryAt[id] = now;
+      this._retryPending = this._retryPending || {};
+      this._retryPending[id] = true;
+      ic.className = 'tk-ic tk-ic-sending';
+      ic.setAttribute('data-testid', 'talk-ic-pending');
+      ic.textContent = '';
+      try {
+        await rpc('talk.say', { role: role, body: body, kind: 'private', by: this.asWho || 'me' });
+      } catch (e) {
+        HP.App.toast('重发没成：' + ((e && e.message) || e), 4000);
+      }
+    },
+    /* 长按（500ms 不动）⇒ 两档小菜单；长按之后那一下 click 用 stopImmediatePropagation 吃掉，
+     * 免得又去开信息窗（R-37 的 tapWho 挂在同一元素上，所以本函数必须**先**挂）。 */
+    longPress(el, fn) {
+      if (!el) return el;
+      let t = null, x0 = 0, y0 = 0, fired = false;
+      const clear = () => { if (t) { clearTimeout(t); t = null; } };
+      const arm = () => { clear(); fired = false; t = setTimeout(() => { t = null; fired = true; fn(); }, 500); };
+      el.addEventListener('touchstart', (e) => {
+        const p = (e.touches && e.touches[0]) || null;
+        if (p) { x0 = p.clientX; y0 = p.clientY; }
+        arm();
+      }, { passive: true });
+      el.addEventListener('touchmove', (e) => {
+        const p = (e.touches && e.touches[0]) || null;
+        if (p && (Math.abs(p.clientX - x0) > 8 || Math.abs(p.clientY - y0) > 8)) clear();
+      }, { passive: true });
+      el.addEventListener('touchend', clear);
+      el.addEventListener('touchcancel', clear);
+      el.addEventListener('mousedown', arm);            /* 本机台/桌面浏览器：按住不动也算 */
+      el.addEventListener('mouseup', clear);
+      el.addEventListener('mouseleave', clear);
+      el.addEventListener('click', (e) => { if (fired) { e.stopImmediatePropagation(); e.preventDefault(); fired = false; } });
+      return el;
+    },
+    /* 两档菜单：删除 / 显示已删除（临时浮层，不进常驻按键；不写说明文字） */
+    msgMenu(m, role) {
+      const old = document.getElementById('tk-msgmenu');
+      if (old) old.remove();
+      if (!m || !m.id) return null;
+      const box = document.createElement('div');
+      box.id = 'tk-msgmenu';
+      box.className = 'tk-msgmenu';
+      const mk = (label, tid, fn) => {
+        const b = document.createElement('button');
+        b.className = 'tk-msgitem';
+        b.setAttribute('data-testid', tid);
+        b.textContent = label;
+        b.addEventListener('click', (e) => { e.stopPropagation(); box.remove(); fn(); });
+        box.appendChild(b);
+        return b;
+      };
+      mk('删除', 'talk-msgmenu-del', () => this.hideMsg(m, role));
+      mk(this.showHidden ? '不显示已删除' : '显示已删除', 'talk-msgmenu-show', () => this.toggleHidden());
+      document.body.appendChild(box);
+      setTimeout(() => {
+        const off = (ev) => { if (!box.contains(ev.target)) { box.remove(); document.removeEventListener('pointerdown', off); } };
+        document.addEventListener('pointerdown', off);
+      }, 0);
+      return box;
+    },
+    /* 「删除」＝ 从我这儿删掉：平台标 hidden_by_user=1；界面把这条从列表去掉（库行与台账都不动） */
+    async hideMsg(m, role) {
+      try {
+        const r = await rpc('talk.hidden', { id: m.id, action: 'hide' });
+        if (!r || (r.changed === 0 && r.hidden_by_user !== 1)) { HP.App.toast('没删掉', 3000); return; }
+      } catch (e) { HP.App.toast('删不掉：' + ((e && e.message) || e), 4000); return; }
+      this._hidSeen = this._hidSeen || {};
+      this._hidSeen[m.id] = { id: m.id, who: m.who, body: m.body, at: m.at, send_state: m.send_state, send_note: m.send_note, hidden: true };
+      const ic = document.querySelector('.tk-ic[data-msg="' + m.id + '"]');
+      const bu = ic ? ic.closest('.tk-bub') : document.querySelector('.tk-bub[data-msg="' + m.id + '"]');
+      if (bu && bu.parentNode) bu.remove();              /* 列表少 1（只在界面上） */
+    },
+    /* 「显示已删除」：拿 `talk.since --show-hidden` 在近 200 条窗口里把被隐藏的找回来（服务端真值，重启也在） */
+    async hiddenItems(role) {
+      try {
+        const from = Math.max(0, (this.last || 0) - 200);
+        const r = await rpc('talk.since', { id: from, show_hidden: true });
+        const MINE = ['me', 'owner.me'];
+        return ((r && r.messages) || []).filter((x) => x.hidden_by_user &&
+          ((MINE.indexOf(x.from) >= 0 && x.to === role) || x.from === role));
+      } catch (e) { return []; }
+    },
+    async toggleHidden() {
+      this.showHidden = !this.showHidden;
+      try { await HP.App.setPref('showHidden', this.showHidden ? 'true' : 'false', { apply: false }); } catch (e) { /* 存不上也先按内存走 */ }
+      this.render();
+    },
     stopSendTicker() { if (this._sendTick) { clearInterval(this._sendTick); this._sendTick = null; } },
     startSendTicker() {
       if (this._sendTick || this._powerSave) return;    /* 省电期间不刷发送状态（R-25） */

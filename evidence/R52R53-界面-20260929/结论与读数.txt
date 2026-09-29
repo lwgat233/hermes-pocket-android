@@ -1,0 +1,57 @@
+R-52 / R-53 第 2 步「界面 + 出包」 结论与读数
+角色 pipeline.renderer · 2026-09-29 · 构件 hermes-pocket-R52R53-三态与删除菜单-20260929.apk
+依据：派活 #1862 ＋ 作者配方 evidence/R52R53-平台侧-20260929/03-给renderer-配方.md（平台侧已完工 509bd64）
+
+== 本次我改了什么（4 个文件；平台侧一行未动）==
+1. `assets/ui/talk.js`
+   · 状态图标并进气泡那一行：`stateOf/paintStateIcon`（pending 小圈 / sent 对号 / failed 红叹号）；
+     `talk.thread` 的 `send_state` 原样用，界面不造状态；`send_note.reason` 挂 `data-note`（自证，不只说"发送失败"）。
+   · 点红叹号重发：`retryMsg()` → `talk.say {role,body,kind:'private'}`；**不新建气泡、不重画列表**；同一条 **1.2s** 内只投一次。
+   · 长按 500ms 出两档菜单：`longPress()/msgMenu()`（「删除」/「显示已删除」）；长按后那一下 click 用
+     `stopImmediatePropagation` 吃掉（R-37 的 tapWho 挂在同一元素上，所以 longPress **先挂**）。
+   · 「删除」= `hideMsg()` → `talk.hidden {id,action:'hide'}`，成功后把那条从列表里摘掉（库行/台账都不动）。
+   · 「显示已删除」= `toggleHidden()` + `hiddenItems()`：拿 `talk.since --show-hidden` 在近 200 条窗口里找回，
+     灰显（`.tk-bub-hidden` + ␡ 标记）；开关存 pref `showHidden`（重启仍在）。
+   · `#tk-sends` 那行**成功态不再出现**：`paintSends/fillSends` 只画"没落定"的；全成功时把节点从 DOM 摘掉。
+2. `assets/ui/talk.css`：`.tk-ic*`（12px、绝对定位在时间行右端 ⇒ 不改行高；红叹号 `::after` 撑 44dp 命中区）、
+   `.tk-msgmenu/.tk-msgitem`（临时浮层、每项 44dp）、`.tk-bub-hidden`、`.tk-delmark`。
+3. `android/.../Bridge.kt`（App 侧两处映射，作者配方第 6 条）：
+   · `talk.since` 带 `show_hidden` ⇒ 追加 `--show-hidden`；
+   · 新增 `talk.hidden` ⇒ `talk.py hidden --id <id> --action hide|restore`。
+   **平台侧 `tools/talk.py` 一个字没改**（`hidden`/`since-json --show-hidden` 都是作者已完工的接口）。
+
+== 判据读数 ==
+① 三态（本机台真渲染路径，raw 见 t-r52r53-界面-原始输出.json）
+   pending 1 个 / sent 1 个 / fail 1 个；三种图标**都是 12×12**（判据 ≤14px）；
+   气泡行高 70 → 去掉图标 70 → 装回 70 ⇒ **变化 0px**；fail 图标 `data-note` = 「角色 r52.nosuch 没有会话（先 spawn）」；
+   图标右 16px 处 `elementFromPoint` 命中的仍是该图标 ⇒ 44dp 命中区有效（伪元素不进 rect，视觉仍 12px）。
+② 成功态 `#tk-sends` = **0**；混一条 timeout ⇒ 1；清空 ⇒ 0。
+③ 点红叹号：`talk.say` **+1**、气泡数 5→5（不变）、图标转 pending；**连点 3 次仍是 +1**（防连点）。
+④ 长按 ⇒ 菜单两项「删除」「显示已删除」，顶栏常驻按键仍 **3**（菜单是临时浮层）；点「删除」⇒ `talk.hidden{id:103,action:hide}`、
+   列表 **5→4**、动作后菜单自己消失。
+⑤ 「显示已删除」⇒ `talk.since` 带 `show_hidden` 调用 1 次、列表回到 **5**（103 找回）、灰显 1 条 + ␡ 标记 1 个。
+⑥ **0 条** pageerror / console.error。
+平台侧真读数（真库真命令，脚本 aicache/tmp/r52r53-platform-check.py，两次命令都真跑）：
+   `msg` 行数 **1056 → 隐藏后 1056 → 恢复后 1056**（不减）；该行仍在（row_still_there=1）；
+   `since-json --id …` 默认 **不含**它、加 `--show-hidden` **含**它（`hidden_by_user=true`）；`thread --role` 隐藏期间**不含**、恢复后**含**；
+   台账 `talk/*.md`：131 个文件 / 2053575 字节 / sha256 前 12 `86a125b1cca9` —— 隐藏前后**完全一致**。
+   测完立刻 `--action restore` 复原（`hidden_count` 0、该行 flag 0）。
+不回归（同轮重跑，raw 都在本目录）：R-39 重叠 0px + 点末条开窗 ✓；R-41 三个输入框 Enter 各 1 条、报错 0 ✓；
+   R-48 终端回车恰好 **1 个 `0x0D`**、连按 3 次＝3、键条 44dp ✓；R-49 点终端/进页离底 0、上翻不拽回、重画不顶回 ✓；
+   R-58 默认收起（容器高 0）/展开即贴底/三次开合不残留 ✓。
+
+== 出包四样 ==
+· APK：`apk/测试版/hermes-pocket-R52R53-三态与删除菜单-20260929.apk`，**5098000 字节**，
+  sha256 `af81d477e3add30930c1fca7cd12f254d7f9dbb5ffbf3b926d034dd86f6f2d8d`
+· build-info：`unified-20260929-130859` · featureId `R-52R53` · builtAt 2026-09-29 13:08 CST
+· 包内＝源树：`ui/talk.js 53c884818dc771c5…`、`ui/talk.css 70d3ea0f46df3c5a…`（`index.html 46df6dc924fbd56d` 未在本轮改动）
+· 整树 `python3 tools/stamp-build.py --verify`：退出码 0、79 行、末行 `PASS 包内 ↔ 源树 对账`
+  （原文 `verify-整树-原始输出.txt`，sha256 `2184d9b48ef1fd36648f1eca9fc8c675e0bc57b6e05c240c6146ea3cf2395b51`）
+· 源文件 sha256：`talk.js 53c884818dc771c585685cc8fc77bf7ec111979df2a3ff0840cdc13f58a283a2`、
+  `talk.css 70d3ea0f46df3c5a59585af72135be92be337667c93747eaef0b843e642d2332`、
+  `Bridge.kt cc74af47ffe331a7aaf5bbbcb2c7f942bc3933d72dd87e12e6a9f8b24afae46c`（Kotlin 编进 dex，随包）
+
+== 本机台读到的、不改本轮结论的两处现象（照实写，供下一轮别重查）==
+· 首屏会留下**两份同名 `#tk-chat` 容器**（页面自己"先清空再异步填"的竞态）：重画一次即落定成单份；
+  探针里已按"重画一次再读"的口径量，属既有现象，与本轮改动无关。
+· 探针读"气泡数"一律按 **data-msg 去重**（同容器里可能各有一条重复节点）。

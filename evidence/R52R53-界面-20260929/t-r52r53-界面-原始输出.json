@@ -1,0 +1,152 @@
+{
+  "name": "R-52/R-53 验收：气泡三态 + 长按两档菜单（删除 / 显示已删除）",
+  "result": {
+    "check": {
+      "00_state": {
+        "chatContainers": 1,
+        "bubbleCount": 5,
+        "bubbleIds": [
+          "101",
+          "102",
+          "103",
+          "104",
+          "105"
+        ],
+        "pending": 1,
+        "sent": 1,
+        "fail": 1,
+        "iconSize": {
+          "pending": {
+            "w": 12,
+            "h": 12
+          },
+          "sent": {
+            "w": 12,
+            "h": 12
+          },
+          "fail": {
+            "w": 12,
+            "h": 12
+          }
+        },
+        "tkSendsCount": 0,
+        "menuOpen": false,
+        "menuItems": [],
+        "hiddenBubbles": 0,
+        "topbarKeys": 3,
+        "view": "role",
+        "calls": {
+          "say": 0,
+          "hidden": 0,
+          "since": 2,
+          "sinceShowHidden": 0,
+          "thread": 3
+        }
+      },
+      "01_three_states": {
+        "chatContainers": 1,
+        "bubbleCount": 5,
+        "bubbleIds": [
+          "101",
+          "102",
+          "103",
+          "104",
+          "105"
+        ],
+        "pending": 1,
+        "sent": 1,
+        "fail": 1,
+        "iconSize": {
+          "pending": {
+            "w": 12,
+            "h": 12
+          },
+          "sent": {
+            "w": 12,
+            "h": 12
+          },
+          "fail": {
+            "w": 12,
+            "h": 12
+          }
+        },
+        "tkSendsCount": 0,
+        "menuOpen": false,
+        "menuItems": [],
+        "hiddenBubbles": 0,
+        "topbarKeys": 3,
+        "bubbleHeightWithIcon": 70,
+        "bubbleHeightNoIcon": 70,
+        "bubbleHeightAfterReadd": 70,
+        "bubbleHeightDelta": 0,
+        "hit16pxRightOfFailIcon": "tk-ic tk-ic-fail",
+        "failNote": "角色 r52.nosuch 没有会话（先 spawn）"
+      },
+      "02_sendrow_only_when_unsettled": {
+        "allSent": 0,
+        "oneFailed": 1,
+        "cleared": 0
+      },
+      "03_tap_fail_mark": {
+        "bubblesBefore": 5,
+        "bubblesAfter": 5,
+        "sayDeltaOneTap": 1,
+        "sayDeltaThreeTaps": 1,
+        "lastSay": {
+          "role": "pipeline.author",
+          "body": "失败那条",
+          "kind": "private",
+          "by": "me",
+          "t": "talk.say",
+          "_rid": 28
+        },
+        "iconClassAfterTap": "tk-ic tk-ic-sending"
+      },
+      "04_longpress_and_delete": {
+        "menuOpen": true,
+        "menuItems": [
+          "删除",
+          "显示已删除"
+        ],
+        "topbarKeysWithMenuOpen": 3,
+        "hiddenCalls": 1,
+        "hiddenArgs": {
+          "id": 103,
+          "action": "hide"
+        },
+        "bubblesBefore": 5,
+        "bubblesAfter": 4,
+        "bubbleIdsAfter": [
+          "101",
+          "102",
+          "104",
+          "105"
+        ],
+        "menuGoneAfterAction": true
+      },
+      "05_show_deleted_recover": {
+        "menuItems": [
+          "删除",
+          "显示已删除"
+        ],
+        "showHidden": true,
+        "sinceShowHiddenCalls": 1,
+        "bubblesAfter": 5,
+        "bubbleIdsAfter": [
+          "101",
+          "102",
+          "103",
+          "104",
+          "105"
+        ],
+        "hiddenStyledBubbles": 1,
+        "delMarks": 1,
+        "tkSendsCount": 0
+      },
+      "06_errors": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}
