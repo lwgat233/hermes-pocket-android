@@ -1,0 +1,77 @@
+{
+  "name": "R-49#3：内容超一屏（靶子 300 行，走真渲染路径）时的滚动读数",
+  "result": {
+    "check": {
+      "00_空终端": {
+        "scrollTop": 0,
+        "scrollHeight": 643,
+        "clientHeight": 643,
+        "离底": 0
+      },
+      "01_灌300行后": {
+        "scrollTop": 5724,
+        "scrollHeight": 6367,
+        "clientHeight": 643,
+        "离底": 0,
+        "有滚动空间": true,
+        "超出一屏的像素": 5724,
+        "行高约": 19.08
+      },
+      "02_点终端即贴底": {
+        "上翻后": {
+          "scrollTop": 5324,
+          "scrollHeight": 6367,
+          "clientHeight": 643,
+          "离底": 400
+        },
+        "两帧后": {
+          "scrollTop": 5724,
+          "scrollHeight": 6367,
+          "clientHeight": 643,
+          "离底": 0
+        },
+        "一秒后": {
+          "scrollTop": 5724,
+          "scrollHeight": 6367,
+          "clientHeight": 643,
+          "离底": 0
+        }
+      },
+      "03_上翻后新输出不拽回": {
+        "上翻": {
+          "scrollTop": 5124,
+          "scrollHeight": 6367,
+          "clientHeight": 643,
+          "离底": 600
+        },
+        "新输出后": {
+          "scrollTop": 5125,
+          "scrollHeight": 7194,
+          "clientHeight": 643,
+          "离底": 1426
+        },
+        "位置没被拽回": true,
+        "上翻时离底": 600,
+        "新输出后离底": 1426
+      },
+      "04_贴底时跟随": {
+        "贴底": {
+          "scrollTop": 6551,
+          "scrollHeight": 7194,
+          "clientHeight": 643,
+          "离底": 0
+        },
+        "新输出后": {
+          "scrollTop": 7068,
+          "scrollHeight": 7711,
+          "clientHeight": 643,
+          "离底": 0
+        }
+      },
+      "05_报错": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}
