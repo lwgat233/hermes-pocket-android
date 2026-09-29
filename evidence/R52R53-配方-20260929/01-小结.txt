@@ -1,0 +1,374 @@
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/hermes-pocket-R48-报错修复与探针入库-20260929.apk`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `bf6e8eef4021`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**5066984 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- t-composer(无 FAIL) · t-r48-cr(无 FAIL) · t-r58-term-toggle(无 FAIL) · t-r49-term-bottom(无 FAIL) ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：{"last": 927, "条数": 200, "hidden_count": 0, "首条": {"id": 285, "from": "owner.me", "len": 5}}
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：{"bootstrap": {"action": "need-pick", "count": 3, "names": ["hermes", "r52t", "roles"], "why": "钉住的会话 已经没了的会话 已经不在了（远端有 3 条）", "at": 1790660754529}, "发出去的字节": [], "有没有 attach": false, "toast": "钉住的会话 已经没了的会话 已经不在了（远端有 3 条）：请在「会话」里点一条，我不替你挑", "面板开着吗": true, "lastPick": {"action": "need-pick", "count": 3, "names": ["hermes", "r52t", "roles"], "why": "钉住的会话 已经没了的会话 已经不在了（远端有 3 条）", "at": 1790660754529}}
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：{"bootstrap": {"action": "attach", "name": "r52t", "count": 3, "why": "连的是你钉住的那条"}, "发出去的字节": ["tmux attach -t 'r52t'\r"], "钉住的就是它": true}
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：{"bootstrap": {"action": "attach", "name": "hermes", "count": 1, "why": "远端只有一条会话"}, "发出去的字节": ["tmux attach -t 'hermes'\r"]}
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：__CHATERR__
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
+R52R53 第 4 步小结（会话钉住显式化 / 聊天页装数据配方）· 2026-09-29
+=========================================================================
+## 改了 3 个文件（App 侧；**没动平台侧 talk.py**）
+1. `ui/sessions.js`：**`pick()` 不再在 `sel` 失效时静默取 `list[0]`** —— 远端只有 1 条会话时照旧直连（不是猜），
+   **多条又没钉住 ⇒ 返回 `need-pick`、不 attach、toast 说明、并把「会话」栏目打开**；加了 `pickWhy()` 与 `lastPick`（可被界面/日志/探针看到）。
+2. `ui/talk.js`：桥回的不是 JSON（= 那条 `talk.py` 命令本身失败）时，**把原因露出来**：`HP.Talk.rpcErr` + toast + 页面上一行「取数失败：…」（**独立节点 `#tk-rpcerr`**，不会被后面的"服务端：…"覆盖）。
+3. `Bridge.kt`：`talkCmd()` 前面**钉一段 PATH**（exec 通道是非交互 shell，PATH 很窄 ⇒ 精简系统/临时 sshd 上会 `python3: command not found`）。
+
+## ① `pick()` 显式化（读数）
+- **改前**（tester 实测 + 旧代码 `return this.list.length ? this.list[0].name : ''`）：App 自己 attach 到了 `hermes`，**不是** `r52t`。
+- **改后**（本地测试台，远端 3 条会话、`sel` 指向一条已不存在的会话）：__PICKFAIL__
+  ⇒ 关键读数：**`发出去的字节 = []`（没有发出任何 `tmux attach`）**、`action='need-pick'`、`names=['hermes','r52t','roles']`、toast 明确、面板已被打开。
+- 钉住有效时照旧连：__PICKOK__
+- 只有一条会话时不算猜、直接连：__ONE__
+
+## ② 配方自验（作者在测试台上走一遍，**如实写**）
+- **真平台回包**（当场跑 `python3 …/roles-chat/tools/talk.py since-json --id 0` 的原样 JSON）：__REAL__
+- 灌进聊天页后：**数据到得了模型层** —— `HP.Talk.msgs = 200`、`last = 927`（见 `01-配方自验探针.json` 的 `04_聊天页_真回包`）。
+  **但气泡仍是 0**：频道页要 `talk.roles`（形状 `{scenes:[{scene,roles:[…]}]}`）/`talk.asks`/`talk.sessions`/**服务端就绪** 四路都到位才画流；
+  我把 roles 喂成真实形状后**角色卡片出来了**（页面出现 `roles 作者 › pipeline.author`），但状态行仍是「服务端：还没搭建」⇒ 不画气泡。
+  ⇒ **我这边复现不了 tester 那套"临时 sshd + r52t"装置**（如实写，不编）；按 `02-给tester-配方.md` 第 3 节的自查顺序，**最可能卡在第 2/3/4 步**。
+- **失败形状**这次能看见了（这也是他们之前"看不出为什么"的直接原因）：{"tk_bub数": 0, "rpcErr": "python3: command not found", "rpcCmd": "since-json --id 0", "toast": "频道取数失败：python3: command not found", "状态行里能看到失败": true, "tk_chat_子节点": 0}
+
+## ③ 不回归（同一套探针，改后重跑）
+- __REG__ ⇒ 四份**都没有 FAIL**；探针页面报错 **0**。
+
+## ④ 包（照旧四样；**如实记一处作废**）
+- 本轮我按 `R52R53` 命名出过一份 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但**构建期间我正在改 R48#5 的文件** ⇒ `stamp-build.py --verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除，不交付**。
+- 交付的是**合并包**：`apk/测试版/__PKGNAME__`（**__PKGB__ 字节**，sha256 前 12 `__PKGSHA__`）—— 它同时含本轮 R52R53#4 的源码改动（会话 pick 显式化 / 取数失败可见 / talkCmd 钉 PATH），
+  `--verify` **退出 0 / PASS**，build-info 的 `featureId = R-48`（按 R48#5 的口径）。原文见 `evidence/R48-修报错与入库-20260929/`。
+
+## 边界
+只碰这两件（会话钉住显式化 + 装数据配方及其必要改动）；**平台侧 `talk.py` 一行未动**；未加常驻按键、未加说明文字。
