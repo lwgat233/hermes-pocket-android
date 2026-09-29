@@ -1,0 +1,6 @@
+== 四探针 FAIL 判定（SPEC §10.1：FAIL 必须 = 0）==
+四探针-t-composer.json                             项 14 · FAIL 0 · SKIP 0
+四探针-t-r48-cr.json                               项  8 · FAIL 0 · SKIP 0
+四探针-t-r58-term-toggle.json                      项 11 · FAIL 0 · SKIP 0
+四探针-t-r49-term-bottom.json                      项  9 · FAIL 0 · SKIP 0
+== 合计 FAIL = 0 · SKIP = 0 ==
