@@ -1,0 +1,29 @@
+{
+  "r58-app-host": {
+    "check": {
+      "steps": [],
+      "gen": {
+        "fp": "SHA256:ttb1A+Ac0DmWKuy7U/YhQK/sw0EJaVonY6KXP+CZSB8",
+        "reused": true
+      },
+      "host": {
+        "id": "d5b9979370b04488",
+        "host": "10.0.2.2",
+        "port": 2222,
+        "startCmd": "R49_LOG=/tmp/r49-probe.log python3 -u /vol1/1000/aicache/tmp/r49-probe3.py"
+      },
+      "connected": true,
+      "topbar": "R58靶机 / TUI·鼠标",
+      "badgeHasTui": true,
+      "termText": "8 13:07:23 ____=298________-299 13:07:23 ____=299________-300 13:07:23 ____=300 [hptarget]0:python3*                               \"galaxy-fnos\" 13:09 29-Sep-26",
+      "viewport": {
+        "sh": 0,
+        "ch": 0,
+        "st": 0,
+        "bottom": 0
+      },
+      "xtermCount": 1
+    }
+  }
+}
+# 连上设备页面: https://appassets.androidplatform.net/ui/index.html | Hermes Pocket

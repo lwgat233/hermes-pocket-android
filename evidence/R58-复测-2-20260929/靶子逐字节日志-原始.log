@@ -1,0 +1,13 @@
+== start 13:07:23（icanon=off echo=off icrnl=off）==
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+== start 13:09:55（icanon=off echo=off icrnl=off）==
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+RX 1 字节 0x0D=0 本批hex=0a
+== feed 40 行（累计 RX 6 字节 / 0x0D 0）==
+== feed 40 行（累计 RX 3 字节 / 0x0D 0）==
