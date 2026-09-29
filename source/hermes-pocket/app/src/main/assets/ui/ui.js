@@ -124,7 +124,7 @@
       card.appendChild(bar);
       back.appendChild(card);
       back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
-      HP.UI.closeDialogs();          // 同一时刻只留一层（不留残节点）
+      if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();   // 同一时刻只留一层（不留残节点）
       document.getElementById('stage').appendChild(back);
       // 会自己变的小窗（比如流量数字每秒在动）：live.fn 定期重画 body，关掉时自动停表
       if (live && typeof live.fn === 'function') {

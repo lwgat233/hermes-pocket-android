@@ -1,0 +1,104 @@
+{
+  "name": "输入框：实时就实时 · 不存储在框里（真实按键）",
+  "result": {
+    "check": {
+      "focusAfterClick": {
+        "tag": "TEXTAREA",
+        "isInput": true
+      },
+      "pressA": {
+        "sent": [
+          "a"
+        ],
+        "input": ""
+      },
+      "pressBc": {
+        "sent": [
+          "b",
+          "c"
+        ],
+        "input": ""
+      },
+      "backspace": {
+        "sent": [
+          ""
+        ],
+        "sentCodes": [
+          [
+            127
+          ]
+        ],
+        "input": ""
+      },
+      "arrowUp": {
+        "sent": [
+          "\u001b[A"
+        ],
+        "input": ""
+      },
+      "enter": {
+        "sent": [
+          "\r"
+        ],
+        "sentCodes": [
+          [
+            13
+          ]
+        ],
+        "input": ""
+      },
+      "composition": {
+        "sentDuringComposition": [],
+        "sentAfterCommit": [
+          "你好"
+        ],
+        "inputAfterCommit": ""
+      },
+      "batchTyping": {
+        "sent": [],
+        "input": "mk"
+      },
+      "batchSendClick": {
+        "sent": [
+          "mk"
+        ],
+        "input": ""
+      },
+      "outputNotInInput": {
+        "before": "",
+        "after": ""
+      },
+      "modeSwitchKeepsDraft": {
+        "afterLive": "草稿ABC",
+        "afterBatch": "草稿ABC"
+      },
+      "keybarEnter": {
+        "found": true,
+        "sent": [
+          "\r"
+        ],
+        "codes": [
+          [
+            13
+          ]
+        ]
+      },
+      "conclusion": {
+        "focusAfterClickIsInput": true,
+        "livePressASentAtOnceAndBoxEmpty": true,
+        "liveTwoCharsSentOneByOne": true,
+        "liveBackspaceSendsDel": true,
+        "liveArrowUpSendsEscapeSequence": true,
+        "liveEnterSendsSingleCr": true,
+        "imeCompositionSendsNothing": true,
+        "imeCommitSendsOnceAndClearsBox": true,
+        "batchTypingSendsNothingAndStaysInBox": true,
+        "batchSendClickSendsTextWithoutEnter": true,
+        "batchSendClickAddsNoCarriageReturn": true,
+        "terminalOutputNeverLandsInBox": true,
+        "keybarEnterStillSendsCarriageReturn": true,
+        "modeSwitchKeepsDraft": true
+      }
+    }
+  }
+}

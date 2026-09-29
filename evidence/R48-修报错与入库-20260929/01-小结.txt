@@ -1,0 +1,280 @@
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = __TV__`、`builtAt = __AT__`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/hermes-pocket-R48-报错修复与探针入库-20260929.apk`（**__B__ 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = __TV__`、`builtAt = __AT__`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**__B__ 字节**，sha256 前 12 `bf6e8eef4021`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = __TV__`、`builtAt = __AT__`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**5066984 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = __TV__`、`builtAt = __AT__`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**__B__ 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：包内1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495 /  / PASS 包内 ↔ 源树 对账）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = R-48`、`testVersion = __TV__`、`builtAt = __AT__`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**__B__ 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = __TV__`、`builtAt = __AT__`、`feature = 修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫，hostkey→confirm 路径 pageerror=0）+ 四个命名探针入库 + 包内含 R-52R53#4 的会话钉住/取数失败可见改动`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**__B__ 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = R48-20260929-135313`、`builtAt = __AT__`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**__B__ 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。
+R48 第 5 步小结（修初始化顺序报错 / 盖章口径 / 探针入库）· 2026-09-29
+=========================================================================
+## ① 报错（主）：`TypeError … reading 'UI'` @ app.js:2255（hostkey → confirm 那条路）
+- **根因（我自己的锅）**：R-48#3 我插"弹窗清扫"时插错了位置 —— 在 `appendChild(back);` 这一行**行内**插成了
+  `$('stage').HP.UI.closeDialogs();`（把行前缀当缩进用），于是这行**不在 append 之前、也没有守卫**，
+  在 `HP.UI` 还没就绪的路径（hostkey→confirm）上就炸了。
+- **修**：① 删掉那 3 行错行；② 三个弹窗点在 `appendChild(back)` **之前**用**守卫过的**调用
+  `if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();`；③ `connect()` 开始、`onState('connected')`、`ui.js:sheet()` 三处也加同样的守卫
+  （**`closeDialogs` 还在**，浮层那条修复一个没丢）。
+- **判据读数**：探针 `d-r48-hostkey-confirm.mjs` 复现步骤＝`HP.App.onHostKey({…,changed:true})` **连走 4 次**（第 2~4 次在确认框还开着时再触发）：
+  · **pageerror 计数 = 0**（改前那条路会抛 TypeError）
+  · 浮层计数：单次 ⇒ 1、**重复 4 次 ⇒ 1（不堆叠）**、点「取消」后 ⇒ 0
+- 该探针也顺手复验了浮层那条：`connect()` ×3 ⇒ 浮层 **0**；`elementFromPoint('#btn-term')` = **`#btn-term`**（基线与有浮层时都命中）。
+
+## ② 盖章口径：包内 `build-info` 实读
+- 上一包确实错了：`R48#3` 出包时我跑 `stamp-build.py` **没带参数** ⇒ 沿用上一包的 `featureId=R-52R53`、`feature=老文案`。
+- 本包**明确带本轮口径**：`--prefix R48 --feature-id R-48 --feature "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫…）+ 四个命名探针入库 + 包内含 R-52R53#4 的改动"`。
+- **包内实读**：`featureId = __FID__`、`testVersion = __TV__`、`builtAt = 2026-09-29 13:53 CST`、`feature = __FEAT__`
+  （读法：`python3 -c "import zipfile,json;print(json.load(open(...)))"` 或直接 `zipfile` 读 `assets/build-info.json`，见本目录脚本输出）
+
+## ③ 探针入库
+- 现在 `git ls-files source/hermes-pocket/tools/ui-harness` 里能看到：`t-composer.mjs`、`t-r48-cr.mjs`、`t-r58-term-toggle.mjs`、`t-r49-term-bottom.mjs`
+  （＋本轮新增的 `d-r48-bytes-overlay.mjs`、`d-r48-hostkey-confirm.mjs`、上一轮 `t-r49-target-300.mjs`、`d-r52r53-talk-data.mjs`）。
+- **怎么跑**：见 `02-怎么跑探针.txt`（一行一条命令，含绝对路径 node 用法）。
+
+## ④ 不回归
+- `t-composer` / `t-r48-cr` / `t-r58-term-toggle` / `t-r49-term-bottom` 本轮**各自跑了一遍**：四份输出里 **FAIL 数 0**；探针页 `pageerror`/`console.error` = **0**。
+- 浮层那条修复仍在（见 ① 的复验读数）。
+
+## ⑥ 包（四样）
+- APK：`apk/测试版/__PKG__`（**__B__ 字节**，sha256 前 12 `__SHA__`）
+- build-info 实读见 ②；整树 `--verify` 原文 `03-verify-整树-原始输出.txt`（尾部：__VERIFY__）；包读数 `04-包读数.txt`
+- **一处如实记**：R52R53#4 那轮我先出了 `hermes-pocket-R52R53-会话钉住与装数据-20260929.apk`，
+  但它构建时我正在改本轮的文件 ⇒ `--verify` **FAIL**（包内 ≠ 源树）⇒ **该包已删除**，不交付；
+  R52R53#4 的源码改动**就在本包内**（本包 verify PASS ✓）。

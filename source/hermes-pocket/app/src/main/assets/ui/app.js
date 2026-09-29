@@ -10,8 +10,8 @@
   HP.FONT = '"JetBrainsMono Nerd Font","JetBrains Mono","Noto Sans Mono","DejaVu Sans Mono","Droid Sans Mono",monospace';
 
   /* —— 打包信息（由 tools/stamp-build.py 从 assets/build-info.json 盖进来，别手改这一段）—— */
-  HP.BUILD = "unified-20260929-133223";
-  HP.BUILDINFO = {"acceptance": "t-composer.mjs（14 条）+ 全部 20 个驱动", "appName": "Hermes Pocket", "builtAt": "2026-09-29 13:32 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "终端页默认收起（本人拍）：收起时容器 display:none 高度 0、只留一颗「显示终端」按钮（≥44dp、无说明文字）；展开即贴底（补 R-49 第三条路径）+ 收起时跳过几何计算（不 resize 成 1×1）；snapToBottom 同时按 DOM 视图区确保真到底", "featureId": "R-52R53", "note": "汇总包（不是单轮）：自 汇总-20260927 之后新增 O14-App#1/#2；不含社媒轮次（属 social-archive）、平台侧修复（R-43 类）、等本人拍（R-44/R-49/R-52/R-53）、只到定位未改码（R-46/R-47/R-50/R-51/R-54）——见 evidence/汇总-20260928/清单-轮次对照.txt", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "unified-20260929-133223"};
+  HP.BUILD = "R48-20260929-135313";
+  HP.BUILDINFO = {"acceptance": "d-r48-hostkey-confirm pageerror=0；t-composer/t-r48-cr/t-r58/t-r49 无 FAIL；浮层连 3 次 connect 后为 0", "appName": "Hermes Pocket", "builtAt": "2026-09-29 13:53 CST", "entry": "dev.hermes.pocket.MainActivity", "feature": "修 HP.UI 初始化顺序报错（弹窗清扫调用加守卫，hostkey→confirm 路径 pageerror=0）+ 四个命名探针入库 + 包内含 R-52R53#4 的会话钉住/取数失败可见改动", "featureId": "R-48", "note": "R48#5：修报错与探针入库轮；含 R52R53#4 的 App 侧改动（会话 pick 显式化、取数失败可见、talkCmd 钉 PATH）", "packageId": "dev.hermes.pocket", "project": "hermes-pocket", "testVersion": "R48-20260929-135313"};
   /* —— 打包信息结束 —— */
 
   const THEME = {
@@ -502,7 +502,7 @@
     },
 
     async connect(hostId) {
-      HP.UI.closeDialogs();          // 连接流程开始：把上一次留下的浮层清干净（R-48#3）
+      if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();   // 连接流程开始：清掉上一次的浮层（R-48#3）
       try {
         this.hostId = hostId;
         // 取一次**新鲜的**主机配置：面板缓存可能是旧的（刚在别处改过 startCmd / 密钥等），
@@ -905,7 +905,7 @@
         }
         if (e.target.hasAttribute('data-n')) back.remove();
       });
-      $('stage').HP.UI.closeDialogs();          // 弹窗不堆叠、不留残节点（R-48#3）
+      if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();   // 弹窗不堆叠、不留残节点（R-48#3；R48#5 加守卫防早于 HP.UI 就绪）
       $('stage').appendChild(back);
       info();
     },
@@ -1701,7 +1701,7 @@
       if (this._watchFn && !this._watchRaf) this._watchRaf = requestAnimationFrame(this._watchFn);
       this.startTrafficTimer();
       if (!this._tickTimer) this._tickTimer = setInterval(() => { try { this.trackCommandTick(); } catch (e) { } }, 1000);
-      if (this.state === 'connected') { HP.UI.closeDialogs(); this.startPing(); }
+      if (this.state === 'connected') { if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs(); this.startPing(); }
       if (HP.Talk && HP.Talk.onPowerSave) HP.Talk.onPowerSave(false);  // 回前台：轮询开表并立刻补一次
       if (HP.NetStats) HP.NetStats.onPowerSave(false);                 // 网络定时探测：按设置决定要不要开回来（R-27）
       this.syncViewport(); this.fitChrome(); this.resetGeometry();
@@ -2252,7 +2252,7 @@
           if (e.target.hasAttribute('data-y')) { back.remove(); resolve(true); }
           else if (e.target.hasAttribute('data-n')) { back.remove(); resolve(false); }
         });
-        $('stage').HP.UI.closeDialogs();          // 弹窗不堆叠、不留残节点（R-48#3）
+        if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();   // 弹窗不堆叠、不留残节点（R-48#3；R48#5 加守卫防早于 HP.UI 就绪）
         $('stage').appendChild(back);
       });
     },
@@ -2272,7 +2272,7 @@
         if (e.target.hasAttribute('data-c')) App.copy(back.querySelector('textarea').value);
         else if (e.target.hasAttribute('data-x')) back.remove();
       });
-      $('stage').HP.UI.closeDialogs();          // 弹窗不堆叠、不留残节点（R-48#3）
+      if (HP.UI && HP.UI.closeDialogs) HP.UI.closeDialogs();   // 弹窗不堆叠、不留残节点（R-48#3；R48#5 加守卫防早于 HP.UI 就绪）
       $('stage').appendChild(back);
     },
 

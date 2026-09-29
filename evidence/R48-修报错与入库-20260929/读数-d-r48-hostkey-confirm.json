@@ -1,0 +1,53 @@
+{
+  "name": "R48#5：hostkey→confirm 路径不报错 + 浮层不堆叠 + 按钮可命中",
+  "result": {
+    "check": {
+      "00_复现步骤": "HP.App.onHostKey({host,port,algo,fingerprint,storedFingerprint,changed:true}) ×4（第 2~4 次在弹窗还开着时再触发）",
+      "01_单次_浮层": {
+        "前": {
+          "hpDialog": 0,
+          "cardInDialog": 0
+        },
+        "后": {
+          "hpDialog": 1,
+          "cardInDialog": 1
+        },
+        "有确认框": true
+      },
+      "02_重复4次_浮层与报错": {
+        "浮层": {
+          "hpDialog": 1,
+          "cardInDialog": 1
+        }
+      },
+      "03_取消后_浮层": {
+        "hpDialog": 0,
+        "cardInDialog": 0
+      },
+      "04_连接流程_浮层": {
+        "hpDialog": 0,
+        "cardInDialog": 0
+      },
+      "05_按钮命中": {
+        "sel": "#btn-term",
+        "矩形": [
+          412,
+          44
+        ],
+        "top": "#btn-term"
+      },
+      "06_浮层时按钮命中": {
+        "sel": "#btn-term",
+        "矩形": [
+          412,
+          44
+        ],
+        "top": "#btn-term"
+      },
+      "07_报错": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}

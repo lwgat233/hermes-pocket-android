@@ -1,0 +1,16 @@
+四个命名探针 + 本轮两个定位探针：怎么跑（照抄）
+=========================================================================
+前置：仓库树 `/vol1/1000/airesults/hermes-pocket/source/hermes-pocket`；node 用绝对路径（后台上下文 PATH 很窄）。
+
+cd /vol1/1000/airesults/hermes-pocket/source/hermes-pocket/tools/ui-harness
+export PATH=/home/lwgat/.local/bin:$PATH
+node harness.mjs t-composer.mjs            # 输入/发送栏 14 条
+node harness.mjs t-r48-cr.mjs              # 软键盘回车 = 恰好 1 个 0x0D
+node harness.mjs t-r58-term-toggle.mjs     # 终端默认收起 / 展开即贴底 / 开合不残留
+node harness.mjs t-r49-term-bottom.mjs     # 终端一进/一点即贴底、上翻不被拽回
+node harness.mjs t-r49-target-300.mjs      # 内容超一屏（靶子 300 行）下的滚动读数
+node harness.mjs d-r48-bytes-overlay.mjs   # 各路径发出的字节 hex + 浮层残留 + ⏎ 尺寸
+node harness.mjs d-r48-hostkey-confirm.mjs # hostkey→confirm 不报错 + 浮层不堆叠 + 按钮可命中
+node harness.mjs d-r52r53-talk-data.mjs    # 会话 pick 显式化 + 聊天页装数据
+
+退出码语义：进程退出码 0 且输出 JSON 里没有 FAIL 字样 = 通过；判读都在 stdout 的 JSON 里。
