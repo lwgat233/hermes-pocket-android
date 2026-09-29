@@ -1,0 +1,204 @@
+R-48 第 3 步小结（键条「⏎」发的字节 / 浮层残留 / ⏎ 尺寸）· 2026-09-29
+=========================================================================
+结论：**三件都查清了**。① App 三条路径**发的都是 `0d`（CR）**，靶子收到的 `0a` 是**远端 tty 行规程（ICRNL）折的**，不是 App 发 LF；
+② 浮层残留的根因是"连接流程里弹窗只 append、没人清"，已修到**连接流程后浮层 0 个**且「显示终端」**可被真触摸命中**；
+③ tester 量的 `60×38` 是**输入框那颗 `#csend`**（不是键条 ⏎，键条是 `#keybar .key` 47×44），已把 `#csend` 提到 **44dp**。
+
+## ① 各条路径发出的字节（本地测试台在 `HP.App.send` 口子上记账，hex）
+| 路径 | 选择器 | 发出的 hex |
+|---|---|---|
+| 真软键盘 Enter（R-48 那条） | `#cinput` + 真 `keyboard.press('Enter')` | **`0d`** |
+| 键条「⏎」 | `#keybar .key`（文案 ⏎） | **`0d`** |
+| 输入框那颗「⏎」 | `#csend` | **`0d`** |
+| 键条 `Ctrl` | `#keybar .key`（Ctrl） | 空（它只切修饰键，不直接发字节） |
+
+## ①下的机制实验（判"真发 LF"还是"链路折叠"）—— 本地真 pty，不牵扯 App
+- **默认 pty（ICANON=1 / ECHO=1 / ICRNL=1，与 sshd 给远端 shell 分的那套默认一致）**：往主端写 `0d` ⇒ 从端读到 **`0a`** ✓（行规程把 CR 折成 LF）
+- **raw（关 ICRNL + 关 ICANON/ECHO，VMIN=1）**：写 `0d` ⇒ 读到 **`0d`**（原样）
+⇒ **结论＝链路折叠，折在"远端那个 tty 的输入行规程（ICRNL）"这一层**，不是 App、也不是我们代码里的替换。
+- 旁证：`Ssh.kt` 只有 `setPtyType("xterm-256color", cols, rows, 0, 0)` 与 `setPtySize`，**没有任何 CR/LF 替换**，字节是原样写进通道的。
+- **给 tester 的自证命令**（把两件事放在**同一次运行**里，就不用来回猜）：靶子脚本里先 `stty -a`（或 `stty -g`）打印一次，
+  再用 `dd bs=1 count=1 2>/dev/null | xxd`（或 python `os.read(0,1).hex()`）打印**自己收到的字节** ⇒
+  若 `stty` 显示 `icrnl` 开着而收到 `0a` ⇒ 就是这一层折的；要收真 CR，**让靶子自己 `stty raw -echo`** 即可（**App 侧不用改**）。
+
+## ② 浮层残留（R-57 并入）
+- **根因（代码级）**：`.hp-dialog` 有 4 个创建点（`ui.js HP.UI.sheet`、`app.js confirm()`、`app.js sheet()`、`app.js openSizeDialog()`），
+  都是 `stage.appendChild(...)`、**关闭全靠各自的关闭回调**；连接流程里只要有一次没走到关闭回调（重复连接、失败路径、被新弹窗顶掉），
+  旧节点就**留在 DOM 里**。而 `.hp-dialog` 是 `position:absolute; inset:0` 的**全屏浮层**（z-index 80–85）⇒ 直接盖住 `#btn-term`（原来 z-index 6）⇒ 真触摸落在浮层上。
+- **修（最小）**：
+  · `ui.js` 新增 **`HP.UI.closeDialogs()`**（把 `.hp-dialog` / `#tk-sheet` **真删掉**，不是 class 藏）；
+  · 每次**弹窗前**扫一遍（`ui.js:sheet` / `app.js confirm()` / `app.js sheet()` / `openSizeDialog()` 共 4 处）⇒ 同一时刻只留一层；
+  · `app.js connect()` 开始处 + `onState('connected')` 各扫一遍 ⇒ 连接流程留下的浮层不许再挡按钮；
+  · `style.css`：`#btn-term { z-index: 6 → 90 }`（高于浮层 80–85）⇒ 就算有残层也拦不住它。
+- **判据读数**（本地测试台，改前 → 改后）：
+  · 连点 3 次 `connect()` 之后浮层计数：`hpDialog 1`（含探针自己开的确认框）→ **`hpDialog 0 / cardInDialog 0 / tkSheet 0`**
+  · `elementFromPoint('#btn-term' 中心)`：改前在**有浮层时**＝`.hp-dialog` ⇒ 改后**基线**＝`#btn-term`、**有浮层时也**＝**`#btn-term`**
+  · `#btn-term` 矩形 412×44（≥44dp ✓）
+
+## ③ 键条「⏎」尺寸
+- **不是同一个元素**：tester 量的 60×38 是 **`#csend`**（输入框右边那颗 ⏎）；键条那颗是 **`#keybar .key`**（文案 ⏎，**47×44**，整条最小键高 44 ✓）。
+- 修：`#csend { height: 38px → 44px }` ⇒ 现在 **60×44**（两个 ⏎ 都 ≥44dp）。
+
+## ④ 不回归（同一套探针，改后重跑）
+- `t-composer.mjs`（项目验收 14 条）· `t-r48-cr.mjs`（真按键回车 1 个 0x0D）· `t-r58-term-toggle.mjs`（默认收起/开合一致/连接次数 0）· `t-r49-term-bottom.mjs`（点终端即贴底）
+  ⇒ **四份都没有 FAIL**；两轮探针**页面报错 0**。
+- 只改了 3 个前端文件（`ui/ui.js`、`ui/app.js`、`ui/style.css`）；**没动平台侧**、**没加常驻按键、没加说明文字**。
+
+## 包（照旧四样）
+- APK：`apk/测试版/hermes-pocket-R48-字节与浮层-20260929.apk`（**__BYTES__ 字节**，sha256 前 12 位 `__SHA__`）
+- build-info：`tools/stamp-build.py` 盖的 stamp（包内 `assets/build-info.json` + `ui/app.js` 的 `HP.BUILDINFO`）
+- 整树 `--verify` 原文：`04-verify-整树-原始输出.txt`（尾部：__VERIFY__）
+- 字节数与 sha256：`05-包读数.txt`
+R-48 第 3 步小结（键条「⏎」发的字节 / 浮层残留 / ⏎ 尺寸）· 2026-09-29
+=========================================================================
+结论：**三件都查清了**。① App 三条路径**发的都是 `0d`（CR）**，靶子收到的 `0a` 是**远端 tty 行规程（ICRNL）折的**，不是 App 发 LF；
+② 浮层残留的根因是"连接流程里弹窗只 append、没人清"，已修到**连接流程后浮层 0 个**且「显示终端」**可被真触摸命中**；
+③ tester 量的 `60×38` 是**输入框那颗 `#csend`**（不是键条 ⏎，键条是 `#keybar .key` 47×44），已把 `#csend` 提到 **44dp**。
+
+## ① 各条路径发出的字节（本地测试台在 `HP.App.send` 口子上记账，hex）
+| 路径 | 选择器 | 发出的 hex |
+|---|---|---|
+| 真软键盘 Enter（R-48 那条） | `#cinput` + 真 `keyboard.press('Enter')` | **`0d`** |
+| 键条「⏎」 | `#keybar .key`（文案 ⏎） | **`0d`** |
+| 输入框那颗「⏎」 | `#csend` | **`0d`** |
+| 键条 `Ctrl` | `#keybar .key`（Ctrl） | 空（它只切修饰键，不直接发字节） |
+
+## ①下的机制实验（判"真发 LF"还是"链路折叠"）—— 本地真 pty，不牵扯 App
+- **默认 pty（ICANON=1 / ECHO=1 / ICRNL=1，与 sshd 给远端 shell 分的那套默认一致）**：往主端写 `0d` ⇒ 从端读到 **`0a`** ✓（行规程把 CR 折成 LF）
+- **raw（关 ICRNL + 关 ICANON/ECHO，VMIN=1）**：写 `0d` ⇒ 读到 **`0d`**（原样）
+⇒ **结论＝链路折叠，折在"远端那个 tty 的输入行规程（ICRNL）"这一层**，不是 App、也不是我们代码里的替换。
+- 旁证：`Ssh.kt` 只有 `setPtyType("xterm-256color", cols, rows, 0, 0)` 与 `setPtySize`，**没有任何 CR/LF 替换**，字节是原样写进通道的。
+- **给 tester 的自证命令**（把两件事放在**同一次运行**里，就不用来回猜）：靶子脚本里先 `stty -a`（或 `stty -g`）打印一次，
+  再用 `dd bs=1 count=1 2>/dev/null | xxd`（或 python `os.read(0,1).hex()`）打印**自己收到的字节** ⇒
+  若 `stty` 显示 `icrnl` 开着而收到 `0a` ⇒ 就是这一层折的；要收真 CR，**让靶子自己 `stty raw -echo`** 即可（**App 侧不用改**）。
+
+## ② 浮层残留（R-57 并入）
+- **根因（代码级）**：`.hp-dialog` 有 4 个创建点（`ui.js HP.UI.sheet`、`app.js confirm()`、`app.js sheet()`、`app.js openSizeDialog()`），
+  都是 `stage.appendChild(...)`、**关闭全靠各自的关闭回调**；连接流程里只要有一次没走到关闭回调（重复连接、失败路径、被新弹窗顶掉），
+  旧节点就**留在 DOM 里**。而 `.hp-dialog` 是 `position:absolute; inset:0` 的**全屏浮层**（z-index 80–85）⇒ 直接盖住 `#btn-term`（原来 z-index 6）⇒ 真触摸落在浮层上。
+- **修（最小）**：
+  · `ui.js` 新增 **`HP.UI.closeDialogs()`**（把 `.hp-dialog` / `#tk-sheet` **真删掉**，不是 class 藏）；
+  · 每次**弹窗前**扫一遍（`ui.js:sheet` / `app.js confirm()` / `app.js sheet()` / `openSizeDialog()` 共 4 处）⇒ 同一时刻只留一层；
+  · `app.js connect()` 开始处 + `onState('connected')` 各扫一遍 ⇒ 连接流程留下的浮层不许再挡按钮；
+  · `style.css`：`#btn-term { z-index: 6 → 90 }`（高于浮层 80–85）⇒ 就算有残层也拦不住它。
+- **判据读数**（本地测试台，改前 → 改后）：
+  · 连点 3 次 `connect()` 之后浮层计数：`hpDialog 1`（含探针自己开的确认框）→ **`hpDialog 0 / cardInDialog 0 / tkSheet 0`**
+  · `elementFromPoint('#btn-term' 中心)`：改前在**有浮层时**＝`.hp-dialog` ⇒ 改后**基线**＝`#btn-term`、**有浮层时也**＝**`#btn-term`**
+  · `#btn-term` 矩形 412×44（≥44dp ✓）
+
+## ③ 键条「⏎」尺寸
+- **不是同一个元素**：tester 量的 60×38 是 **`#csend`**（输入框右边那颗 ⏎）；键条那颗是 **`#keybar .key`**（文案 ⏎，**47×44**，整条最小键高 44 ✓）。
+- 修：`#csend { height: 38px → 44px }` ⇒ 现在 **60×44**（两个 ⏎ 都 ≥44dp）。
+
+## ④ 不回归（同一套探针，改后重跑）
+- `t-composer.mjs`（项目验收 14 条）· `t-r48-cr.mjs`（真按键回车 1 个 0x0D）· `t-r58-term-toggle.mjs`（默认收起/开合一致/连接次数 0）· `t-r49-term-bottom.mjs`（点终端即贴底）
+  ⇒ **四份都没有 FAIL**；两轮探针**页面报错 0**。
+- 只改了 3 个前端文件（`ui/ui.js`、`ui/app.js`、`ui/style.css`）；**没动平台侧**、**没加常驻按键、没加说明文字**。
+
+## 包（照旧四样）
+- APK：`apk/测试版/__PKG__`（**__BYTES__ 字节**，sha256 前 12 位 `da21e54d38f3`）
+- build-info：`tools/stamp-build.py` 盖的 stamp（包内 `assets/build-info.json` + `ui/app.js` 的 `HP.BUILDINFO`）
+- 整树 `--verify` 原文：`04-verify-整树-原始输出.txt`（尾部：__VERIFY__）
+- 字节数与 sha256：`05-包读数.txt`
+R-48 第 3 步小结（键条「⏎」发的字节 / 浮层残留 / ⏎ 尺寸）· 2026-09-29
+=========================================================================
+结论：**三件都查清了**。① App 三条路径**发的都是 `0d`（CR）**，靶子收到的 `0a` 是**远端 tty 行规程（ICRNL）折的**，不是 App 发 LF；
+② 浮层残留的根因是"连接流程里弹窗只 append、没人清"，已修到**连接流程后浮层 0 个**且「显示终端」**可被真触摸命中**；
+③ tester 量的 `60×38` 是**输入框那颗 `#csend`**（不是键条 ⏎，键条是 `#keybar .key` 47×44），已把 `#csend` 提到 **44dp**。
+
+## ① 各条路径发出的字节（本地测试台在 `HP.App.send` 口子上记账，hex）
+| 路径 | 选择器 | 发出的 hex |
+|---|---|---|
+| 真软键盘 Enter（R-48 那条） | `#cinput` + 真 `keyboard.press('Enter')` | **`0d`** |
+| 键条「⏎」 | `#keybar .key`（文案 ⏎） | **`0d`** |
+| 输入框那颗「⏎」 | `#csend` | **`0d`** |
+| 键条 `Ctrl` | `#keybar .key`（Ctrl） | 空（它只切修饰键，不直接发字节） |
+
+## ①下的机制实验（判"真发 LF"还是"链路折叠"）—— 本地真 pty，不牵扯 App
+- **默认 pty（ICANON=1 / ECHO=1 / ICRNL=1，与 sshd 给远端 shell 分的那套默认一致）**：往主端写 `0d` ⇒ 从端读到 **`0a`** ✓（行规程把 CR 折成 LF）
+- **raw（关 ICRNL + 关 ICANON/ECHO，VMIN=1）**：写 `0d` ⇒ 读到 **`0d`**（原样）
+⇒ **结论＝链路折叠，折在"远端那个 tty 的输入行规程（ICRNL）"这一层**，不是 App、也不是我们代码里的替换。
+- 旁证：`Ssh.kt` 只有 `setPtyType("xterm-256color", cols, rows, 0, 0)` 与 `setPtySize`，**没有任何 CR/LF 替换**，字节是原样写进通道的。
+- **给 tester 的自证命令**（把两件事放在**同一次运行**里，就不用来回猜）：靶子脚本里先 `stty -a`（或 `stty -g`）打印一次，
+  再用 `dd bs=1 count=1 2>/dev/null | xxd`（或 python `os.read(0,1).hex()`）打印**自己收到的字节** ⇒
+  若 `stty` 显示 `icrnl` 开着而收到 `0a` ⇒ 就是这一层折的；要收真 CR，**让靶子自己 `stty raw -echo`** 即可（**App 侧不用改**）。
+
+## ② 浮层残留（R-57 并入）
+- **根因（代码级）**：`.hp-dialog` 有 4 个创建点（`ui.js HP.UI.sheet`、`app.js confirm()`、`app.js sheet()`、`app.js openSizeDialog()`），
+  都是 `stage.appendChild(...)`、**关闭全靠各自的关闭回调**；连接流程里只要有一次没走到关闭回调（重复连接、失败路径、被新弹窗顶掉），
+  旧节点就**留在 DOM 里**。而 `.hp-dialog` 是 `position:absolute; inset:0` 的**全屏浮层**（z-index 80–85）⇒ 直接盖住 `#btn-term`（原来 z-index 6）⇒ 真触摸落在浮层上。
+- **修（最小）**：
+  · `ui.js` 新增 **`HP.UI.closeDialogs()`**（把 `.hp-dialog` / `#tk-sheet` **真删掉**，不是 class 藏）；
+  · 每次**弹窗前**扫一遍（`ui.js:sheet` / `app.js confirm()` / `app.js sheet()` / `openSizeDialog()` 共 4 处）⇒ 同一时刻只留一层；
+  · `app.js connect()` 开始处 + `onState('connected')` 各扫一遍 ⇒ 连接流程留下的浮层不许再挡按钮；
+  · `style.css`：`#btn-term { z-index: 6 → 90 }`（高于浮层 80–85）⇒ 就算有残层也拦不住它。
+- **判据读数**（本地测试台，改前 → 改后）：
+  · 连点 3 次 `connect()` 之后浮层计数：`hpDialog 1`（含探针自己开的确认框）→ **`hpDialog 0 / cardInDialog 0 / tkSheet 0`**
+  · `elementFromPoint('#btn-term' 中心)`：改前在**有浮层时**＝`.hp-dialog` ⇒ 改后**基线**＝`#btn-term`、**有浮层时也**＝**`#btn-term`**
+  · `#btn-term` 矩形 412×44（≥44dp ✓）
+
+## ③ 键条「⏎」尺寸
+- **不是同一个元素**：tester 量的 60×38 是 **`#csend`**（输入框右边那颗 ⏎）；键条那颗是 **`#keybar .key`**（文案 ⏎，**47×44**，整条最小键高 44 ✓）。
+- 修：`#csend { height: 38px → 44px }` ⇒ 现在 **60×44**（两个 ⏎ 都 ≥44dp）。
+
+## ④ 不回归（同一套探针，改后重跑）
+- `t-composer.mjs`（项目验收 14 条）· `t-r48-cr.mjs`（真按键回车 1 个 0x0D）· `t-r58-term-toggle.mjs`（默认收起/开合一致/连接次数 0）· `t-r49-term-bottom.mjs`（点终端即贴底）
+  ⇒ **四份都没有 FAIL**；两轮探针**页面报错 0**。
+- 只改了 3 个前端文件（`ui/ui.js`、`ui/app.js`、`ui/style.css`）；**没动平台侧**、**没加常驻按键、没加说明文字**。
+
+## 包（照旧四样）
+- APK：`apk/测试版/__PKG__`（**5146700 字节**，sha256 前 12 位 `__SHA__`）
+- build-info：`tools/stamp-build.py` 盖的 stamp（包内 `assets/build-info.json` + `ui/app.js` 的 `HP.BUILDINFO`）
+- 整树 `--verify` 原文：`04-verify-整树-原始输出.txt`（尾部：__VERIFY__）
+- 字节数与 sha256：`05-包读数.txt`
+R-48 第 3 步小结（键条「⏎」发的字节 / 浮层残留 / ⏎ 尺寸）· 2026-09-29
+=========================================================================
+结论：**三件都查清了**。① App 三条路径**发的都是 `0d`（CR）**，靶子收到的 `0a` 是**远端 tty 行规程（ICRNL）折的**，不是 App 发 LF；
+② 浮层残留的根因是"连接流程里弹窗只 append、没人清"，已修到**连接流程后浮层 0 个**且「显示终端」**可被真触摸命中**；
+③ tester 量的 `60×38` 是**输入框那颗 `#csend`**（不是键条 ⏎，键条是 `#keybar .key` 47×44），已把 `#csend` 提到 **44dp**。
+
+## ① 各条路径发出的字节（本地测试台在 `HP.App.send` 口子上记账，hex）
+| 路径 | 选择器 | 发出的 hex |
+|---|---|---|
+| 真软键盘 Enter（R-48 那条） | `#cinput` + 真 `keyboard.press('Enter')` | **`0d`** |
+| 键条「⏎」 | `#keybar .key`（文案 ⏎） | **`0d`** |
+| 输入框那颗「⏎」 | `#csend` | **`0d`** |
+| 键条 `Ctrl` | `#keybar .key`（Ctrl） | 空（它只切修饰键，不直接发字节） |
+
+## ①下的机制实验（判"真发 LF"还是"链路折叠"）—— 本地真 pty，不牵扯 App
+- **默认 pty（ICANON=1 / ECHO=1 / ICRNL=1，与 sshd 给远端 shell 分的那套默认一致）**：往主端写 `0d` ⇒ 从端读到 **`0a`** ✓（行规程把 CR 折成 LF）
+- **raw（关 ICRNL + 关 ICANON/ECHO，VMIN=1）**：写 `0d` ⇒ 读到 **`0d`**（原样）
+⇒ **结论＝链路折叠，折在"远端那个 tty 的输入行规程（ICRNL）"这一层**，不是 App、也不是我们代码里的替换。
+- 旁证：`Ssh.kt` 只有 `setPtyType("xterm-256color", cols, rows, 0, 0)` 与 `setPtySize`，**没有任何 CR/LF 替换**，字节是原样写进通道的。
+- **给 tester 的自证命令**（把两件事放在**同一次运行**里，就不用来回猜）：靶子脚本里先 `stty -a`（或 `stty -g`）打印一次，
+  再用 `dd bs=1 count=1 2>/dev/null | xxd`（或 python `os.read(0,1).hex()`）打印**自己收到的字节** ⇒
+  若 `stty` 显示 `icrnl` 开着而收到 `0a` ⇒ 就是这一层折的；要收真 CR，**让靶子自己 `stty raw -echo`** 即可（**App 侧不用改**）。
+
+## ② 浮层残留（R-57 并入）
+- **根因（代码级）**：`.hp-dialog` 有 4 个创建点（`ui.js HP.UI.sheet`、`app.js confirm()`、`app.js sheet()`、`app.js openSizeDialog()`），
+  都是 `stage.appendChild(...)`、**关闭全靠各自的关闭回调**；连接流程里只要有一次没走到关闭回调（重复连接、失败路径、被新弹窗顶掉），
+  旧节点就**留在 DOM 里**。而 `.hp-dialog` 是 `position:absolute; inset:0` 的**全屏浮层**（z-index 80–85）⇒ 直接盖住 `#btn-term`（原来 z-index 6）⇒ 真触摸落在浮层上。
+- **修（最小）**：
+  · `ui.js` 新增 **`HP.UI.closeDialogs()`**（把 `.hp-dialog` / `#tk-sheet` **真删掉**，不是 class 藏）；
+  · 每次**弹窗前**扫一遍（`ui.js:sheet` / `app.js confirm()` / `app.js sheet()` / `openSizeDialog()` 共 4 处）⇒ 同一时刻只留一层；
+  · `app.js connect()` 开始处 + `onState('connected')` 各扫一遍 ⇒ 连接流程留下的浮层不许再挡按钮；
+  · `style.css`：`#btn-term { z-index: 6 → 90 }`（高于浮层 80–85）⇒ 就算有残层也拦不住它。
+- **判据读数**（本地测试台，改前 → 改后）：
+  · 连点 3 次 `connect()` 之后浮层计数：`hpDialog 1`（含探针自己开的确认框）→ **`hpDialog 0 / cardInDialog 0 / tkSheet 0`**
+  · `elementFromPoint('#btn-term' 中心)`：改前在**有浮层时**＝`.hp-dialog` ⇒ 改后**基线**＝`#btn-term`、**有浮层时也**＝**`#btn-term`**
+  · `#btn-term` 矩形 412×44（≥44dp ✓）
+
+## ③ 键条「⏎」尺寸
+- **不是同一个元素**：tester 量的 60×38 是 **`#csend`**（输入框右边那颗 ⏎）；键条那颗是 **`#keybar .key`**（文案 ⏎，**47×44**，整条最小键高 44 ✓）。
+- 修：`#csend { height: 38px → 44px }` ⇒ 现在 **60×44**（两个 ⏎ 都 ≥44dp）。
+
+## ④ 不回归（同一套探针，改后重跑）
+- `t-composer.mjs`（项目验收 14 条）· `t-r48-cr.mjs`（真按键回车 1 个 0x0D）· `t-r58-term-toggle.mjs`（默认收起/开合一致/连接次数 0）· `t-r49-term-bottom.mjs`（点终端即贴底）
+  ⇒ **四份都没有 FAIL**；两轮探针**页面报错 0**。
+- 只改了 3 个前端文件（`ui/ui.js`、`ui/app.js`、`ui/style.css`）；**没动平台侧**、**没加常驻按键、没加说明文字**。
+
+## 包（照旧四样）
+- APK：`apk/测试版/__PKG__`（**__BYTES__ 字节**，sha256 前 12 位 `__SHA__`）
+- build-info：`tools/stamp-build.py` 盖的 stamp（包内 `assets/build-info.json` + `ui/app.js` 的 `HP.BUILDINFO`）
+- 整树 `--verify` 原文：`04-verify-整树-原始输出.txt`（尾部：包内1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495 /  / PASS 包内 ↔ 源树 对账）
+- 字节数与 sha256：`05-包读数.txt`

@@ -174,7 +174,7 @@ body:not(.term-hide) #panner { top: 44px; }
   left: 0;
   right: 0;
   top: 0;
-  z-index: 6;
+  z-index: 90;               /* R-48#3：抬到浮层（80–85）之上，残留浮层不许拦它 */
   min-height: 44px;                    /* R-33 硬线：命中区 ≥44dp */
   border: 0;
   background: var(--bg-bar, #0f1218);
@@ -376,7 +376,7 @@ body.term-hide #btn-term { top: 50%; transform: translateY(-50%); }
 }
 #csend {
   flex: 0 0 auto;
-  height: 38px;
+  height: 44px;            /* R-48#3：命中区 ≥44dp（原来 38 低于口径） */
   min-width: 60px;
   border-radius: 10px;
   border: 1px solid var(--accent);

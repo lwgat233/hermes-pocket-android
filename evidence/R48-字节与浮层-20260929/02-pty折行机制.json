@@ -1,0 +1,24 @@
+{
+ "A_默认_flags": {
+  "ICRNL": true,
+  "ICANON": true,
+  "ECHO": true,
+  "tty": "/dev/pts/9"
+ },
+ "A_默认_读到": {
+  "hex": "0a",
+  "说明": "0d 进 → 0a 出 = ICRNL 把 CR 折成 LF"
+ },
+ "B_裸模式_flags": {
+  "ICRNL": false,
+  "ICANON": false,
+  "ECHO": false
+ },
+ "B_裸模式_读到": {
+  "hex": "0d",
+  "说明": "raw + ICRNL 关 ⇒ CR 原样 0d（与靶子 tty 全关的情形一致）"
+ },
+ "C_stty_旁证": [
+  "bash: line 1: /dev/tty: No such device or address"
+ ]
+}

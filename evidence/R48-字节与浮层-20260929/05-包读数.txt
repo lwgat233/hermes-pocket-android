@@ -1,0 +1,3 @@
+/vol1/1000/airesults/hermes-pocket/apk/测试版/hermes-pocket-R48-字节与浮层-20260929.apk
+sha256 = da21e54d38f30c021b50f8f5272b5adf01d15905870277ee5cd63b85d9a8fe50
+字节   = 5146700

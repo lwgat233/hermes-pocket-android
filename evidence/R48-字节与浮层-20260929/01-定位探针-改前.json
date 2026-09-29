@@ -1,0 +1,90 @@
+{
+  "name": "R-48#3：发送字节（hex）+ 浮层残留与命中 + 两个 ⏎ 的尺寸",
+  "result": {
+    "check": {
+      "01_真软键盘Enter": {
+        "hex": [
+          "0d"
+        ]
+      },
+      "02_键条回车": {
+        "hex": [
+          "0d"
+        ],
+        "选择器": "#keybar .key（文案 ⏎）",
+        "矩形": [
+          47,
+          44
+        ],
+        "整条最小键高": 44
+      },
+      "03_输入框回车": {
+        "选择器": "#csend",
+        "矩形": [
+          60,
+          38
+        ],
+        "elementFromPoint": "#csend",
+        "hex": [
+          "0d"
+        ]
+      },
+      "04_键条CtrlC": {
+        "文案": "Ctrl",
+        "hex": []
+      },
+      "05_浮层_基线": {
+        "hpDialog": 0,
+        "cardInDialog": 0,
+        "tkSheet": 0,
+        "stageChildren": 7,
+        "bodyChildren": 15
+      },
+      "06_浮层_连接流程后": {
+        "连接尝试": [
+          "connect ok",
+          "connect ok",
+          "connect ok"
+        ],
+        "前": {
+          "hpDialog": 0,
+          "cardInDialog": 0,
+          "tkSheet": 0,
+          "stageChildren": 7,
+          "bodyChildren": 15
+        },
+        "后": {
+          "hpDialog": 1,
+          "cardInDialog": 1,
+          "tkSheet": 0,
+          "stageChildren": 8,
+          "bodyChildren": 15
+        }
+      },
+      "07_按钮命中_基线": {
+        "sel": "#btn-term",
+        "矩形": [
+          412,
+          44
+        ],
+        "top": ".hp-dialog"
+      },
+      "08_按钮命中_有浮层时": {
+        "sel": "#btn-term",
+        "矩形": [
+          412,
+          44
+        ],
+        "top": ".hp-dialog"
+      },
+      "09_两个回车对照": {
+        "键条": "#keybar .key（⏎）",
+        "输入框": "#csend"
+      },
+      "10_报错": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}

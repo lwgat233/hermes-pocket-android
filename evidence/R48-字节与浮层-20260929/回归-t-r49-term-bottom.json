@@ -1,0 +1,101 @@
+{
+  "name": "R-49 验收：终端页一进/一点即到最底，且不拽回手动上翻的位置",
+  "result": {
+    "check": {
+      "00_可上翻": {
+        "scrollTop": 3258,
+        "scrollHeight": 4301,
+        "clientHeight": 643,
+        "离底": 400
+      },
+      "01_点终端即贴底": {
+        "同拍": {
+          "scrollTop": 3658,
+          "scrollHeight": 4301,
+          "clientHeight": 643,
+          "离底": 0
+        },
+        "两帧后": {
+          "scrollTop": 3658,
+          "scrollHeight": 4301,
+          "clientHeight": 643,
+          "离底": 0
+        },
+        "一秒后": {
+          "scrollTop": 3658,
+          "scrollHeight": 4301,
+          "clientHeight": 643,
+          "离底": 0
+        },
+        "新输出后": {
+          "scrollTop": 4278,
+          "scrollHeight": 4921,
+          "clientHeight": 643,
+          "离底": 0
+        }
+      },
+      "02_进页即贴底": {
+        "上翻后": {
+          "scrollTop": 3778,
+          "scrollHeight": 4921,
+          "clientHeight": 643,
+          "离底": 500
+        },
+        "关盖层后": {
+          "scrollTop": 4278,
+          "scrollHeight": 4921,
+          "clientHeight": 643,
+          "离底": 0
+        }
+      },
+      "03_上翻后不拽回": {
+        "上翻": {
+          "scrollTop": 3678,
+          "scrollHeight": 4921,
+          "clientHeight": 643,
+          "离底": 600
+        },
+        "新输出后": {
+          "scrollTop": 3679,
+          "scrollHeight": 5747,
+          "clientHeight": 643,
+          "离底": 1425
+        },
+        "位置没被拽回底部": true
+      },
+      "04_重画不顶回": {
+        "重画前": {
+          "scrollTop": 3679,
+          "scrollHeight": 5747,
+          "clientHeight": 643,
+          "离底": 1425
+        },
+        "重画后": {
+          "scrollTop": 3679,
+          "scrollHeight": 5747,
+          "clientHeight": 643,
+          "离底": 1425
+        },
+        "没被顶回顶部": true
+      },
+      "05_贴底时跟随": {
+        "贴底": {
+          "scrollTop": 5104,
+          "scrollHeight": 5747,
+          "clientHeight": 643,
+          "离底": 0
+        },
+        "新输出后": {
+          "scrollTop": 5621,
+          "scrollHeight": 6264,
+          "clientHeight": 643,
+          "离底": 0
+        }
+      },
+      "06_报错": {
+        "count": 0,
+        "detail": []
+      }
+    }
+  }
+}
