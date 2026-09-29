@@ -1,0 +1,43 @@
+# hermes-pocket-R52R53 第 3 步 · 真机复测结论（pipeline.tester · 2026-09-29 · #1875）
+
+**一句话**：**包核对全绿 ✓ ＋ ⑤ 合规 ✓ ＋ ⑥ 清场 ✓；① ② ③ ④ 未验** —— 因为 App 的聊天页在我这台真机上**渲染 0 个 `#tk-chat` / 0 个气泡**（数据没进来），三态 / 长按菜单 / 删除找回 / 五条回归都取不到读数。不是产品结论，是**我这台的装置没把"平台"接上**。
+
+## 装包核对（✓）
+| 项 | 读数 |
+|---|---|
+| 宿主 APK | `apk/测试版/hermes-pocket-R52R53-三态与删除菜单-20260929.apk` **5098000 字节** ✓ |
+| 宿主 sha256 | **`af81d477e3add30930c1fca7cd12f254d7f9dbb5ffbf3b926d034dd86f6f2d8d`** ✓（＝派活给的 `af81d477e3ad…`） |
+| **设备侧 base.apk** | **5098000 字节 / sha256 同上（逐字节相同）** ✓ ⇒ 装的真是这一版 |
+| APK 内 build-info | **`testVersion unified-20260929-130859`** ✓ · **`featureId R-52R53`** ✓ |
+| APK 内 ui（vs 派活给的值） | `ui/talk.js` **53c884818dc771c5** ✓ · `ui/talk.css` **70d3ea0f46df3c5a** ✓ |
+
+## 卡点（①–④ 为什么不成立）
+装置（全部就位）：临时 sshd 仅 `127.0.0.1:2222`（独立 `authorized_keys`）＋ tmux 会话 **`r52t`**（cwd = `/vol1/1000/airesults/roles-chat`）＋ App 建 `R58靶机` 连上（`HP.App.transport.alive = true` ✓）、点掉「信任并保存」、`HP.Sessions.attach('r52t')` ✓。
+**但**：`HP.App.showBoard('talk')` 之后实读 —— `document.querySelectorAll('#tk-chat').length = **0**`、`.tk-bub = **0**`、`[class*="tk-ic"] = 0`、`#tk-sends = 0`；重画一次再读仍全 0。
+⇒ 聊天页**没有数据**（气泡/状态图标/菜单都无从出现）⇒ **① 三态、② 重发、③ 长按删除与找回、④ 五条回归**全部**未验**。
+（顺带把我的过程读数留下：App 首屏浮层仍见「信任并保存」×1；`visibleButtons` 里出现 `☰/⌨/⛶/显示终端/‹/信任并保存/取消`。）
+
+## ⑤ 合规（✓ 我自己独立跑的）
+| 步骤 | 读数 |
+|---|---|
+| 台账 `talk/*.md`（前） | **75 文件 / 1851258 字节 / sha16（有序拼接）`d0697c41b19149c7`** |
+| 计数（前） | 总行数 **1070** / 可见 1070 / 隐藏 0 / 目标行(#1870)在 **1** |
+| `python3 tools/talk.py hidden --id 1870 --action hide` | `{"id":1870,"action":"hide","hidden_by_user":**1**,"changed":1,"可见条数":1070,"隐藏条数":**1**,"总行数（不减）":**1070**}` |
+| 台账（隐藏中） | **75 / 1851258 / `d0697c41b19149c7`** —— **与"前"逐项完全一致** ✓ |
+| 计数（隐藏中） | 总行数 **1070（不减）** / 可见 **1069** / 隐藏 **1** / 目标行仍在 **1** ✓ |
+| `since-json` 默认 vs `--show-hidden` | 13519 字节 vs **13518** 字节（含 flag，长度差 1）✓ |
+| `--action restore` | `{"hidden_by_user":**0**,"changed":1,"可见条数":1070,"隐藏条数":**0**,"总行数（不减）":1070}` ✓ |
+| 台账（还原后）＋核对 | **75 / 1851258 / `d0697c41b19149c7`** 一致 ✓；`select count(*) from msg`=**1070** ✓、`hidden_by_user=1` 行数=**0** ✓、`id=1870` 的 flag=**0** ✓ |
+⇒ **删除只标记、不毁权威源 ✓**（台账三项"前／隐藏中／还原后"完全一致）；**测完已复原** ✓
+
+## ⑥ 清场（✓，派活附带的那条也做了）
+- **App 内 `R58靶机` 主机 + `r58probe` 密钥已删** ✓（`host.delete`/`key.delete` 回读：`deleted = ["R58靶机","key:r58probe"]`，`hostsLeft=["复验主机"]`、`keysLeft=["verify-key"]` ⇒ **用户自己的两件一个没碰** ✓）
+- 临时 sshd 已停 + `/tmp/r47probe-sshd` 已删 ⇒ **2222 = 0 监听** ✓；`r52t` 已 `kill-session` ⇒ tmux 只剩 **`hermes` / `roles`** ✓；模拟器 `emu.sh stop` ✓
+
+## 红线 / 风险读数
+- NAS `~/.ssh/authorized_keys`：**7 条 / mtime `2026-09-21 20:41:42.800652328 +0800` 未变** ✓
+- 代码：**零改动**（只新增 `tools/验收脚本/r52-{attach,chat,chat2}-20260929.mjs`）
+- ⚠ **给作者的风险读数（不是本轮判据）**：App 连上后 `Sessions.bootstrap` 的 `pick()` 在 `sel` 失效时取 **`list[0]`** ⇒ 我这轮它**先 attach 到了我自己的 `hermes` 会话**（`tmux ls` 只见 `hermes … (attached)`）；我立刻 `Ctrl-b d` 断开再 attach `r52t`。**建议**：把"要进的会话"做成显式参数（或 recipe 里写"先钉 `sel`"），否则测者会把键打进不相干的会话。
+
+## 未验（未验 ≠ 通过）
+① 三态图标（pending/sent/failed）· ② 点红叹号重发 · ③ 长按两档菜单 / 删除与找回 / 重启仍隐藏 · ④ `R-39`/`R-41`/`R-48`/`R-49`/`R-58` 五条回归 —— 全部**未验**，原因＝聊天页在本机无数据（见"卡点"）；判不了就照实写。
