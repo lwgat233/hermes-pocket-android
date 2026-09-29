@@ -1,0 +1,146 @@
+# 公开资料原句摘录（自动抽取，20 个关键词）
+
+===== howtogeek-telegram.html（275859 字节，命中 17 行） =====
+  How to Delete Telegram Messages and Chat Histories
+  How to Delete Everything You've Ever Sent
+  , you'll probably want to know how to delete conversations from both your device and Telegram's servers. This isn't quite as straightforward as you may think.
+  ), anyone can delete a message from a one-on-one chat from all devices. This includes both messages that you've sent and messages that you've received. There are no time limits, and the message will be deleted from all devices, including the Telegram server.
+  Cloud chats with multiple participants work differently. You can only delete messages that you've sent from everyone's devices within 48 hours of sending them. After this, you can still delete a message, but it will remain on both the server and the recipients' devices. If the recipients also delete the message, then it's gone forever.
+  To delete a message, tap and hold it, then choose Delete.
+  You can then choose between "Delete for me" and "Delete for everyone," or whoever it is you're talking to.
+  If you want to erase all copies of such a message from Telegram's servers---even the recipient's copy---you'll need to ask the recipient of the message to delete it on their device, too.
+  To delete the entire conversation, swipe right on it in the conversations list and choose Delete. You'll be asked whether you want to delete messages on your end or for the entire conversation.
+  Being able to delete a message from a recipient's device sounds like a godsend akin to
+  If you send a message to a friend that has push notifications enabled for Telegram (a messaging app isn't much use without them), your message will still appear in their notifications. Most mobile devices delete notifications once they've been tapped, but most still contain the bulk of an incoming message.
+  Want to delete everything you've ever sent? For a nuclear option, you can
+  delete your entire Telegram account
+  . But if you've sent sensitive messages containing private data to anyone, you may need to ask them to delete their copies of those messages from their account to ensure that all copies are purged from Telegram's servers.
+  How to Delete Your Telegram Account
+  Readers like you help support How-To Geek. When you make a purchase using links on our site, we may earn an affiliate commission.
+  5 once-great Android apps you should delete immediately, and what to use instead
+
+===== qqbot-recall.html（29183 字节，命中 4 行） =====
+  撤回消息 | QQ 机器人官方文档
+  管理员可以撤回普通成员的消息。
+  频道主可以撤回所有人的消息。
+  是否隐藏提示小灰条，true 为隐藏，false 为显示。默认为false
+
+===== signal-delete-chats.html（5894 字节，命中 0 行） =====
+
+===== signal-delete.html（5836 字节，命中 0 行） =====
+
+===== signal-delivered.html（5969 字节，命中 0 行） =====
+
+===== techmesto-telegram.html（212190 字节，命中 8 行） =====
+  If you are a WhatsApp user who recently switched to Telegram, then the ticks or checkmarks are going to be confusing. Telegram, even though has a similar system of single and double checks, they work a little differently.
+  – Telegram shows a single checkmark when the message is sent from your device and uploaded to the Telegram server.
+  – Double checks signify that the recipient has read the message/chat.
+  where a single check means the message is sent, double means delivered. The checks change to blue color when the recipient reads the message. So, you need to keep the above difference in mind while evaluating the message that you have sent to a friend on Telegram.
+  Why isn’t there a “Delivered to device” indicator?
+  If the person receives your message and decides to ignore your message, then only the single tick (or check) will show. Hence, it is quite difficult to find out whether the message got delivered.
+  I hope this cleared your doubts about what the checkmarks on Telegram mean. If you still have something in mind, then the comment section below is for you to use 🙂
+  How to Edit and correct a WhatsApp message that’s already sent
+
+===== telegram-faq.html（119829 字节，命中 54 行） =====
+  What do the check marks mean in Telegram?
+  Can I delete my messages?
+  How do I delete my username?
+  Delete your Telegram account
+  . The Telegram team had to leave Russia due to local IT regulations and has tried a number of locations as its base, including Berlin, London and Singapore. We’re currently happy with Dubai, although are ready to relocate again if local regulations change.
+  delivered instantly
+  Q: What do the check marks mean?
+  — message delivered to the Telegram cloud and your friend has been notified if he allows notifications.
+  — message read (your friend opened Telegram and opened the conversation with the message).
+  We don't have a 'delivered to device' status for messages because Telegram can run on as many devices as you want. So which particular one would that check mean?
+  Read a message they sent you in a one-on-one chat.
+  Q: Can I delete my messages?
+  Yes. You can always delete any messages you
+  one-on-one conversation (in groups, it's still your own messages only). You can also clear the entire chat history on both ends. On Telegram, deleted messages do not leave a mark in the chat.
+  Edit your messages after posting, delete them so that they disappear for everyone.
+  Appoint administrators that can mass-delete messages, control membership, and pin important messages. Define their admin privileges with granular precision.
+  Read more about channels in the Channels FAQ »
+  Read more about invite links in our blog »
+  Q: How do I delete my username?
+  We understand that certain usernames are part of an online identity for some of us. If your desired username is already taken and it is
+  A user with root access can easily bypass security features built into the operating system, read process memory or access restricted areas, such as the
+  Secret chats are meant for people who want more secrecy than the average fella. All messages in secret chats use end-to-end encryption. This means only you and the recipient can read those messages — nobody else can decipher them, including us here at Telegram (
+  ). On top of this, Messages cannot be forwarded from secret chats. And when you delete messages on your side of the conversation, the app on the other side of the secret chat will be ordered to delete them as well.
+  in a set amount of time after they have been read or opened by the recipient. The message will then disappear from both your and your friend's devices.
+  To set the timer, simply tap the clock icon (in the input field on iOS, top bar on Android), and then choose the desired time limit. The clock starts ticking the moment the message is displayed on the recipient's screen (gets two check marks). As soon as the time runs out, the message disappears from
+  Note that people will always see your number if they know it already and
+  To change your number, go to Settings, then tap on your phone number (just above the username), then 'Change Number'. If you already have a different Telegram account on the target number, you'll need to
+  Q: How do I delete my account?
+  If you would like to delete your account, you can do this on the
+  Q: What happens if I delete my account?
+  As was just mentioned above, all your data will be flushed from our system: all messages, groups, and contacts associated with your account will be deleted. That said, your contacts will still be able to chat in the groups that you have created, and they will still have
+  Telegram is not a commercial organization, and we value our disk space greatly. If you stop using Telegram and don't come online for at least 18 months, your account will be deleted along with all messages, media, contacts and every other piece of data you store in the Telegram cloud. You can change the exact period after which your inactive account will self-destruct in Settings.
+  Q: Can I delete my data without deleting my account?
+  You can delete most of your data without deleting your Telegram account.
+  To delete individual messages or entire chats for both parties at any time, simply tap on a message (or hold to select any number of chats) and tap on the delete icon, then check the option to delete for both parties.
+  To delete your Synced Contacts, choose
+  Delete Synced Contacts
+  To delete your Cloud Drafts, choose
+  Delete All Cloud Drafts
+  To delete suggestion metadata about contacts and bots you message frequently, turn off
+  To delete your profile pictures, open your profile > tap on your profile picture >
+  To delete the stories you posted go to
+  , then hold to select and tap on the delete icon in the top right corner.
+  To delete your call history go to Calls >
+  > Delete All Calls.
+  , it is best that you wipe it remotely. You can read more about it here:
+  delete your Telegram account
+  If you are already logged in to Telegram on a device, you can
+  . While frozen, you can still read your chats, but you cannot send messages or post content.
+  with multiple conversation threads and streaming responses – and
+  Q: If I add a bot to my group, can it read my messages?
+  . Be sure to read the
+  To delete a contact, open a chat with the person, tap the title in the top area of the chat screen to open their profile, then tap on (⋮) in the top right corner > 'Delete contact'.
+  If you want to delete the contact completely, make sure you also delete them from your phone contacts. Telegram stays in sync and will add the contact back if you don't.
+
+===== wecom-recall.html（1005490 字节，命中 36 行） =====
+  企业微信聊天消息多久内可以撤回-帮助中心-企业微信
+  一、如何撤回自己发出的会话消息
+  1、消息撤回操作方法：电脑端右键消息->撤回，手机端需长按消息->撤回。
+  2、内部单聊/群聊、与企业微信联系人的单聊、只有企业微信联系人的群聊，支持撤回24小时内发出的消息；超过时间则看不到撤回选项。
+  温馨提示：若需正常使用撤回功能，建议更新版本，若版本过低则不支持撤回24小时内的消息。
+  （1）支持撤回2分钟内发出的消息；超过时间则看不到撤回选项。
+  （2）文件消息可撤回时间是3小时，合并消息包含文件消息和非文件消息的撤回时间是2分钟。企业微信用户使用微信插件操作时也支持。
+  注：若成员在文件防泄漏的生效范围内，发送文件消息可撤回时间是2分钟。
+  4、微信客服会话支持撤回2分钟内的消息，企业微信用户、微信用户都可以各自撤回自己的消息。
+  5、若撤回的是文字消息，撤回之后可以在5分钟内点击“重新编辑”进行编辑撤回的内容，超过5分钟则看不到“重新编辑”。（图片、文件等信息撤回后不支持重新编辑）
+  若是内部群的群主/群管理员撤回的话，群主/群管理员、发送者都不能重新编辑；需要发送者自己操作撤回，才可以“重新编辑”撤回5分钟内的文字消息。
+  支持撤回语音、文字、图片、文件、视频、名片、位置、分享的链接消息等；
+  消息撤回后，双方都可以在会话框看到相应的提示。
+  7、微信插件的会话中不支持操作撤回消息，若在企业微信侧撤回消息，微信插件的会话中也会同步撤回。
+  二、群主、群管理员如何撤回群成员发出的消息
+  1、群主和群管理员支持撤回内部群成员发送的聊天记录。群聊中有员工服务，员工服务发送的消息支持被撤回；员工服务发起的群聊，群主也能撤回群成员消息。（外部群暂不支持）
+  2、红包消息暂不支持被撤回。
+  3、消息发送后超过24小时不支持被撤回。
+  4、在【手机端->内部群->长按群成员发送的消息->撤回】
+  或【电脑端->内部群->右键单击群成员发送的消息->撤回成员消息】可进行撤回。
+  （1）消息超过撤回时间会没有撤回按钮，企业微信联系人会话支持撤回24小时，微信联系人会话2分钟。
+  （2）若未超过撤回时间，可检查手机本地时间与网络时间是否一致。
+  （3）电脑端企业微信侧自己给自己发送的消息，没有撤回选项。手机端有撤回入口。
+  2、消息撤回后，手机端系统消息通知界面仍可见已撤回的消息
+  目前消息撤回后，仅支持对企业微信会话内的消息撤回，暂不支持撤回手机系统通知界面的消息记录。
+  3、会话中删除了消息还能撤回吗
+  已删除的消息，暂不支持操作撤回。
+  4、超过消息撤回时间怎么办
+  目前超过消息撤回时间后暂无其他方式可以撤回。
+  5、会话中撤回的消息，对方还可以继续看到
+  目前进群附带的聊天记录相当于转发，转发的消息无法被撤回。
+  例如：A邀请B加入群聊并附带了29条聊天记录，邀请后，A操作撤回文件，B可以继续看到。
+  6、撤回图文消息/图文混排后，原本的图片变为[图片]
+  当前企业开启文件防泄露后，在防泄漏范围内的成员发出去的图片会变为保密图片，故图文混排撤回后重新编辑图片仅展示[图片]。
+  7、撤回文件后可以缓存文件夹中找到/撤回文件后，在缓存文件夹也会删除对应文件
+  目前撤回的文件会删除。如果操作撤回时，文件被打开占用着，就会删除不了。
+
+===== xinhua-wechat-recall.html（22477 字节，命中 8 行） =====
+  微信“撤回”功能，有新变化 - 新华网客户端
+  微信“撤回”功能，有新变化
+  「你撤回了一条消息」→ 删除
+  或许你对撤回的印象还停在「两分钟内赶紧撤」？除了这次更新的能力，撤回还有不少实用用法。
+  2分钟内，长按那条消息——撤回
+  撤回后5分钟内点「重新编辑」
+  原内容会回到输入框，改好字，重新发送
+  选择「撤回本次发送的全部消息」
